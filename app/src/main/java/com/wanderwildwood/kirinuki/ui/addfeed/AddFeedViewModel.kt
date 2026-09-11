@@ -42,10 +42,18 @@ class AddFeedViewModel(
 
         viewModelScope.launch {
             val existing = repository.getFeed(parsed)
+            // A feed with no title yet is a blank row in the list, and it stays blank if
+            // the first fetch fails. Stand the host in until the feed says its own name:
+            // this is `title`, not `customTitle`, so the sync overwrites it.
+            val placeholder = parsed.host.removePrefix("www.")
             val feedId =
                 repository.saveFeed(
-                    existing?.copy(title = title.ifBlank { existing.title })
-                        ?: Feed(url = parsed, title = title, customTitle = title),
+                    existing?.copy(customTitle = title.ifBlank { existing.customTitle })
+                        ?: Feed(
+                            url = parsed,
+                            title = placeholder,
+                            customTitle = title,
+                        ),
                 )
             runOnceRssSync(di = di, feedId = feedId, forceNetwork = true, triggeredByUser = true)
             _saved.value = true

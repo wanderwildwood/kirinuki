@@ -1,7 +1,10 @@
 package com.wanderwildwood.kirinuki.ui.compose.utils
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
 import com.wanderwildwood.kirinuki.base.diAwareViewModel
@@ -19,7 +22,12 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
             withWindowSize {
                 ProvideTypographySettings(fontScale = textScale) {
                     KirinukiTheme {
-                        WithKirinukiTextToolbar(content)
+                        // Every screen gets the theme's ground. Without it a screen that
+                        // is not built on a Scaffold draws on a transparent window, which
+                        // on this panel means black paper and black ink on top of it.
+                        Surface(modifier = Modifier.fillMaxSize()) {
+                            WithKirinukiTextToolbar(content)
+                        }
                     }
                 }
             }
