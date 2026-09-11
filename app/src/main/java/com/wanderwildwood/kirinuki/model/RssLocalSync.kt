@@ -3,6 +3,9 @@ package com.wanderwildwood.kirinuki.model
 import android.app.Application
 import android.util.Log
 import com.wanderwildwood.kirinuki.archmodel.Repository
+import com.wanderwildwood.kirinuki.model.gemtext.GemsubParser
+import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
+import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
@@ -26,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Response
@@ -54,6 +58,7 @@ class RssLocalSync(
     private val repository: Repository by instance()
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
+    private val geminiClient: GeminiClient by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val application: Application by instance()
 
@@ -222,6 +227,81 @@ class RssLocalSync(
         }
     }
 
+    /**
+     * Get the feed, however this one is published. Both branches hand back the same
+     * [Feed], so everything after this point -- guids, storage, unread counts, every
+     * screen -- is the same code whether it came from RSS, Atom, JSON Feed or a gemlog.
+     */
+    private suspend fun fetchFeed(
+        url: URL,
+        forceNetwork: Boolean,
+    ): Either<FeedParserError, ParsedFeed> =
+        when (url.protocol) {
+            "gemini" -> fetchGemlog(url)
+            else -> fetchOverHttp(url, forceNetwork)
+        }
+
+    private suspend fun fetchOverHttp(
+        url: URL,
+        forceNetwork: Boolean,
+    ): Either<FeedParserError, ParsedFeed> =
+        Either
+            .catching(
+                onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
+            ) {
+                okHttpClient.getResponse(url, forceNetwork = forceNetwork)
+            }.flatMap { response ->
+                response.use {
+                    if (response.isSuccessful) {
+                        response.body?.let { responseBody ->
+                            feedParser.parseFeedResponse(
+                                response.request.url.toUrl(),
+                                responseBody,
+                            )
+                        } ?: NoBody(url = url.toString()).left()
+                    } else {
+                        response.retryAfterSeconds?.let { retryAfterSeconds ->
+                            logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
+                        }
+                        HttpError(
+                            url = url.toString(),
+                            code = response.code,
+                            retryAfterSeconds = response.retryAfterSeconds,
+                            message = response.message,
+                        ).left()
+                    }
+                }
+            }
+
+    /**
+     * A gemlog is an ordinary page whose links carry dates. There is no feed document to
+     * fetch, so this reads the page a person would read and takes the dated links out of it.
+     */
+    private suspend fun fetchGemlog(url: URL): Either<FeedParserError, ParsedFeed> =
+        Either
+            .catching(
+                onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
+            ) {
+                withContext(Dispatchers.IO) {
+                    geminiClient.fetch(url.toString())
+                }
+            }.flatMap { response ->
+                when {
+                    response !is GeminiResponse.Body ->
+                        NotHTML(url = url.toString()).left()
+
+                    !response.isGemtext ->
+                        UnsupportedContentType(url = url.toString(), mimeType = response.mimeType).left()
+
+                    else ->
+                        GemsubParser().parse(response.url, response.text())?.right()
+                            // Dated links are what makes a page a gemlog. Without any,
+                            // there is nothing here to subscribe to, and saying so beats
+                            // reporting a successful sync that can never produce an entry.
+                            ?: NoBody(url = url.toString()).left()
+                }
+            }
+
     private suspend fun syncFeed(
         feedId: Long,
         maxFeedItemCount: Int,
@@ -248,35 +328,8 @@ class RssLocalSync(
 
         logDebug(LOG_TAG, "Fetching ${feedSql.displayTitle}")
 
-        return Either
-            .catching(
-                onCatch = { t ->
-                    FetchError(url = url.toString(), throwable = t)
-                },
-            ) {
-                okHttpClient.getResponse(feedSql.url, forceNetwork = forceNetwork)
-            }.flatMap { response ->
-                response.use {
-                    if (response.isSuccessful) {
-                        response.body?.let { responseBody ->
-                            feedParser.parseFeedResponse(
-                                response.request.url.toUrl(),
-                                responseBody,
-                            )
-                        } ?: NoBody(url = url.toString()).left()
-                    } else {
-                        response.retryAfterSeconds?.let { retryAfterSeconds ->
-                            logDebug(LOG_TAG, "$url, Retry after: $retryAfterSeconds")
-                        }
-                        HttpError(
-                            url = url.toString(),
-                            code = response.code,
-                            retryAfterSeconds = response.retryAfterSeconds,
-                            message = response.message,
-                        ).left()
-                    }
-                }
-            }.onLeft {
+        return fetchFeed(url, forceNetwork)
+            .onLeft {
                 // Nothing was parsed, nothing to do. lastSync time has already been updated
             }.flatMap { feed ->
                 Either.catching(
