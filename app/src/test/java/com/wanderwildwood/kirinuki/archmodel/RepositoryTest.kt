@@ -8,7 +8,6 @@ import com.wanderwildwood.kirinuki.db.room.ID_ALL_FEEDS
 import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.RemoteReadMarkReadyToBeApplied
-import com.wanderwildwood.kirinuki.sync.SyncRestClient
 import com.wanderwildwood.kirinuki.util.addDynamicShortcutToFeed
 import com.wanderwildwood.kirinuki.util.reportShortcutToFeedUsed
 import io.mockk.MockKAnnotations
@@ -56,9 +55,6 @@ class RepositoryTest : DIAware {
     private lateinit var feedStore: FeedStore
 
     @MockK
-    private lateinit var fontStore: FontStore
-
-    @MockK
     private lateinit var syncRemoteStore: SyncRemoteStore
 
     @MockK
@@ -67,9 +63,6 @@ class RepositoryTest : DIAware {
     @MockK
     private lateinit var application: KirinukiApplication
 
-    @MockK
-    private lateinit var syncRestClient: SyncRestClient
-
     override val di by DI.lazy {
         bind<Repository>() with singleton { spyk(Repository(di)) }
         bind<FeedItemStore>() with instance(feedItemStore)
@@ -77,9 +70,7 @@ class RepositoryTest : DIAware {
         bind<SessionStore>() with instance(sessionStore)
         bind<SyncRemoteStore>() with instance(syncRemoteStore)
         bind<FeedStore>() with instance(feedStore)
-        bind<FontStore>() with instance(fontStore)
         bind<AndroidSystemStore>() with instance(androidSystemStore)
-        bind<SyncRestClient>() with instance(syncRestClient)
         bind<Application>() with instance(application)
         bind<ApplicationCoroutineScope>() with singleton { ApplicationCoroutineScope() }
     }
@@ -94,43 +85,17 @@ class RepositoryTest : DIAware {
         every { settingsStore.minReadTime } returns MutableStateFlow(Instant.EPOCH)
 
         every { feedItemStore.getFeedItemCountRaw(any(), any(), any(), any(), any()) } returns flowOf(0)
-
-        every { syncRestClient.isConfigured } returns false
     }
 
     @Test
-    fun initialStartWillAddFeederNews() {
-        every { settingsStore.addedFeederNews } returns MutableStateFlow(false)
-
-        // Construct it
-        repository
-
-        coVerify(timeout = 500L, exactly = 1) {
-            settingsStore.addedFeederNews
-            feedStore.upsertFeed(
-                Feed(
-                    title = "Feeder News",
-                    url = URL("https://news.nononsenseapps.com/index.atom"),
-                ),
-            )
-            settingsStore.setAddedFeederNews(true)
-        }
-    }
-
-    @Test
-    fun secondStartWillNotAddFeederNews() {
-        every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
-
-        // Construct it
+    fun firstStartSubscribesToNothing() {
+        // Upstream signed every new install up to its own news feed on first start.
+        // A reader should open empty and wait to be told what to read, and this is the
+        // guard on that: it fails if any default subscription comes back.
         repository
 
         coVerify(timeout = 500L, exactly = 0) {
-            feedStore.upsertFeed(
-                Feed(
-                    title = "Feeder News",
-                    url = URL("https://news.nononsenseapps.com/index.atom"),
-                ),
-            )
+            feedStore.upsertFeed(any())
         }
     }
 
@@ -480,36 +445,4 @@ class RepositoryTest : DIAware {
         confirmVerified(feedItemStore, syncRemoteStore)
     }
 
-    @Test
-    fun remoteMarkAsReadExistingItem() {
-        coEvery { feedItemStore.getFeedItemId(URL("https://foo"), "guid") } returns 5L
-
-        runBlocking {
-            repository.remoteMarkAsRead(URL("https://foo"), "guid")
-        }
-
-        coVerify {
-            feedItemStore.getFeedItemId(URL("https://foo"), "guid")
-            syncRemoteStore.addRemoteReadMark(feedUrl = URL("https://foo"), articleGuid = "guid")
-            syncRemoteStore.setSynced(5L)
-            feedItemStore.markAsReadAndNotified(5L, any())
-        }
-        confirmVerified(feedItemStore, syncRemoteStore)
-    }
-
-    @Test
-    fun remoteMarkAsReadNonExistingItem() {
-        coEvery { feedItemStore.getFeedItemId(any(), any()) } returns null
-        coEvery { syncRemoteStore.addRemoteReadMark(any(), any()) } just Runs
-
-        runBlocking {
-            repository.remoteMarkAsRead(URL("https://foo"), "guid")
-        }
-
-        coVerify {
-            feedItemStore.getFeedItemId(URL("https://foo"), "guid")
-            syncRemoteStore.addRemoteReadMark(URL("https://foo"), "guid")
-        }
-        confirmVerified(feedItemStore, syncRemoteStore)
-    }
 }

@@ -15,7 +15,6 @@ import com.wanderwildwood.kirinuki.archmodel.TranslationApiSettings
 import com.wanderwildwood.kirinuki.archmodel.UserSettings
 import com.wanderwildwood.kirinuki.db.room.FeedDao
 import com.wanderwildwood.kirinuki.model.OPMLParserHandler
-import com.wanderwildwood.kirinuki.ui.compose.settings.FontSelection
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import io.mockk.Runs
 import io.mockk.coVerify
@@ -144,7 +143,6 @@ class OpmlParserTest : DIAware {
                 settingsStore.setShowOnlyTitles(true)
                 settingsStore.setOpenAdjacent(true)
                 settingsStore.setUseInAppAudioPlayer(false)
-                settingsStore.setFont(FontSelection.RobotoFlex)
                 settingsStore.setShowReadingTime(false)
                 settingsStore.setOpenDrawerOnFab(true)
                 settingsStore.setIsPagingMode(true)
