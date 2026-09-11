@@ -14,8 +14,8 @@ import coil3.fetch.SourceFetchResult
 import coil3.request.Options
 import coil3.request.colorSpace
 import coil3.request.premultipliedAlpha
-import com.nononsenseapps.feeder.FeederApplication
-import com.nononsenseapps.feeder.R
+import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.R
 import okio.BufferedSource
 
 private const val LOG_TAG = "FEEDER_ICO"

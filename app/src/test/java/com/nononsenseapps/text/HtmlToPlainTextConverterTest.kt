@@ -1,7 +1,7 @@
 package com.nononsenseapps.text
 
-import com.nononsenseapps.feeder.ui.text.HtmlToPlainTextConverter
-import com.nononsenseapps.feeder.ui.text.repeated
+import com.wanderwildwood.kirinuki.ui.text.HtmlToPlainTextConverter
+import com.wanderwildwood.kirinuki.ui.text.repeated
 import org.junit.Test
 import kotlin.test.assertEquals
 

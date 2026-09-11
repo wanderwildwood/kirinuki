@@ -53,7 +53,7 @@
       android:value="true" />
 
     <activity
-      android:name="com.nononsenseapps.feeder.ui.MainActivity"
+      android:name="com.wanderwildwood.kirinuki.ui.MainActivity"
       android:exported="true"
       android:label="@string/app_name"
       android:launchMode="singleTop">
@@ -175,20 +175,6 @@
     <service
       android:name=".background.FeederJobService"
       android:permission="android.permission.BIND_JOB_SERVICE" />
-
-    <receiver android:name=".widget.FeedWidgetReceiver"
-            android:exported="true">
-      <intent-filter>
-        <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-      </intent-filter>
-      <meta-data
-              android:name="android.appwidget.provider"
-              android:resource="@xml/feed_app_widget_info" />
-    </receiver>
-
-    <activity
-            android:name=".widget.FeedWidgetSettingsActivity"
-            android:exported="false" />
 
   </application>
 </manifest>
