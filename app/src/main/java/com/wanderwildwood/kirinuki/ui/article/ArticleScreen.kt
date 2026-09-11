@@ -43,6 +43,7 @@ import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 @Composable
 fun ArticleScreen(
     onBack: () -> Unit,
+    onFollowGemini: (String) -> Unit,
     viewModel: ArticleViewModel,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
@@ -137,7 +138,13 @@ fun ArticleScreen(
                     linearArticleContent(
                         articleContent = content,
                         onLinkClick = { url, _ ->
-                            context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                            // Nothing on the phone handles gemini://, so a link to a
+                            // capsule would simply do nothing. Keep it here instead.
+                            if (url.startsWith("gemini://")) {
+                                onFollowGemini(url)
+                            } else {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
+                            }
                         },
                     )
 

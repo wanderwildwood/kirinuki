@@ -3,6 +3,9 @@ package com.wanderwildwood.kirinuki.di
 import com.wanderwildwood.kirinuki.model.FeedParser
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.RssLocalSync
+import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
+import com.wanderwildwood.kirinuki.net.gemini.KnownHosts
+import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.nononsenseapps.jsonfeed.Feed
 import com.nononsenseapps.jsonfeed.JsonFeedParser
 import com.nononsenseapps.jsonfeed.feedAdapter
@@ -23,4 +26,12 @@ val networkModule =
         // These don't have state issues
         bind<RssLocalSync>() with singleton { RssLocalSync(di) }
         bind<FullTextParser>() with singleton { FullTextParser(di) }
+
+        // ⚠ Gemini shares nothing with the OkHttpClient above, and must not: its trust
+        // manager accepts certificates no authority signed. See TrustOnFirstUse.
+        bind<KnownHosts>() with
+            singleton {
+                KnownHosts(instance<FilePathProvider>().filesDir.resolve("gemini-known-hosts"))
+            }
+        bind<GeminiClient>() with singleton { GeminiClient(instance()) }
     }

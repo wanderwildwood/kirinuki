@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -8,10 +9,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.background.schedulePeriodicOrphanedFilesCleanup
@@ -28,6 +34,8 @@ import com.wanderwildwood.kirinuki.ui.articles.ArticleListScreen
 import com.wanderwildwood.kirinuki.ui.articles.ArticleListViewModel
 import com.wanderwildwood.kirinuki.ui.compose.utils.withAllProviders
 import com.wanderwildwood.kirinuki.ui.feeds.FeedsScreen
+import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageScreen
+import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageViewModel
 import com.wanderwildwood.kirinuki.ui.feeds.FeedsViewModel
 import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
 import com.wanderwildwood.kirinuki.ui.settings.SettingsViewModel
@@ -36,6 +44,13 @@ import org.kodein.di.instance
 import java.time.LocalDate
 
 class MainActivity : DIAwareComponentActivity() {
+    /**
+     * A gemini:// link tapped in another app, waiting to be navigated to once the
+     * composition exists. Held rather than acted on, because the intent arrives before
+     * there is a nav controller to act with.
+     */
+    private val pendingCapsule = mutableStateOf<String?>(null)
+
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
     private val repository: Repository by instance()
@@ -88,8 +103,23 @@ class MainActivity : DIAwareComponentActivity() {
             }
         }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        capsuleFrom(intent)?.let { pendingCapsule.value = it }
+    }
+
+    private fun capsuleFrom(intent: Intent?): String? =
+        intent
+            ?.takeIf { it.action == Intent.ACTION_VIEW }
+            ?.data
+            ?.takeIf { it.scheme == "gemini" }
+            ?.toString()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        pendingCapsule.value = capsuleFrom(intent)
 
         mainActivityViewModel.ensurePeriodicSyncConfigured()
         schedulePeriodicOrphanedFilesCleanup(di)
@@ -107,6 +137,14 @@ class MainActivity : DIAwareComponentActivity() {
     fun AppContent() {
         val navController = rememberNavController()
         val articleListState = rememberLazyListState()
+
+        val capsule by pendingCapsule
+        LaunchedEffect(capsule) {
+            capsule?.let {
+                pendingCapsule.value = null
+                navController.navigate(Route.gemini(it))
+            }
+        }
 
         val importLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -143,6 +181,7 @@ class MainActivity : DIAwareComponentActivity() {
                 val viewModel: ArticleViewModel = diAwareViewModel()
                 ArticleScreen(
                     onBack = { navController.popBackStack() },
+                    onFollowGemini = { navController.navigate(Route.gemini(it)) },
                     viewModel = viewModel,
                     listState = articleListState,
                 )
@@ -153,6 +192,20 @@ class MainActivity : DIAwareComponentActivity() {
                     onBack = { navController.popBackStack() },
                     onImportOpml = { importLauncher.launch(arrayOf("*/*")) },
                     onExportOpml = { exportLauncher.launch("kirinuki-${LocalDate.now()}.opml") },
+                    viewModel = viewModel,
+                )
+            }
+            composable(
+                Route.GEMINI_ROUTE,
+                arguments = listOf(navArgument(Route.GEMINI_ARG) { type = NavType.StringType }),
+            ) { entry ->
+                val viewModel: GeminiPageViewModel = diAwareViewModel(
+                    key = entry.arguments?.getString(Route.GEMINI_ARG),
+                )
+                GeminiPageScreen(
+                    url = entry.arguments?.getString(Route.GEMINI_ARG).orEmpty(),
+                    onBack = { navController.popBackStack() },
+                    onFollow = { navController.navigate(Route.gemini(it)) },
                     viewModel = viewModel,
                 )
             }

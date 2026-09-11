@@ -62,16 +62,15 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
 
-      <!-- This filter MUST look like this for Android to automatically open these links -->
-      <intent-filter android:autoVerify="true">
+      <!-- Nothing else on the phone opens gemini://, so offer to. This is also how a
+           capsule link shared or tapped in another app arrives here. -->
+      <intent-filter>
         <action android:name="android.intent.action.VIEW" />
 
         <category android:name="android.intent.category.DEFAULT" />
         <category android:name="android.intent.category.BROWSABLE" />
 
-        <data android:scheme="http" />
-        <data android:scheme="https" />
-        <data android:host="feederapp.nononsenseapps.com" />
+        <data android:scheme="gemini" />
       </intent-filter>
 
       <meta-data

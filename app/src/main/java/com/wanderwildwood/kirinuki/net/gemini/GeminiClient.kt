@@ -34,22 +34,35 @@ class GeminiClient(
     ): GeminiResponse {
         var current = url
         repeat(maxRedirects + 1) { hop ->
-            val response = fetchOnce(current)
-            if (response !is Redirect) return response
-            if (hop == maxRedirects) {
-                return GeminiResponse.Failure(current, 53, "Too many redirects")
+            when (val step = fetchOnce(current)) {
+                is Hop.Done -> return step.response
+                is Hop.Redirect -> {
+                    if (hop == maxRedirects) {
+                        return GeminiResponse.Failure(current, 53, "Too many redirects")
+                    }
+                    current = resolve(current, step.to)
+                }
             }
-            current = resolve(current, response.to)
         }
         error("unreachable")
     }
 
-    private class Redirect(
-        override val url: String,
-        val to: String,
-    ) : GeminiResponse
+    /**
+     * A redirect is not one of the answers a caller can be given — [fetch] follows it —
+     * so it is kept out of [GeminiResponse] entirely. Putting it in there made every
+     * `when` over a response carry a branch that could never happen.
+     */
+    private sealed interface Hop {
+        data class Done(
+            val response: GeminiResponse,
+        ) : Hop
 
-    private fun fetchOnce(url: String): GeminiResponse {
+        data class Redirect(
+            val to: String,
+        ) : Hop
+    }
+
+    private fun fetchOnce(url: String): Hop {
         val uri = URI(url)
         require(uri.scheme == "gemini") { "not a gemini URL: $url" }
         val host = uri.host ?: throw GeminiException("no host in $url")
@@ -71,14 +84,16 @@ class GeminiClient(
             val meta = header.drop(2).trimStart()
 
             return when (status / 10) {
-                1 -> GeminiResponse.Input(url, meta, sensitive = status == 11)
+                1 -> Hop.Done(GeminiResponse.Input(url, meta, sensitive = status == 11))
                 2 -> {
                     val (mime, charset) = parseMeta(meta)
-                    GeminiResponse.Body(url, mime, charset, socket.inputStream.readBody())
+                    Hop.Done(
+                        GeminiResponse.Body(url, mime, charset, socket.inputStream.readBody()),
+                    )
                 }
-                3 -> Redirect(url, meta)
-                6 -> GeminiResponse.CertificateRequired(url, meta)
-                else -> GeminiResponse.Failure(url, status, meta)
+                3 -> Hop.Redirect(meta)
+                6 -> Hop.Done(GeminiResponse.CertificateRequired(url, meta))
+                else -> Hop.Done(GeminiResponse.Failure(url, status, meta))
             }
         }
     }
