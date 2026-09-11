@@ -201,7 +201,6 @@
   <string name="or_open_device_sync_link">Alternatively, open the link on your device.</string>
   <string name="treat_like_password">Treat this like a password. Anyone can read your synced data if they have the link.</string>
   <string name="qr_code">QR Code</string>
-  <string name="feeder_device_sync_code">Feeder device sync code</string>
   <string name="leave_sync_chain">Leave sync chain</string>
   <string name="device_sync_description_1">Device sync allows you to sync feed subscriptions and read articles between your various devices.</string>
   <string name="device_sync_description_2">Simply scan the code from your sync chain that you created on another device, or start a new sync chain.</string>
@@ -219,7 +218,7 @@
   <string name="new_indicator">New</string>
 
   <string name="permission_read_desc">Allows the application to read feeds and articles</string>
-  <string name="permission_read_label">Feeder read-only access</string>
+  <string name="permission_read_label">Clippings read-only access</string>
 
   <string name="explanation_permission_notifications">Permission must be granted before notifications can be enabled.</string>
   <string name="article_image">Article image</string>
@@ -360,7 +359,6 @@
   <string name="downloading_offline_translation_model">Downloading offline translation model %1$s to %2$s: %3$d%%</string>
   <string name="offline_translation_model_download_hint">First download can be 20–50 MB and may take a few minutes. Translation works offline afterward.</string>
   <string name="preferred_translation_language">Preferred translation language</string>
-  <string name="preferred_translation_language_description">Choose the language Feeder should translate into.</string>
   <string name="preferred_translation_language_fallback">the preferred language</string>
   <string name="local_translation_requires_android_12">Local translation requires Android 12 or newer.</string>
   <string name="local_translation_unavailable">Local translation is not available on this device.</string>
@@ -376,7 +374,6 @@
   <string name="bergamot_model_download_failed">Could not download %1$s -> %2$s model.</string>
   <string name="bergamot_runtime_download_required">Download the offline translation engine to continue.</string>
   <string name="bergamot_runtime_download_title">Download offline translation engine?</string>
-  <string name="bergamot_runtime_download_warning">Feeder will download a 4.9 MB executable WebAssembly runtime from the Mozilla/Bergamot project. This code is not built or checked by F-Droid. After the download, translation works offline.</string>
   <string name="bergamot_runtime_download_failed">Could not download the offline translation engine.</string>
   <string name="downloading_offline_translation_runtime">Downloading offline translation engine: %1$d%%</string>
   <string name="download">Download</string>
@@ -384,14 +381,12 @@
   <string name="bergamot_webview_not_initialized">Bergamot WebView is not initialized.</string>
   <string name="bergamot_response_parse_failed">Could not parse Bergamot response.</string>
   <string name="local_translation_setup_system">Uses your device\'s translation service first.</string>
-  <string name="local_translation_setup_bergamot">If it is unavailable, Feeder can use its downloadable offline translation engine.</string>
   <string name="translation_language_placeholder">Select a language</string>
   <string name="show_only_bergamot_languages">Show only downloadable languages</string>
   <string name="set_translation_language_first">Set a preferred translation language in AI settings</string>
   <string name="translate_feed_cards_by_default">Translate article previews</string>
   <string name="translate_articles_by_default">Translate articles by default</string>
   <string name="downloaded_translation_models">Downloaded translation models</string>
-  <string name="downloaded_translation_models_desc">Offline translation languages downloaded by Feeder. Remove languages you no longer need to free up space.</string>
   <string name="delete_model_pair">Delete model</string>
   <string name="delete_model_pair_desc">Delete the %1$s to %2$s translation model (%3$s)?</string>
   <string name="delete_all_models">Delete all downloaded models</string>
@@ -401,9 +396,6 @@
   <string name="no_downloaded_models">No translation models downloaded yet. Translation will download the needed model automatically.</string>
   <string name="delete_button_text">Delete</string>
   <string name="cancel">Cancel</string>
-
-  <string name="widget_title">Feeder</string>
-  <string name="widget_refreshing">Refreshing</string>
   <string name="force_single_column">Force single column</string>
   <!-- kirinuki -->
   <string name="show_summary">Summary</string>
