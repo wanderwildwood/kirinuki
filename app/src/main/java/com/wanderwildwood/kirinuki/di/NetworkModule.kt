@@ -5,6 +5,8 @@ import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.RssLocalSync
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gopher.GopherClient
+import com.wanderwildwood.kirinuki.model.tour.TourStore
+import com.wanderwildwood.kirinuki.net.SmolnetFetcher
 import com.wanderwildwood.kirinuki.net.spartan.SpartanClient
 import com.wanderwildwood.kirinuki.net.gemini.KnownHosts
 import com.wanderwildwood.kirinuki.util.FilePathProvider
@@ -40,4 +42,10 @@ val networkModule =
         // nothing to share with anything else.
         bind<GopherClient>() with singleton { GopherClient() }
         bind<SpartanClient>() with singleton { SpartanClient() }
+        bind<SmolnetFetcher>() with singleton { SmolnetFetcher(di) }
+        bind<TourStore>() with
+            singleton {
+                val files = instance<FilePathProvider>().filesDir
+                TourStore(files.resolve("tour"), files.resolve("tour-cache"))
+            }
     }

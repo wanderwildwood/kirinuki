@@ -420,4 +420,11 @@
   <string name="read_it">Read it</string>
   <string name="subscribe_to_this">Subscribe to this</string>
   <string name="gopher_unsupported_type">This is not text or a menu, so there is nothing to read here.</string>
+  <string name="tour">Tour</string>
+  <string name="tour_add">Add to the tour</string>
+  <string name="tour_queued">Put on the tour.</string>
+  <string name="tour_queued_detail">It will be here to read after the next sync.</string>
+  <string name="tour_empty">Nothing on the tour. Anything you cannot reach can be put here, and fetched next time you sync.</string>
+  <string name="tour_waiting">waiting for a sync</string>
+  <string name="tour_remove">Take off the tour</string>
 </resources>

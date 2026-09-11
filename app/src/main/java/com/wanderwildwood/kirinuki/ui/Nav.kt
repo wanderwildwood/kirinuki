@@ -9,6 +9,7 @@ object Route {
     const val ARTICLES = "articles"
     const val ARTICLE = "article"
     const val SETTINGS = "settings"
+    const val TOUR = "tour"
     const val ADD_FEED = "addfeed"
     const val ADD_FEED_ARG = "url"
     const val ADD_FEED_ROUTE = "$ADD_FEED?$ADD_FEED_ARG={$ADD_FEED_ARG}"

@@ -4,7 +4,9 @@ import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -25,6 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -115,6 +118,16 @@ fun GeminiPageScreen(
                     item {
                         TextMMD(text = current.message, modifier = Modifier.fillMaxWidth())
                         current.detail?.let { TextMMD(text = it, modifier = Modifier.fillMaxWidth()) }
+                        // Somewhere you cannot reach now is exactly what the tour is for.
+                        if (current.canQueue) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            OutlinedButtonMMD(
+                                onClick = { viewModel.queueOnTour(url, hostOf(url)) },
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                TextMMD(text = stringResource(R.string.tour_add))
+                            }
+                        }
                     }
 
                 is GeminiPageState.Page ->
