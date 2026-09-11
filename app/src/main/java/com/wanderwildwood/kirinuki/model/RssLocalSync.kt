@@ -233,11 +233,13 @@ class RssLocalSync(
      * screen -- is the same code whether it came from RSS, Atom, JSON Feed or a gemlog.
      */
     private suspend fun fetchFeed(
+        feedSql: Feed,
         url: URL,
         forceNetwork: Boolean,
+        maxFeedItemCount: Int,
     ): Either<FeedParserError, ParsedFeed> =
         when (url.protocol) {
-            "gemini" -> fetchGemlog(url)
+            "gemini" -> fetchGemlog(feedSql, url, maxFeedItemCount)
             else -> fetchOverHttp(url, forceNetwork)
         }
 
@@ -277,7 +279,11 @@ class RssLocalSync(
      * A gemlog is an ordinary page whose links carry dates. There is no feed document to
      * fetch, so this reads the page a person would read and takes the dated links out of it.
      */
-    private suspend fun fetchGemlog(url: URL): Either<FeedParserError, ParsedFeed> =
+    private suspend fun fetchGemlog(
+        feedSql: Feed,
+        url: URL,
+        maxFeedItemCount: Int,
+    ): Either<FeedParserError, ParsedFeed> =
         Either
             .catching(
                 onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
@@ -294,13 +300,61 @@ class RssLocalSync(
                         UnsupportedContentType(url = url.toString(), mimeType = response.mimeType).left()
 
                     else ->
-                        GemsubParser().parse(response.url, response.text())?.right()
+                        GemsubParser()
+                            .parse(response.url, response.text())
+                            ?.let { withEntryText(feedSql, it, maxFeedItemCount).right() }
                             // Dated links are what makes a page a gemlog. Without any,
                             // there is nothing here to subscribe to, and saying so beats
                             // reporting a successful sync that can never produce an entry.
                             ?: NoBody(url = url.toString()).left()
                 }
             }
+
+    /**
+     * Fetch the text of entries that are new, so a gemlog can be read with the radio off.
+     *
+     * A gemlog index carries only titles and dates -- the writing is at the other end of
+     * each link. Left to be fetched when an entry is opened, "sync once, read for a week"
+     * would be untrue of exactly the feeds this was built for.
+     *
+     * Only entries not already stored are fetched, so this costs a page per new post
+     * rather than the whole gemlog every sync. An entry whose page cannot be fetched is
+     * still stored: a missing body is worth less than a missing post.
+     */
+    private suspend fun withEntryText(
+        feedSql: Feed,
+        parsed: ParsedFeed,
+        maxFeedItemCount: Int,
+    ): ParsedFeed {
+        val items =
+            parsed.items
+                .orEmpty()
+                .take(maxFeedItemCount)
+                .map { item ->
+                    val guid = item.id ?: return@map item
+                    val link = item.url ?: return@map item
+                    if (repository.loadFeedItem(guid = guid, feedId = feedSql.id) != null) {
+                        return@map item
+                    }
+                    item.copy(content_text = gemtextAt(link))
+                }
+        return parsed.copy(items = items)
+    }
+
+    private suspend fun gemtextAt(link: String): String =
+        try {
+            withContext(Dispatchers.IO) {
+                val response = geminiClient.fetch(link)
+                if (response is GeminiResponse.Body && response.isGemtext) {
+                    response.text()
+                } else {
+                    ""
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Could not fetch the entry at $link", e)
+            ""
+        }
 
     private suspend fun syncFeed(
         feedId: Long,
@@ -328,7 +382,7 @@ class RssLocalSync(
 
         logDebug(LOG_TAG, "Fetching ${feedSql.displayTitle}")
 
-        return fetchFeed(url, forceNetwork)
+        return fetchFeed(feedSql, url, forceNetwork, maxFeedItemCount)
             .onLeft {
                 // Nothing was parsed, nothing to do. lastSync time has already been updated
             }.flatMap { feed ->
