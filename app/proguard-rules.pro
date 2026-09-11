@@ -1,8 +1,5 @@
-# Add project specific ProGuard rules here.
-# By default, the flags in this file are appended to flags specified
-# in /home/jonas/android-sdk-linux/tools/proguard/proguard-android.txt
-# You can edit the include path and order by changing the proguardFiles
-# directive in build.gradle.
+# Project specific R8 rules. These are appended to the SDK's own
+# proguard-android-optimize.txt; see proguardFiles in app/build.gradle.kts.
 #
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
