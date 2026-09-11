@@ -19,7 +19,7 @@ import org.kodein.di.direct
 import org.kodein.di.instance
 import kotlin.system.measureTimeMillis
 
-private const val LOG_TAG = "FEEDER_OPMLACTIONS"
+private const val LOG_TAG = "KIRINUKI_OPMLACTIONS"
 
 /**
  * Exports OPML on a background thread

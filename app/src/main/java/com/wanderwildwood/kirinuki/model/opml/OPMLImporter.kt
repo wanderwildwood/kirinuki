@@ -171,4 +171,4 @@ open class OPMLImporter(
     }
 }
 
-private const val LOG_TAG = "FEEDER_OMPLIMPORT"
+private const val LOG_TAG = "KIRINUKI_OMPLIMPORT"

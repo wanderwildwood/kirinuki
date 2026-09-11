@@ -352,7 +352,7 @@ class OpmlPullParser(
     ): String? = parser.getAttributeValue(null, property.name)
 }
 
-private const val LOG_TAG = "FEEDER_OPMLPULL"
+private const val LOG_TAG = "KIRINUKI_OPMLPULL"
 
 sealed class OpmlError {
     abstract val throwable: Throwable?

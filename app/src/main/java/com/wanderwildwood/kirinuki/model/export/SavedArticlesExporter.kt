@@ -20,7 +20,7 @@ import org.kodein.di.direct
 import org.kodein.di.instance
 import kotlin.system.measureTimeMillis
 
-private const val LOG_TAG = "FEEDER_SAVEDARTEXPORT"
+private const val LOG_TAG = "KIRINUKI_SAVEDARTEXPORT"
 const val SAVED_ARTICLES_EXPORT_FORMAT = "feeder-saved-articles"
 const val SAVED_ARTICLES_EXPORT_VERSION = 1
 

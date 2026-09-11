@@ -129,6 +129,6 @@ class SyncRemoteStore(
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_SYNC_REMOTE"
+        private const val LOG_TAG = "KIRINUKI_SYNC_REMOTE"
     }
 }

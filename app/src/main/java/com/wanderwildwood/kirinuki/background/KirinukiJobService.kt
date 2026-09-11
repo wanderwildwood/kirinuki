@@ -104,6 +104,6 @@ class KirinukiJobService : DIAwareJobService() {
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_JOB_SERVICE"
+        private const val LOG_TAG = "KIRINUKI_JOB_SERVICE"
     }
 }

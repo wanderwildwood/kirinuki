@@ -20,13 +20,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Article
+import androidx.compose.material.icons.outlined.StarBorder
+import androidx.compose.material.icons.outlined.Subject
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.TextToDisplay
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
-import com.wanderwildwood.kirinuki.ui.feeds.BarAction
+import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 /**
  * The cutting itself. Title, where it came from, and the text -- the summary the feed
@@ -58,11 +65,21 @@ fun ArticleScreen(
                     )
                 },
                 navigationIcon = {
-                    BarAction(stringResource(R.string.go_back), onBack)
+                    BarIcon(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = stringResource(R.string.go_back),
+                        onClick = onBack,
+                    )
                 },
                 actions = {
-                    BarAction(
-                        label =
+                    BarIcon(
+                        icon =
+                            if (showingFullText) {
+                                Icons.Outlined.Subject
+                            } else {
+                                Icons.Outlined.Article
+                            },
+                        contentDescription =
                             if (showingFullText) {
                                 stringResource(R.string.show_summary)
                             } else {
@@ -70,8 +87,14 @@ fun ArticleScreen(
                             },
                         onClick = { viewModel.toggleFullText() },
                     )
-                    BarAction(
-                        label =
+                    BarIcon(
+                        icon =
+                            if (article?.bookmarked == true) {
+                                Icons.Filled.Star
+                            } else {
+                                Icons.Outlined.StarBorder
+                            },
+                        contentDescription =
                             if (article?.bookmarked == true) {
                                 stringResource(R.string.remove_bookmark)
                             } else {
@@ -80,8 +103,9 @@ fun ArticleScreen(
                         onClick = { viewModel.toggleBookmarked() },
                     )
                     article?.link?.let { link ->
-                        BarAction(
-                            label = stringResource(R.string.open_in_web_view),
+                        BarIcon(
+                            icon = Icons.AutoMirrored.Outlined.OpenInNew,
+                            contentDescription = stringResource(R.string.open_in_web_view),
                             onClick = {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, link.toUri()))
                             },

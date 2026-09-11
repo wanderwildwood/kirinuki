@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
  * And that cached responses are used when possible.
  */
 object OneImageRequestPerHostInterceptor : Interceptor {
-    private const val LOG_TAG = "FEEDER_IMAGE"
+    private const val LOG_TAG = "KIRINUKI_IMAGE"
 
     // Uses Hash to bin hosts into separate locks so we don't accumulate too many locks
     private val inProgressHosts = ConcurrentHashMap<Int, Mutex>()

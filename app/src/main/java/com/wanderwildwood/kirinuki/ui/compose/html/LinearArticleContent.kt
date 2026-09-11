@@ -108,7 +108,7 @@ import com.wanderwildwood.kirinuki.ui.compose.utils.focusableInNonTouchMode
 import com.wanderwildwood.kirinuki.util.logDebug
 import kotlin.math.abs
 
-private const val LOG_TAG = "FEEDER_LINEARCON"
+private const val LOG_TAG = "KIRINUKI_LINEARCON"
 
 fun LazyListScope.linearArticleContent(
     articleContent: LinearArticle,

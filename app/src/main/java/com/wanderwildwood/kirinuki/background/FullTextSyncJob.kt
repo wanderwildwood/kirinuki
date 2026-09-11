@@ -33,7 +33,7 @@ class FullTextSyncJob(
     }
 
     companion object {
-        const val LOG_TAG = "FEEDER_FULLTEXT"
+        const val LOG_TAG = "KIRINUKI_FULLTEXT"
     }
 }
 

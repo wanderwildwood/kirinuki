@@ -125,6 +125,6 @@ class ActivityLauncher(
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_ALAUNCH"
+        private const val LOG_TAG = "KIRINUKI_ALAUNCH"
     }
 }

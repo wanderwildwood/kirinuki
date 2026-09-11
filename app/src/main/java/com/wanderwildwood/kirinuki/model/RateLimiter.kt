@@ -9,7 +9,7 @@ import kotlin.random.Random
  * Limits arbitrary operations to a certain rate.
  */
 object RateLimiter {
-    private const val LOG_TAG = "FEEDER_RATELIMIT"
+    private const val LOG_TAG = "KIRINUKI_RATELIMIT"
     private const val MAX_PER_SECOND = 3
     private const val DELAY_MS = 1000L / MAX_PER_SECOND
     private val lastTime = ConcurrentHashMap<String, Long>()

@@ -2,7 +2,7 @@ package com.wanderwildwood.kirinuki.model.html
 
 import androidx.collection.ArrayMap
 
-private const val LOG_TAG = "FEEDER_LINEAR"
+private const val LOG_TAG = "KIRINUKI_LINEAR"
 
 data class LinearArticle(
     val elements: List<LinearElement>,

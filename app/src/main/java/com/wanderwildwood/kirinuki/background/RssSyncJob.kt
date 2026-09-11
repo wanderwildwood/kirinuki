@@ -60,7 +60,7 @@ class RssSyncJob(
     }
 
     companion object {
-        const val LOG_TAG = "FEEDER_RSSSYNCJOB"
+        const val LOG_TAG = "KIRINUKI_RSSSYNCJOB"
     }
 }
 

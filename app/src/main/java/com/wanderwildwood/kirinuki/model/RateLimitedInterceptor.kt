@@ -7,7 +7,7 @@ import okhttp3.Response
  * Interceptor that prevents more than one request to a host at a time
  */
 object RateLimitedInterceptor : Interceptor {
-    private const val LOG_TAG = "FEEDER_RATEINTER"
+    private const val LOG_TAG = "KIRINUKI_RATEINTER"
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()

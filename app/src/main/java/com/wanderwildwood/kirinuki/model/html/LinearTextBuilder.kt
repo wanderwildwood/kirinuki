@@ -173,6 +173,6 @@ class LinearTextBuilder : Appendable {
     fun isNotEmpty(): Boolean = !isEmpty()
 
     companion object {
-        private const val LOG_TAG = "FEEDER_LINEARTB"
+        private const val LOG_TAG = "KIRINUKI_LINEARTB"
     }
 }

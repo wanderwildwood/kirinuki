@@ -24,7 +24,7 @@ import com.wanderwildwood.kirinuki.util.ActivityLauncher
 import org.kodein.di.compose.LocalDI
 import org.kodein.di.instance
 
-private const val LOG_TAG = "FEEDER_TEXTTOOL"
+private const val LOG_TAG = "KIRINUKI_TEXTTOOL"
 
 @Composable
 fun WithKirinukiTextToolbar(content: @Composable () -> Unit) {

@@ -31,7 +31,7 @@ const val ID_UNSET: Long = 0
 const val ID_ALL_FEEDS: Long = -10
 const val ID_SAVED_ARTICLES: Long = -20
 
-private const val LOG_TAG = "FEEDER_APPDB"
+private const val LOG_TAG = "KIRINUKI_APPDB"
 
 /**
  * Database versions
@@ -465,7 +465,7 @@ class MigrationFrom23To24(
                     """.trimIndent(),
                 )
             } catch (e: SQLiteException) {
-                Log.e("FEEDER_DB", "Failed to migrate blocklist", e)
+                Log.e("KIRINUKI_DB", "Failed to migrate blocklist", e)
             }
 
             sharedPrefs

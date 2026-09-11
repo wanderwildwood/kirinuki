@@ -51,7 +51,7 @@ private const val CHANNEL_ID = "feederNotifications"
 private const val ARTICLE_NOTIFICATION_GROUP = "com.wanderwildwood.kirinuki.ARTICLE"
 internal const val ACTION_OPEN_IN_CUSTOM_TAB = "com.wanderwildwood.kirinuki.OPEN_IN_CUSTOM_TAB"
 
-private const val LOG_TAG = "FEEDER_NOTIFY"
+private const val LOG_TAG = "KIRINUKI_NOTIFY"
 
 suspend fun notify(
     appContext: Context,

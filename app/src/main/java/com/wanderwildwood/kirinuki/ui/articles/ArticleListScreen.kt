@@ -19,6 +19,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.DoneAll
+import androidx.compose.material.icons.outlined.Refresh
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
@@ -26,7 +30,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.FeedType
 import com.wanderwildwood.kirinuki.model.FeedListItem
-import com.wanderwildwood.kirinuki.ui.feeds.BarAction
+import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 /**
  * The cuttings in one feed. Title, where it came from, when -- and nothing else:
@@ -61,15 +65,21 @@ fun ArticleListScreen(
                     TextMMD(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 },
                 navigationIcon = {
-                    BarAction(stringResource(R.string.go_back), onBack)
+                    BarIcon(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = stringResource(R.string.go_back),
+                        onClick = onBack,
+                    )
                 },
                 actions = {
-                    BarAction(
-                        label = stringResource(R.string.mark_all_as_read),
+                    BarIcon(
+                        icon = Icons.Outlined.DoneAll,
+                        contentDescription = stringResource(R.string.mark_all_as_read),
                         onClick = { viewModel.markAllAsRead() },
                     )
-                    BarAction(
-                        label = stringResource(R.string.sync),
+                    BarIcon(
+                        icon = Icons.Outlined.Refresh,
+                        contentDescription = stringResource(R.string.sync),
                         onClick = { viewModel.refresh() },
                     )
                 },

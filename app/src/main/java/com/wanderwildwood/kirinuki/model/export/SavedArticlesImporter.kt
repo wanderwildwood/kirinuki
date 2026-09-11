@@ -22,7 +22,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import kotlin.system.measureTimeMillis
 
-private const val LOG_TAG = "FEEDER_SAVEDARTIMPORT"
+private const val LOG_TAG = "KIRINUKI_SAVEDARTIMPORT"
 
 private val savedArticlesImportJson =
     Json {

@@ -618,7 +618,7 @@ class SettingsStore(
     }
 
     companion object {
-//        private const val LOG_TAG = "FEEDER_SETTINGSSTORE"
+//        private const val LOG_TAG = "KIRINUKI_SETTINGSSTORE"
     }
 }
 

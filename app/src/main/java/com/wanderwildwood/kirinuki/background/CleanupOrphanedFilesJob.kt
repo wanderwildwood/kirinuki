@@ -95,7 +95,7 @@ class CleanupOrphanedFilesJob(
     }
 
     companion object {
-        const val LOG_TAG = "FEEDER_CLEANUP_FILES"
+        const val LOG_TAG = "KIRINUKI_CLEANUP_FILES"
     }
 }
 

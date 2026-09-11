@@ -543,7 +543,7 @@ class RssLocalSync(
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_RSS_LOCAL_SYNC"
+        private const val LOG_TAG = "KIRINUKI_RSS_LOCAL_SYNC"
     }
 }
 

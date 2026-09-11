@@ -51,7 +51,7 @@ class BlocklistUpdateJob(
     }
 
     companion object {
-        const val LOG_TAG = "FEEDER_BLOCKLIST"
+        const val LOG_TAG = "KIRINUKI_BLOCKLIST"
     }
 }
 

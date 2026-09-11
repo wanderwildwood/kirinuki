@@ -20,11 +20,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
-import com.wanderwildwood.kirinuki.ui.feeds.BarAction
+import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
+import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -49,7 +52,13 @@ fun SettingsScreen(
         topBar = {
             TopAppBarMMD(
                 title = { TextMMD(text = stringResource(R.string.action_settings)) },
-                navigationIcon = { BarAction(stringResource(R.string.go_back), onBack) },
+                navigationIcon = {
+                    BarIcon(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = stringResource(R.string.go_back),
+                        onClick = onBack,
+                    )
+                },
             )
         },
     ) { padding ->

@@ -315,7 +315,7 @@ sealed class Either<out A, out B> {
             return try {
                 Right(block())
             } catch (t: Throwable) {
-                logDebug("FEEDER_EITHER", "Catching caught exception", t)
+                logDebug("KIRINUKI_EITHER", "Catching caught exception", t)
                 Left(onCatch(t))
             }
         }

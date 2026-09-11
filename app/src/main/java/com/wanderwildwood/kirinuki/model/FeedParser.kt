@@ -278,7 +278,7 @@ class FeedParser(
         }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_FEEDPARSER"
+        private const val LOG_TAG = "KIRINUKI_FEEDPARSER"
     }
 }
 

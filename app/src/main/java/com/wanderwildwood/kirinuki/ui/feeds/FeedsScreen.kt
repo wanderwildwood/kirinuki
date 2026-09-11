@@ -19,6 +19,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Settings
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
@@ -28,6 +31,7 @@ import com.wanderwildwood.kirinuki.db.room.ID_ALL_FEEDS
 import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
+import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 /**
  * The feeds, and above them the two rows that are not feeds: everything, and what was kept.
@@ -62,8 +66,16 @@ fun FeedsScreen(
                     )
                 },
                 actions = {
-                    BarAction(stringResource(R.string.add_feed), onAddFeed)
-                    BarAction(stringResource(R.string.action_settings), onSettings)
+                    BarIcon(
+                        icon = Icons.Outlined.Add,
+                        contentDescription = stringResource(R.string.add_feed),
+                        onClick = onAddFeed,
+                    )
+                    BarIcon(
+                        icon = Icons.Outlined.Settings,
+                        contentDescription = stringResource(R.string.action_settings),
+                        onClick = onSettings,
+                    )
                 },
             )
         },
@@ -157,19 +169,4 @@ private fun FeedRow(
             TextMMD(text = item.unreadCount.toString())
         }
     }
-}
-
-@Composable
-internal fun BarAction(
-    label: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    TextMMD(
-        text = label,
-        modifier =
-            modifier
-                .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-    )
 }

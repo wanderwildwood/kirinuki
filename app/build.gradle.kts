@@ -42,6 +42,15 @@ android {
 
         // For espresso tests
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // The Go feed parser ships a native library per ABI, and all of them together
+        // make a 140 MB debug APK that an emulator struggles to install and run.
+        // Pass -PabiFilter=x86_64 for an emulator build; release keeps every ABI.
+        (project.findProperty("abiFilter") as String?)?.let { abi ->
+            ndk {
+                abiFilters.add(abi)
+            }
+        }
     }
 
     dependenciesInfo {
@@ -94,7 +103,6 @@ android {
         val debug by getting {
             isMinifyEnabled = false
             isShrinkResources = false
-            applicationIdSuffix = ".debug"
             isPseudoLocalesEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),

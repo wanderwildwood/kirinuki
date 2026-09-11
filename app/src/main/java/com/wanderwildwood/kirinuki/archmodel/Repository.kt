@@ -37,7 +37,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
@@ -46,6 +48,7 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 import java.net.URL
+import java.time.Duration
 import java.time.Instant
 import java.time.ZonedDateTime
 
@@ -290,14 +293,34 @@ class Repository(
     fun setForceSingleColumn(value: Boolean) = settingsStore.setForceSingleColumn(value)
 
     /**
-     * Returns true if the latest sync timestamp is within the last 10 seconds
+     * True while a sync is recent enough to still be worth saying so.
+     *
+     * ⚠ The obvious version of this -- map the timestamp to "is it within ten seconds"
+     * -- never becomes false. The query returns MAX(last_sync), which changes when a
+     * sync *starts* and never again, so the comparison against now() is made exactly
+     * once, while it is still true, and nothing emits afterwards to re-make it. The
+     * title said "Syncing" for the rest of the session.
+     *
+     * So the flow says false itself, after the time it is claiming has actually passed.
      */
+    @OptIn(ExperimentalCoroutinesApi::class)
     val currentlySyncing: Flow<Boolean>
         get() =
             feedStore
                 .getCurrentlySyncingLatestTimestamp()
-                .mapLatest { value ->
-                    (value ?: Instant.EPOCH).isAfter(Instant.now().minusSeconds(10))
+                .flatMapLatest { value ->
+                    flow {
+                        val startedAt = value ?: Instant.EPOCH
+                        val remaining =
+                            SYNC_SETTLE_SECONDS - Duration.between(startedAt, Instant.now()).seconds
+                        if (remaining <= 0) {
+                            emit(false)
+                        } else {
+                            emit(true)
+                            delay(remaining * 1000L)
+                            emit(false)
+                        }
+                    }
                 }.distinctUntilChanged()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -734,7 +757,10 @@ class Repository(
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_REPO"
+        private const val LOG_TAG = "KIRINUKI_REPO"
+
+        /** How long after a sync starts the app still says it is syncing. */
+        private const val SYNC_SETTLE_SECONDS = 10L
     }
 }
 

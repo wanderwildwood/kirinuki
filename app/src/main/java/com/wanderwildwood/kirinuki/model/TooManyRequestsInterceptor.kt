@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
  */
 object TooManyRequestsInterceptor : Interceptor {
     private val tooManyResponses = ConcurrentHashMap<String, Instant>()
-    private const val LOG_TAG = "FEEDER_TOOMANY"
+    private const val LOG_TAG = "KIRINUKI_TOOMANY"
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()

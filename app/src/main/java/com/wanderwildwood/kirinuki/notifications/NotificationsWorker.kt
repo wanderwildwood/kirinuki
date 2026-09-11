@@ -78,6 +78,6 @@ class NotificationsWorker(
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_NW"
+        private const val LOG_TAG = "KIRINUKI_NW"
     }
 }

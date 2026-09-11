@@ -113,13 +113,13 @@ class KirinukiApplication :
                         addInterceptor { chain ->
                             val request = chain.request()
                             logDebug(
-                                "FEEDER",
+                                "KIRINUKI",
                                 "Request ${request.url} headers [${request.headers}]",
                             )
 
                             chain.proceed(request).also {
                                 logDebug(
-                                    "FEEDER",
+                                    "KIRINUKI",
                                     "Response ${it.request.url} code ${it.networkResponse?.code} cached ${it.cacheResponse != null}",
                                 )
                             }

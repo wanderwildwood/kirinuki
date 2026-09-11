@@ -19,11 +19,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.buttons.ButtonMMD
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
-import com.wanderwildwood.kirinuki.ui.feeds.BarAction
+import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +50,13 @@ fun AddFeedScreen(
         topBar = {
             TopAppBarMMD(
                 title = { TextMMD(text = stringResource(R.string.add_feed)) },
-                navigationIcon = { BarAction(stringResource(R.string.go_back), onBack) },
+                navigationIcon = {
+                    BarIcon(
+                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = stringResource(R.string.go_back),
+                        onClick = onBack,
+                    )
+                },
             )
         },
     ) { padding ->

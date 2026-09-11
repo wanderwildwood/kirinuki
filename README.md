@@ -78,12 +78,6 @@ database — is Feeder's and is the reason this exists at all.
 - Full-text extraction via [Readability4J](https://github.com/dankito/Readability4J).
 - UI built with Mudita's [MMD](https://github.com/mudita/MMD) component library for Kompakt.
 
-## Support
-
-This is free software and it stays free; there is nothing here to buy. If you would like to
-send something somewhere anyway, there are some llamas in Hot Springs, North Carolina who go
-through a great deal of hay: <https://hotspringsllamas.org/donate/>
-
 ## Licence
 
 GPL-3.0, the same as upstream Feeder. See [LICENSE](LICENSE).

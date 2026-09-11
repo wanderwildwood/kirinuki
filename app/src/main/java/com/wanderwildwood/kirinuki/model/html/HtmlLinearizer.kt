@@ -1012,7 +1012,7 @@ class HtmlLinearizer(
         // 100_000 chars is estimated at around 60 mins of reading time.
         const val MAX_ELEMENTS = 2_000
         const val MAX_CHARS = 100_000
-        private const val LOG_TAG = "FEEDER_LINEARIZER"
+        private const val LOG_TAG = "KIRINUKI_LINEARIZER"
         private val spaceRegex = Regex("\\s+")
     }
 }

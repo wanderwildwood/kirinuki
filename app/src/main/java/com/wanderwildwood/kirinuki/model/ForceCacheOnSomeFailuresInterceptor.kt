@@ -13,7 +13,7 @@ object ForceCacheOnSomeFailuresInterceptor : Interceptor {
         }
         return when (response.code) {
             in 400..499 -> {
-                logDebug("FEEDER", "cache-control forced for code ${response.code}")
+                logDebug("KIRINUKI", "cache-control forced for code ${response.code}")
                 // Cache for 60 minutes
                 // The intent is primarily to cache 404s for incorrect favicons
                 // but all 4xx errors are probably wise not to hammer

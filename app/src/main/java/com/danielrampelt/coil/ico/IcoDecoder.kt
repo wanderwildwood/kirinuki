@@ -18,7 +18,7 @@ import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.R
 import okio.BufferedSource
 
-private const val LOG_TAG = "FEEDER_ICO"
+private const val LOG_TAG = "KIRINUKI_ICO"
 
 class IcoDecoder(
     context: Context,

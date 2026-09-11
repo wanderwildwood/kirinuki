@@ -166,7 +166,7 @@ class FullTextParser(
         }
 
     companion object {
-        internal const val LOG_TAG = "FEEDER_FULLTEXT"
+        internal const val LOG_TAG = "KIRINUKI_FULLTEXT"
 
         // giving a bit of leeway to allow for inline images and junk like inline CSS and javscript
         // but this is way higher than is possible to render if actual HTML.

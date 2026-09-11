@@ -305,4 +305,4 @@ class Outline : BodyTag("outline") {
 }
 
 const val OPML_FEEDER_NAMESPACE = "https://nononsenseapps.com/feeder"
-private const val LOG_TAG = "FEEDER_OPMLWRITER"
+private const val LOG_TAG = "KIRINUKI_OPMLWRITER"
