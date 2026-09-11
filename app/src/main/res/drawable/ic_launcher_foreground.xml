@@ -1,32 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  PLACEHOLDER. Not the icon.
+  切抜 — a column cut out of a page with scissors.
 
-  A rectangle with one corner cut off, which is a clipping only in the sense that
-  it is rectangular and lacks a corner. It exists so the app installs and the
-  screenshots have something in the corner. See ICON.md.
+  Drawn to the five rules measured off the chanterelle in kinokocho/tools/make-art.py:
+  one weight throughout at 0.015 of the drawing's width (the chanterelle is 0.0143),
+  seven strokes to its eight, sitting four degrees off square, and nothing filled.
+  Every edge is a run of nearly straight segments that change angle where the scissors
+  bit again, at uneven intervals so the outline does not fall into a rhythm.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
     android:height="108dp"
-    android:viewportWidth="108"
-    android:viewportHeight="108">
-  <path
-      android:strokeColor="#000000"
-      android:strokeWidth="3"
-      android:fillColor="#00000000"
-      android:pathData="M34,32 L64,32 L74,42 L74,76 L34,76 Z" />
-  <path
-      android:strokeColor="#000000"
-      android:strokeWidth="3"
-      android:fillColor="#00000000"
-      android:pathData="M64,32 L64,42 L74,42" />
-  <path
-      android:strokeColor="#000000"
-      android:strokeWidth="3"
-      android:pathData="M42,54 L66,54" />
-  <path
-      android:strokeColor="#000000"
-      android:strokeWidth="3"
-      android:pathData="M42,63 L60,63" />
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+  <!-- Scaled to 0.84. An adaptive icon only guarantees the central 72dp of 108,
+       and a circular mask takes the corners of even that: the drawing's bounding
+       circle is 78.6% of the canvas against a safe 66.7%, so at full size the
+       launcher clipped the top, the bottom and both cut edges. -->
+  <group
+      android:pivotX="254.5"
+      android:pivotY="257"
+      android:rotation="-4"
+      android:scaleX="0.84"
+      android:scaleY="0.84">
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"
+        android:pathData="M132,104 L262,98 L374,108 L366,166 L376,232 L368,286 L378,366 L370,408 L244,416 L134,404 L141,330 L131,268 L139,186 Z" />
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M166,156 L320,151" />
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M167,212 L354,206" />
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M167,248 L298,244" />
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M168,284 L350,278" />
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M168,320 L312,315" />
+    <path
+        android:strokeColor="#000000"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M169,356 L276,352" />
+  </group>
 </vector>
