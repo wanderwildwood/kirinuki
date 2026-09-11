@@ -18,12 +18,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.buttons.ButtonMMD
+import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
+import com.wanderwildwood.kirinuki.net.gemini.isGeminiUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,6 +33,7 @@ import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 fun AddFeedScreen(
     onBack: () -> Unit,
     onSaved: () -> Unit,
+    onRead: (String) -> Unit,
     viewModel: AddFeedViewModel,
     modifier: Modifier = Modifier,
     initialUrl: String = "",
@@ -92,7 +95,19 @@ fun AddFeedScreen(
                 enabled = url.isNotBlank(),
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                TextMMD(text = stringResource(R.string.save))
+                TextMMD(text = stringResource(R.string.subscribe))
+            }
+
+            // A capsule address is as likely to be a page as a gemlog, and subscribing to
+            // a page gets you a feed that can never have an entry in it. Offer the other
+            // thing here rather than making that the only way in.
+            if (isGeminiUrl(url.trim())) {
+                OutlinedButtonMMD(
+                    onClick = { onRead(url.trim()) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextMMD(text = stringResource(R.string.read_it))
+                }
             }
         }
     }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -42,6 +43,7 @@ fun GeminiPageScreen(
     url: String,
     onBack: () -> Unit,
     onFollow: (String) -> Unit,
+    onSubscribe: (String) -> Unit,
     viewModel: GeminiPageViewModel,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
@@ -70,6 +72,12 @@ fun GeminiPageScreen(
                     )
                 },
                 actions = {
+                    // Following a capsule usually occurs to you while reading it.
+                    BarIcon(
+                        icon = Icons.Outlined.Add,
+                        contentDescription = stringResource(R.string.subscribe_to_this),
+                        onClick = { onSubscribe(url) },
+                    )
                     BarIcon(
                         icon = Icons.Outlined.Refresh,
                         contentDescription = stringResource(R.string.sync),

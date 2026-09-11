@@ -159,26 +159,31 @@ class MainActivity : DIAwareComponentActivity() {
                 lifecycleScope.launch { exportOpml(di, uri) }
             }
 
+        // ⚠ Every view model here is taken from its own NavBackStackEntry rather than
+        // from the activity. Scoped to the activity they share one SavedStateRegistry,
+        // and returning to a destination registers the same key twice --
+        // "SavedStateProvider with the given key is already registered" -- which is a
+        // crash on the second visit, not the first, so it survives a quick look.
         NavHost(navController, startDestination = Route.FEEDS) {
-            composable(Route.FEEDS) {
-                val viewModel: FeedsViewModel = diAwareViewModel()
+            composable(Route.FEEDS) { entry ->
+                val viewModel: FeedsViewModel = entry.diAwareViewModel()
                 FeedsScreen(
                     onOpenFeed = { navController.navigate(Route.ARTICLES) },
-                    onAddFeed = { navController.navigate(Route.ADD_FEED) },
+                    onAddFeed = { navController.navigate(Route.addFeed("")) },
                     onSettings = { navController.navigate(Route.SETTINGS) },
                     viewModel = viewModel,
                 )
             }
-            composable(Route.ARTICLES) {
-                val viewModel: ArticleListViewModel = diAwareViewModel()
+            composable(Route.ARTICLES) { entry ->
+                val viewModel: ArticleListViewModel = entry.diAwareViewModel()
                 ArticleListScreen(
                     onOpenArticle = { navController.navigate(Route.ARTICLE) },
                     onBack = { navController.popBackStack() },
                     viewModel = viewModel,
                 )
             }
-            composable(Route.ARTICLE) {
-                val viewModel: ArticleViewModel = diAwareViewModel()
+            composable(Route.ARTICLE) { entry ->
+                val viewModel: ArticleViewModel = entry.diAwareViewModel()
                 ArticleScreen(
                     onBack = { navController.popBackStack() },
                     onFollowGemini = { navController.navigate(Route.gemini(it)) },
@@ -186,8 +191,8 @@ class MainActivity : DIAwareComponentActivity() {
                     listState = articleListState,
                 )
             }
-            composable(Route.SETTINGS) {
-                val viewModel: SettingsViewModel = diAwareViewModel()
+            composable(Route.SETTINGS) { entry ->
+                val viewModel: SettingsViewModel = entry.diAwareViewModel()
                 SettingsScreen(
                     onBack = { navController.popBackStack() },
                     onImportOpml = { importLauncher.launch(arrayOf("*/*")) },
@@ -199,22 +204,32 @@ class MainActivity : DIAwareComponentActivity() {
                 Route.GEMINI_ROUTE,
                 arguments = listOf(navArgument(Route.GEMINI_ARG) { type = NavType.StringType }),
             ) { entry ->
-                val viewModel: GeminiPageViewModel = diAwareViewModel(
-                    key = entry.arguments?.getString(Route.GEMINI_ARG),
-                )
+                val viewModel: GeminiPageViewModel = entry.diAwareViewModel()
                 GeminiPageScreen(
                     url = entry.arguments?.getString(Route.GEMINI_ARG).orEmpty(),
                     onBack = { navController.popBackStack() },
                     onFollow = { navController.navigate(Route.gemini(it)) },
+                    onSubscribe = { navController.navigate(Route.addFeed(it)) },
                     viewModel = viewModel,
                 )
             }
-            composable(Route.ADD_FEED) {
-                val viewModel: AddFeedViewModel = diAwareViewModel()
+            composable(
+                Route.ADD_FEED_ROUTE,
+                arguments =
+                    listOf(
+                        navArgument(Route.ADD_FEED_ARG) {
+                            type = NavType.StringType
+                            defaultValue = ""
+                        },
+                    ),
+            ) { entry ->
+                val viewModel: AddFeedViewModel = entry.diAwareViewModel()
                 AddFeedScreen(
                     onBack = { navController.popBackStack() },
                     onSaved = { navController.popBackStack() },
+                    onRead = { navController.navigate(Route.gemini(it)) },
                     viewModel = viewModel,
+                    initialUrl = entry.arguments?.getString(Route.ADD_FEED_ARG).orEmpty(),
                 )
             }
         }

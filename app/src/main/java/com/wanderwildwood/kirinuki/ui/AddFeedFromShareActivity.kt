@@ -3,6 +3,7 @@ package com.wanderwildwood.kirinuki.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import androidx.core.net.toUri
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
@@ -28,6 +29,14 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                 AddFeedScreen(
                     onBack = { onNavigateUpFromIntentActivities() },
                     onSaved = { finish() },
+                    // This activity has no nav graph of its own, so reading hands the
+                    // address back to the app the same way any other capsule link arrives.
+                    onRead = { url ->
+                        startActivity(
+                            Intent(Intent.ACTION_VIEW, url.toUri(), this, MainActivity::class.java),
+                        )
+                        finish()
+                    },
                     viewModel = diAwareViewModel(),
                     initialUrl = initialFeedUrl,
                 )

@@ -416,4 +416,7 @@
   <string name="gemini_certificate_changed">This host is showing a different certificate to the one it showed before, and the old one has not expired. Either it changed keys early, or this is not the host.</string>
   <string name="gemini_unreachable">Could not reach the capsule.</string>
   <string name="gemini_open_in_browser">Open in browser</string>
+  <string name="subscribe">Subscribe</string>
+  <string name="read_it">Read it</string>
+  <string name="subscribe_to_this">Subscribe to this</string>
 </resources>
