@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.wanderwildwood.kirinuki.ApplicationCoroutineScope
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.archmodel.FeedItemStore
 import com.wanderwildwood.kirinuki.archmodel.FeedStore
 import com.wanderwildwood.kirinuki.archmodel.FontStore
@@ -93,7 +93,7 @@ class RssLocalSyncKtTest : DIAware {
         import(networkModule)
         bind<SharedPreferences>() with
             singleton {
-                getApplicationContext<FeederApplication>().getSharedPreferences(
+                getApplicationContext<KirinukiApplication>().getSharedPreferences(
                     "test",
                     Context.MODE_PRIVATE,
                 )
@@ -103,8 +103,8 @@ class RssLocalSyncKtTest : DIAware {
         bind<FilePathProvider>() with
             singleton {
                 filePathProvider(
-                    cacheDir = getApplicationContext<FeederApplication>().cacheDir,
-                    filesDir = getApplicationContext<FeederApplication>().filesDir,
+                    cacheDir = getApplicationContext<KirinukiApplication>().cacheDir,
+                    filesDir = getApplicationContext<KirinukiApplication>().filesDir,
                 )
             }
     }

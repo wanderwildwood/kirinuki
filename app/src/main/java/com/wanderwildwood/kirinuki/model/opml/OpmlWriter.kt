@@ -207,8 +207,8 @@ class Title : TagWithText("title")
 abstract class BodyTag(
     name: String,
 ) : TagWithText(name) {
-    suspend fun feederSettings(init: suspend FeederSettings.() -> Unit) {
-        initTag(FeederSettings(), init)
+    suspend fun feederSettings(init: suspend KirinukiSettings.() -> Unit) {
+        initTag(KirinukiSettings(), init)
     }
 
     suspend fun outline(
@@ -247,21 +247,21 @@ abstract class BodyTag(
 
 class Body : BodyTag("body")
 
-class FeederSettings : BodyTag("feeder:settings") {
-    suspend fun feederSetting(init: suspend FeederSetting.() -> Unit) {
-        initTag(FeederSetting(), init)
+class KirinukiSettings : BodyTag("feeder:settings") {
+    suspend fun feederSetting(init: suspend KirinukiSetting.() -> Unit) {
+        initTag(KirinukiSetting(), init)
     }
 
-    suspend fun feederBlocked(init: suspend FeederBlocked.() -> Unit) {
-        initTag(FeederBlocked(), init)
+    suspend fun feederBlocked(init: suspend KirinukiBlocked.() -> Unit) {
+        initTag(KirinukiBlocked(), init)
     }
 }
 
-class FeederBlocked : BodyTag("feeder:blocked") {
+class KirinukiBlocked : BodyTag("feeder:blocked") {
     var pattern: String by attributes
 }
 
-class FeederSetting : Tag("feeder:setting") {
+class KirinukiSetting : Tag("feeder:setting") {
     var key: String by attributes
     var value: String by attributes
 }

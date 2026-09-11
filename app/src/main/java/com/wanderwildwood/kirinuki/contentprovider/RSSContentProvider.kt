@@ -6,7 +6,7 @@ import android.content.UriMatcher
 import android.database.Cursor
 import android.net.Uri
 import com.wanderwildwood.kirinuki.BuildConfig
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.db.room.FeedDao
 import com.wanderwildwood.kirinuki.db.room.FeedItemDao
 import org.kodein.di.DI
@@ -17,7 +17,7 @@ class RSSContentProvider :
     ContentProvider(),
     DIAware {
     override val di: DI by lazy {
-        val application = context!!.applicationContext as FeederApplication
+        val application = context!!.applicationContext as KirinukiApplication
         application.di
     }
 

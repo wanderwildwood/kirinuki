@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.blob.blobInputStream
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -75,7 +75,7 @@ class MigrationFrom9To10 {
 
         blobInputStream(
             itemId = 8,
-            filesDir = ApplicationProvider.getApplicationContext<FeederApplication>().filesDir,
+            filesDir = ApplicationProvider.getApplicationContext<KirinukiApplication>().filesDir,
         ).bufferedReader().useLines {
             val lines = it.toList()
             assertEquals(1, lines.size)

@@ -113,7 +113,7 @@ fun schedulePeriodicOrphanedFilesCleanup(di: DI) {
 
     // Only schedule if the job doesn't exist yet
     if (currentJob == null) {
-        val componentName = ComponentName(context, FeederJobService::class.java)
+        val componentName = ComponentName(context, KirinukiJobService::class.java)
 
         // Schedule to run once per day (24 hours)
         val dailyIntervalMillis = TimeUnit.DAYS.toMillis(1)

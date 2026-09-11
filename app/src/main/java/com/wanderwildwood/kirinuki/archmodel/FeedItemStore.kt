@@ -22,8 +22,8 @@ import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.upsertFeedItems
 import com.wanderwildwood.kirinuki.model.PREVIEW_COLUMNS
 import com.wanderwildwood.kirinuki.model.PreviewItem
-import com.wanderwildwood.kirinuki.ui.compose.feed.FeedListItem
-import com.wanderwildwood.kirinuki.ui.compose.feedarticle.FeedListFilter
+import com.wanderwildwood.kirinuki.model.FeedListItem
+import com.wanderwildwood.kirinuki.model.FeedListFilter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -75,17 +75,6 @@ class FeedItemStore(
 
         return dao.getPreviewsCount(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
     }
-
-    fun getWidgetFeedListItems(
-        feedId: Long,
-        tag: String,
-    ): Flow<List<FeedListItem>> =
-        when {
-            feedId == ID_SAVED_ARTICLES -> dao.widgetPreviewsSaved()
-            feedId > ID_UNSET -> dao.widgetPreviewsByFeed(feedId)
-            tag.isNotEmpty() -> dao.widgetPreviewsByTag(tag)
-            else -> dao.widgetPreviewsAllFeeds()
-        }.map { list -> list.map { it.toFeedListItem(application) } }
 
     fun getPagedFeedItemsRaw(
         feedId: Long,
@@ -367,10 +356,8 @@ private fun PreviewItem.toFeedListItem(context: Context) =
         feedTitle = feedDisplayTitle,
         unread = readTime == null,
         pubDate = pubDate.formatForFeed(context),
-        image = image,
         link = link,
         bookmarked = bookmarked,
-        feedImageUrl = feedImageUrl,
         rawPubDate = pubDate,
         primarySortTime = primarySortTime,
         wordCount = bestWordCount,

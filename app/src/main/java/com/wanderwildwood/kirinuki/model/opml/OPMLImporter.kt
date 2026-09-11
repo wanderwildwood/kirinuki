@@ -4,7 +4,6 @@ import android.util.Log
 import com.wanderwildwood.kirinuki.archmodel.SettingsStore
 import com.wanderwildwood.kirinuki.archmodel.UserSettings
 import com.wanderwildwood.kirinuki.archmodel.darkThemePreferenceFromString
-import com.wanderwildwood.kirinuki.archmodel.defaultFont
 import com.wanderwildwood.kirinuki.archmodel.feedItemStyleFromString
 import com.wanderwildwood.kirinuki.archmodel.itemOpenerFromString
 import com.wanderwildwood.kirinuki.archmodel.linkOpenerFromString
@@ -97,13 +96,9 @@ open class OPMLImporter(
             UserSettings.SETTING_USE_IN_APP_AUDIO_PLAYER -> settingsStore.setUseInAppAudioPlayer(value.toBoolean())
             UserSettings.SETTING_PAGING_MODE -> settingsStore.setIsPagingMode(value.toBoolean())
             UserSettings.SETTING_ANIMATED_PAGING -> settingsStore.setIsAnimatedPaging(value.toBoolean())
-            UserSettings.SETTING_FONT ->
-                settingsStore.setFont(
-                    com.wanderwildwood.kirinuki.ui.compose.settings.getFontSelectionFromPath(
-                        filePathProvider,
-                        value,
-                    ) ?: defaultFont,
-                )
+            // The app ships no fonts and cannot add them, so an exported font choice
+            // from Feeder is read and ignored rather than refused.
+            UserSettings.SETTING_FONT -> Unit
             UserSettings.SETTING_LIST_SHOW_READING_TIME -> settingsStore.setShowReadingTime(value.toBoolean())
             UserSettings.SETTING_OPEN_DRAWER_ON_FAB -> settingsStore.setOpenDrawerOnFab(value.toBoolean())
             UserSettings.SETTING_SHOW_TITLE_UNREAD_COUNT -> settingsStore.setShowTitleUnreadCount(value.toBoolean())

@@ -7,7 +7,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.db.legacy.COL_AUTHOR
 import com.wanderwildwood.kirinuki.db.legacy.COL_CUSTOM_TITLE
 import com.wanderwildwood.kirinuki.db.legacy.COL_DESCRIPTION
@@ -58,7 +58,7 @@ import java.time.ZonedDateTime
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class MigrationFromLegacy5ToLatest {
-    private val feederApplication: FeederApplication = getApplicationContext()
+    private val feederApplication: KirinukiApplication = getApplicationContext()
     private val di: DI by closestDI(feederApplication)
 
     @Rule

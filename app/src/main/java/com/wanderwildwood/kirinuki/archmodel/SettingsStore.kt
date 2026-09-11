@@ -10,9 +10,7 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.background.schedulePeriodicRssSync
 import com.wanderwildwood.kirinuki.db.room.BlocklistDao
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
-import com.wanderwildwood.kirinuki.ui.compose.feedarticle.FeedListFilter
-import com.wanderwildwood.kirinuki.ui.compose.settings.FontSelection
-import com.wanderwildwood.kirinuki.ui.compose.settings.getFontSelectionFromPath
+import com.wanderwildwood.kirinuki.model.FeedListFilter
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.wanderwildwood.kirinuki.util.getStringNonNull
@@ -314,24 +312,6 @@ class SettingsStore(
     fun setTextScale(value: Float) {
         _textScale.value = value
         sp.edit().putFloat(PREF_TEXT_SCALE, value).apply()
-    }
-
-    private val _font =
-        MutableStateFlow(
-            try {
-                val fontPath = sp.getStringNonNull(PREF_FONT, defaultFont.path)
-                getFontSelectionFromPath(filePathProvider, fontPath)
-                    ?: defaultFont
-            } catch (_: Exception) {
-                defaultFont
-            },
-        )
-
-    val font = _font.asStateFlow()
-
-    fun setFont(value: FontSelection) {
-        _font.value = value
-        sp.edit().putString(PREF_FONT, value.serialize()).apply()
     }
 
     private val _maximumCountPerFeed =
@@ -645,6 +625,8 @@ class SettingsStore(
 /**
  * Boolean indicating if Feeder News feed has been added or not
  */
+// Kept so an OPML exported by Feeder still parses; the app itself has no font setting.
+const val PREF_FONT = "pref_font"
 const val PREF_ADDED_FEEDER_NEWS = "pref_added_feeder_news"
 
 /**
@@ -719,7 +701,6 @@ const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
-const val PREF_FONT = "pref_font"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
@@ -995,4 +976,3 @@ data class PrefsFeedListFilter(
     override val unread: Boolean = true
 }
 
-val defaultFont = FontSelection.RobotoFlex

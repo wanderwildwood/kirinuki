@@ -25,7 +25,15 @@
 -keep class kotlin.Metadata { *; }
 
 # Everything in the app is essential
--keep class com.nononsenseapps.** { *; }
+# The view models are constructed reflectively by DIAwareViewModelFactory
+# (modelClass.getConstructor(DI::class.java)), so R8 cannot see the constructor
+# being used and strips it. Nothing complains at build time -- the release APK
+# simply dies the first time a screen asks for its view model, while the debug
+# build, which does not minify, is fine. The fork inherited this keep under the
+# upstream package name, where the rename silently stopped it matching.
+-keep class com.wanderwildwood.kirinuki.** { *; }
+# The vendored jsonfeed parser keeps its original package.
+-keep class com.nononsenseapps.jsonfeed.** { *; }
 
 # For Okio
 # Animal Sniffer compileOnly dependency to ensure APIs are compatible with older versions of Java.

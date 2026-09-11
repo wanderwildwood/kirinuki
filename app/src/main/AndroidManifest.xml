@@ -36,7 +36,7 @@
   </queries>
 
   <application
-    android:name=".FeederApplication"
+    android:name=".KirinukiApplication"
     android:allowBackup="true"
     android:enableOnBackInvokedCallback="true"
     android:icon="@mipmap/ic_launcher"
@@ -173,7 +173,7 @@
 
     <!-- Service for background jobs -->
     <service
-      android:name=".background.FeederJobService"
+      android:name=".background.KirinukiJobService"
       android:permission="android.permission.BIND_JOB_SERVICE" />
 
   </application>

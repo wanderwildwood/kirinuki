@@ -1,35 +1,39 @@
 package com.wanderwildwood.kirinuki.ui
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.core.util.Consumer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
-import com.wanderwildwood.kirinuki.background.runOnceSyncChainGetUpdates
 import com.wanderwildwood.kirinuki.background.schedulePeriodicOrphanedFilesCleanup
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
+import com.wanderwildwood.kirinuki.base.diAwareViewModel
+import com.wanderwildwood.kirinuki.model.opml.exportOpml
+import com.wanderwildwood.kirinuki.model.opml.importOpml
 import com.wanderwildwood.kirinuki.notifications.NotificationsWorker
-import com.wanderwildwood.kirinuki.ui.compose.navigation.AddFeedDestination
-import com.wanderwildwood.kirinuki.ui.compose.navigation.ArticleDestination
-import com.wanderwildwood.kirinuki.ui.compose.navigation.EditFeedDestination
-import com.wanderwildwood.kirinuki.ui.compose.navigation.FeedDestination
-import com.wanderwildwood.kirinuki.ui.compose.navigation.SearchFeedDestination
-import com.wanderwildwood.kirinuki.ui.compose.navigation.SettingsDestination
-import com.wanderwildwood.kirinuki.ui.compose.navigation.SyncScreenDestination
-import com.wanderwildwood.kirinuki.ui.compose.navigation.TextSettingsDestination
+import com.wanderwildwood.kirinuki.ui.addfeed.AddFeedScreen
+import com.wanderwildwood.kirinuki.ui.addfeed.AddFeedViewModel
+import com.wanderwildwood.kirinuki.ui.article.ArticleScreen
+import com.wanderwildwood.kirinuki.ui.article.ArticleViewModel
+import com.wanderwildwood.kirinuki.ui.articles.ArticleListScreen
+import com.wanderwildwood.kirinuki.ui.articles.ArticleListViewModel
 import com.wanderwildwood.kirinuki.ui.compose.utils.withAllProviders
+import com.wanderwildwood.kirinuki.ui.feeds.FeedsScreen
+import com.wanderwildwood.kirinuki.ui.feeds.FeedsViewModel
+import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
+import com.wanderwildwood.kirinuki.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
+import java.time.LocalDate
 
 class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
@@ -52,11 +56,15 @@ class MainActivity : DIAwareComponentActivity() {
         maybeRequestSync()
     }
 
+    /**
+     * The Kompakt has volume keys and a screen that does not like a finger dragged
+     * across it, so they page the article.
+     */
     override fun onKeyDown(
         keyCode: Int,
         event: KeyEvent?,
     ): Boolean {
-        if (mainActivityViewModel.isPagingMode.value && repository.isArticleOpen.value) {
+        if (repository.isArticleOpen.value) {
             when (keyCode) {
                 KeyEvent.KEYCODE_VOLUME_UP -> {
                     mainActivityViewModel.emitScrollCommand(ScrollDirection.UP)
@@ -75,12 +83,7 @@ class MainActivity : DIAwareComponentActivity() {
         lifecycleScope.launch {
             if (mainActivityViewModel.shouldSyncOnResume) {
                 if (mainActivityViewModel.isOkToSyncAutomatically()) {
-                    runOnceSyncChainGetUpdates(di)
-                    runOnceRssSync(
-                        di = di,
-                        forceNetwork = false,
-                        triggeredByUser = false,
-                    )
+                    runOnceRssSync(di = di, forceNetwork = false, triggeredByUser = false)
                 }
             }
         }
@@ -89,8 +92,6 @@ class MainActivity : DIAwareComponentActivity() {
         super.onCreate(savedInstanceState)
 
         mainActivityViewModel.ensurePeriodicSyncConfigured()
-
-        // Configure daily cleanup of orphaned article files
         schedulePeriodicOrphanedFilesCleanup(di)
 
         enableEdgeToEdge()
@@ -105,37 +106,64 @@ class MainActivity : DIAwareComponentActivity() {
     @Composable
     fun AppContent() {
         val navController = rememberNavController()
-        val navDrawerListState = rememberLazyListState()
+        val articleListState = rememberLazyListState()
 
-        NavHost(navController, startDestination = FeedDestination.route) {
-            FeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
-            ArticleDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
-            // Feed editing
-            EditFeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
-            SearchFeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
-            AddFeedDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
-            // Settings
-            SettingsDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
-            // Sync settings
-            SyncScreenDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
-            // Add Fonts
-            TextSettingsDestination.register(this, navController, navDrawerListState, mainActivityViewModel)
+        val importLauncher =
+            rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                lifecycleScope.launch { importOpml(di, uri) }
+            }
+        val exportLauncher =
+            rememberLauncherForActivityResult(
+                ActivityResultContracts.CreateDocument("text/opml"),
+            ) { uri ->
+                uri ?: return@rememberLauncherForActivityResult
+                lifecycleScope.launch { exportOpml(di, uri) }
+            }
+
+        NavHost(navController, startDestination = Route.FEEDS) {
+            composable(Route.FEEDS) {
+                val viewModel: FeedsViewModel = diAwareViewModel()
+                FeedsScreen(
+                    onOpenFeed = { navController.navigate(Route.ARTICLES) },
+                    onAddFeed = { navController.navigate(Route.ADD_FEED) },
+                    onSettings = { navController.navigate(Route.SETTINGS) },
+                    viewModel = viewModel,
+                )
+            }
+            composable(Route.ARTICLES) {
+                val viewModel: ArticleListViewModel = diAwareViewModel()
+                ArticleListScreen(
+                    onOpenArticle = { navController.navigate(Route.ARTICLE) },
+                    onBack = { navController.popBackStack() },
+                    viewModel = viewModel,
+                )
+            }
+            composable(Route.ARTICLE) {
+                val viewModel: ArticleViewModel = diAwareViewModel()
+                ArticleScreen(
+                    onBack = { navController.popBackStack() },
+                    viewModel = viewModel,
+                    listState = articleListState,
+                )
+            }
+            composable(Route.SETTINGS) {
+                val viewModel: SettingsViewModel = diAwareViewModel()
+                SettingsScreen(
+                    onBack = { navController.popBackStack() },
+                    onImportOpml = { importLauncher.launch(arrayOf("*/*")) },
+                    onExportOpml = { exportLauncher.launch("kirinuki-${LocalDate.now()}.opml") },
+                    viewModel = viewModel,
+                )
+            }
+            composable(Route.ADD_FEED) {
+                val viewModel: AddFeedViewModel = diAwareViewModel()
+                AddFeedScreen(
+                    onBack = { navController.popBackStack() },
+                    onSaved = { navController.popBackStack() },
+                    viewModel = viewModel,
+                )
+            }
         }
-
-        DisposableEffect(navController) {
-            val listener =
-                Consumer<Intent> { intent ->
-                    if (!navController.handleDeepLink(intent)) {
-                        Log.e(LOG_TAG, "NavController rejected intent: $intent")
-                    }
-                }
-            addOnNewIntentListener(listener)
-            onDispose { removeOnNewIntentListener(listener) }
-        }
-    }
-
-    companion object {
-        private const val LOG_TAG = "FEEDER_MAIN"
-        private const val KEY_NOTIFICATION_PERMISSION_REQUESTED = "notification_permission_requested"
     }
 }

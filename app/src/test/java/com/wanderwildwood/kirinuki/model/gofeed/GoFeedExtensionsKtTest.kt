@@ -16,7 +16,7 @@ class GoFeedExtensionsKtTest {
         val html = "  <img src='http://google.com/image.png' alt='An image'/> "
 
         val item =
-            FeederGoItem(
+            KirinukiGoItem(
                 goItem =
                     makeGoItem(
                         guid = "$baseUrl/id",
@@ -39,7 +39,7 @@ class GoFeedExtensionsKtTest {
     @Test
     fun linkFallsBackToGuidWhenGuidIsUrl() {
         val item =
-            FeederGoItem(
+            KirinukiGoItem(
                 goItem =
                     makeGoItem(
                         guid = "https://example.com/article/123",
@@ -55,7 +55,7 @@ class GoFeedExtensionsKtTest {
     @Test
     fun linkDoesNotFallBackToGuidWhenGuidIsNonHttpUri() {
         val item =
-            FeederGoItem(
+            KirinukiGoItem(
                 goItem =
                     makeGoItem(
                         guid = "urn:uuid:some-non-url-id",
@@ -72,7 +72,7 @@ class GoFeedExtensionsKtTest {
     fun linkDoesNotFallBackToGuidWhenGuidIsInvalidUri() {
         // Double ## makes the fragment contain a bare '#', which is invalid in RFC 3986
         val item =
-            FeederGoItem(
+            KirinukiGoItem(
                 goItem =
                     makeGoItem(
                         guid = "http://example.com/sub/##",
@@ -88,7 +88,7 @@ class GoFeedExtensionsKtTest {
     @Test
     fun linkIsPreferredOverGuidWhenBothPresent() {
         val item =
-            FeederGoItem(
+            KirinukiGoItem(
                 goItem =
                     makeGoItem(
                         guid = "https://example.com/guid",
@@ -106,7 +106,7 @@ class GoFeedExtensionsKtTest {
         val imageUrl = "https://example.com/feed.jpg"
         val html = "<img src='$imageUrl' alt='Article image'/>"
         val item =
-            FeederGoItem(
+            KirinukiGoItem(
                 goItem =
                     makeGoItem(
                         guid = "$baseUrl/id",

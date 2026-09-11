@@ -1,6 +1,6 @@
 package com.wanderwildwood.kirinuki.model.gofeed
 
-import com.wanderwildwood.kirinuki.sync.adapter
+
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import java.io.IOException

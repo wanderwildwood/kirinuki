@@ -8,7 +8,6 @@ import androidx.paging.PagingData
 import com.wanderwildwood.kirinuki.ApplicationCoroutineScope
 import com.wanderwildwood.kirinuki.background.runOnceBlocklistUpdate
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
-import com.wanderwildwood.kirinuki.background.runOnceSyncChainSendRead
 import com.wanderwildwood.kirinuki.background.schedulePeriodicRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedForSettings
@@ -28,11 +27,9 @@ import com.wanderwildwood.kirinuki.model.FeedUnreadCount
 import com.wanderwildwood.kirinuki.model.ThumbnailImage
 import com.wanderwildwood.kirinuki.sync.DeviceListResponse
 import com.wanderwildwood.kirinuki.sync.ErrorResponse
-import com.wanderwildwood.kirinuki.sync.SyncRestClient
-import com.wanderwildwood.kirinuki.ui.compose.feed.FeedListItem
-import com.wanderwildwood.kirinuki.ui.compose.feedarticle.FeedListFilter
-import com.wanderwildwood.kirinuki.ui.compose.feedarticle.emptyFeedListFilter
-import com.wanderwildwood.kirinuki.ui.compose.settings.FontSelection
+import com.wanderwildwood.kirinuki.model.FeedListItem
+import com.wanderwildwood.kirinuki.model.FeedListFilter
+import com.wanderwildwood.kirinuki.model.emptyFeedListFilter
 import com.wanderwildwood.kirinuki.util.Either
 import com.wanderwildwood.kirinuki.util.addDynamicShortcutToFeed
 import com.wanderwildwood.kirinuki.util.reportShortcutToFeedUsed
@@ -66,8 +63,6 @@ class Repository(
     private val applicationCoroutineScope: ApplicationCoroutineScope by instance()
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
-    private val syncClient: SyncRestClient by instance()
-    private val fontStore: FontStore by instance()
 
     init {
         addFeederNewsIfInitialStart()
@@ -98,8 +93,6 @@ class Repository(
     fun setMinReadTime(value: Instant) = settingsStore.setMinReadTime(value)
 
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentFeedAndTag
-
-    val currentWidgetFeedAndTag: StateFlow<Pair<Long, String>> = settingsStore.currentWidgetFeedAndTag
 
     fun getUnreadCount(
         feedId: Long,
@@ -132,13 +125,6 @@ class Repository(
         if (settingsStore.setCurrentFeedAndTag(feedId, tag)) {
             setMinReadTime(Instant.now())
         }
-    }
-
-    fun setCurrentWidgetFeedAndTag(
-        feedId: Long,
-        tag: String,
-    ) {
-        settingsStore.setCurrentWidgetFeedAndTag(feedId, tag)
     }
 
     suspend fun renameTag(
@@ -282,61 +268,13 @@ class Repository(
 
     fun setSyncOnlyWhenCharging(value: Boolean) = settingsStore.setSyncOnlyWhenCharging(value)
 
-    val loadImageOnlyOnWifi = settingsStore.loadImageOnlyOnWifi
-
-    fun setLoadImageOnlyOnWifi(value: Boolean) = settingsStore.setLoadImageOnlyOnWifi(value)
-
-    val showThumbnails = settingsStore.showThumbnails
-
-    fun setShowThumbnails(value: Boolean) = settingsStore.setShowThumbnails(value)
-
     val useDetectLanguage = settingsStore.useDetectLanguage
 
     fun setUseDetectLanguage(value: Boolean) = settingsStore.setUseDetectLanguage(value)
 
-    val useDynamicTheme = settingsStore.useDynamicTheme
-
-    fun setUseDynamicTheme(value: Boolean) = settingsStore.setUseDynamicTheme(value)
-
     val textScale = settingsStore.textScale
 
     fun setTextScale(value: Float) = settingsStore.setTextScale(value)
-
-    val font = settingsStore.font
-
-    fun setFont(value: FontSelection) = settingsStore.setFont(value)
-
-    suspend fun addFont(uri: Uri): Either<AddFontError, Unit> =
-        Either.catching(
-            onCatch = { e ->
-                Log.e(LOG_TAG, "Failed to add user font", e)
-                AddFontError(e)
-            },
-        ) {
-            // Add font to the system
-            val userFont = fontStore.addFont(uri)
-
-            // Make it the selected font
-            setFont(userFont)
-        }
-
-    suspend fun removeFont(font: FontSelection): Either<RemoveFontError, Unit> =
-        Either.catching(
-            onCatch = { e ->
-                Log.e(LOG_TAG, "Failed to remove user font", e)
-                RemoveFontError(e)
-            },
-        ) {
-            if (font is FontSelection.UserFont) {
-                // Set font to default
-                setFont(defaultFont)
-
-                // Now remove the font
-                fontStore.removeFont(font)
-            }
-        }
-
-    val fontOptions = fontStore.fontOptions
 
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
 
@@ -351,10 +289,6 @@ class Repository(
 
     fun setLinkOpener(value: LinkOpener) = settingsStore.setLinkOpener(value)
 
-    val useInAppAudioPlayer = settingsStore.useInAppAudioPlayer
-
-    fun setUseInAppAudioPlayer(value: Boolean) = settingsStore.setUseInAppAudioPlayer(value)
-
     val syncFrequency = settingsStore.syncFrequency
 
     fun setSyncFrequency(value: SyncFrequency) = settingsStore.setSyncFrequency(value)
@@ -364,26 +298,6 @@ class Repository(
     fun setResumeTime(value: Instant) {
         sessionStore.setResumeTime(value)
     }
-
-    val openAISettings = settingsStore.openAiSettings
-
-    fun setOpenAiSettings(value: OpenAISettings) = settingsStore.setOpenAiSettings(value)
-
-    val translationApiSettings = settingsStore.translationApiSettings
-
-    fun setTranslationApiSettings(value: TranslationApiSettings) = settingsStore.setTranslationApiSettings(value)
-
-    val preferredTranslationLanguage = settingsStore.preferredTranslationLanguage
-
-    fun setPreferredTranslationLanguage(value: String) = settingsStore.setPreferredTranslationLanguage(value)
-
-    val translateArticlePreviewsByDefault = settingsStore.translateArticlePreviewsByDefault
-
-    fun setTranslateArticlePreviewsByDefault(value: Boolean) = settingsStore.setTranslateArticlePreviewsByDefault(value)
-
-    val translateArticlesByDefault = settingsStore.translateArticlesByDefault
-
-    fun setTranslateArticlesByDefault(value: Boolean) = settingsStore.setTranslateArticlesByDefault(value)
 
     val showTitleUnreadCount = settingsStore.showTitleUnreadCount
 
@@ -439,12 +353,6 @@ class Repository(
                 filter = it.filter,
                 search = it.search,
             )
-        }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    fun getCurrentWidgetFeedListItems(): Flow<List<FeedListItem>> =
-        currentWidgetFeedAndTag.flatMapLatest { (feedId, tag) ->
-            feedItemStore.getWidgetFeedListItems(feedId = feedId, tag = tag)
         }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -521,7 +429,6 @@ class Repository(
                 feedItemStore.markAsReadAndNotified(itemId)
             }
         }
-        runOnceSyncChainSendRead(di)
     }
 
     suspend fun markAsUnread(itemId: Long) {
@@ -603,7 +510,6 @@ class Repository(
             tag.isNotBlank() -> feedItemStore.markAllAsReadInTag(tag)
             else -> feedItemStore.markAllAsRead()
         }
-        runOnceSyncChainSendRead(di)
         setMinReadTime(Instant.now())
     }
 
@@ -621,7 +527,6 @@ class Repository(
             descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
             cursor = cursor,
         )
-        runOnceSyncChainSendRead(di)
     }
 
     suspend fun markAfterAsRead(
@@ -638,7 +543,6 @@ class Repository(
             descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
             cursor = cursor,
         )
-        runOnceSyncChainSendRead(di)
     }
 
     val allTags: Flow<List<String>> = feedStore.allTags
@@ -677,19 +581,6 @@ class Repository(
     suspend fun markAsFullTextDownloaded(feedItemId: Long) = feedItemStore.markAsFullTextDownloaded(feedItemId)
 
     fun getFeedItemsNeedingNotifying(): Flow<List<Long>> = feedItemStore.getFeedItemsNeedingNotifying()
-
-    suspend fun remoteMarkAsRead(
-        feedUrl: URL,
-        articleGuid: String,
-    ) {
-        // Always write a remoteReadMark - this is part of concurrency mitigation
-        syncRemoteStore.addRemoteReadMark(feedUrl = feedUrl, articleGuid = articleGuid)
-        // But also try to get an existing ID and set
-        feedItemStore.getFeedItemId(feedUrl = feedUrl, articleGuid = articleGuid)?.let { itemId ->
-            syncRemoteStore.setSynced(itemId)
-            feedItemStore.markAsReadAndNotified(itemId = itemId)
-        }
-    }
 
     fun getSyncRemoteFlow(): Flow<SyncRemote?> = syncRemoteStore.getSyncRemoteFlow()
 
@@ -773,43 +664,6 @@ class Repository(
         syncRemoteStore.replaceRemoteFeedsWith(remoteFeeds)
     }
 
-    suspend fun updateDeviceList(): Either<ErrorResponse, DeviceListResponse> = syncClient.getDevices()
-
-    suspend fun joinSyncChain(
-        syncCode: String,
-        secretKey: String,
-    ): Either<ErrorResponse, String> =
-        syncClient
-            .join(syncCode = syncCode, remoteSecretKey = secretKey)
-            .onRight {
-                syncClient.getDevices()
-            }
-
-    suspend fun leaveSyncChain() {
-        syncClient
-            .leave()
-            .onLeft {
-                Log.e(LOG_TAG, "leaveSyncChain: ${it.code}, ${it.body}", it.throwable)
-            }
-    }
-
-    suspend fun removeDevice(deviceId: Long) {
-        syncClient
-            .removeDevice(deviceId = deviceId)
-            .onLeft {
-                Log.e(LOG_TAG, "removeDevice: ${it.code}, ${it.body}", it.throwable)
-            }
-    }
-
-    suspend fun startNewSyncChain(): Either<ErrorResponse, Pair<String, String>> =
-        syncClient
-            .create()
-            .onRight {
-                updateDeviceList()
-            }.map { syncCode ->
-                syncCode to getSyncRemote().secretKey
-            }
-
     suspend fun syncLoadFeedIfStale(
         feedId: Long,
         staleTime: Long,
@@ -887,9 +741,6 @@ class Repository(
     fun setSyncWorkerRunning(running: Boolean) {
         sessionStore.setSyncWorkerRunning(running)
     }
-
-    val isSyncChainConfigured: Boolean
-        get() = syncClient.isConfigured
 
     /**
      * Set the retry after time for feeds with the given base URL.

@@ -3,7 +3,6 @@ package com.wanderwildwood.kirinuki.di
 import android.app.Application
 import com.wanderwildwood.kirinuki.archmodel.FeedItemStore
 import com.wanderwildwood.kirinuki.archmodel.FeedStore
-import com.wanderwildwood.kirinuki.archmodel.FontStore
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.archmodel.SessionStore
 import com.wanderwildwood.kirinuki.archmodel.SettingsStore
@@ -17,13 +16,6 @@ import com.wanderwildwood.kirinuki.ui.CommonActivityViewModel
 import com.wanderwildwood.kirinuki.ui.MainActivityViewModel
 import com.wanderwildwood.kirinuki.ui.NavigationDeepLinkViewModel
 import com.wanderwildwood.kirinuki.ui.OpenLinkInDefaultActivityViewModel
-import com.wanderwildwood.kirinuki.ui.compose.editfeed.CreateFeedScreenViewModel
-import com.wanderwildwood.kirinuki.ui.compose.editfeed.EditFeedScreenViewModel
-import com.wanderwildwood.kirinuki.ui.compose.feedarticle.ArticleViewModel
-import com.wanderwildwood.kirinuki.ui.compose.feedarticle.FeedViewModel
-import com.wanderwildwood.kirinuki.ui.compose.searchfeed.SearchFeedViewModel
-import com.wanderwildwood.kirinuki.ui.compose.settings.SettingsViewModel
-import com.wanderwildwood.kirinuki.ui.compose.settings.TextSettingsViewModel
 import kotlinx.serialization.json.Json
 import org.kodein.di.DI
 import org.kodein.di.bind
@@ -39,7 +31,6 @@ val archModelModule =
         bind<SessionStore>() with singleton { SessionStore() }
         bind<SettingsStore>() with singleton { SettingsStore(di) }
         bind<FeedStore>() with singleton { FeedStore(di) }
-        bind<FontStore>() with singleton { FontStore(di) }
         bind<FeedItemStore>() with singleton { FeedItemStore(di) }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OPMLParserHandler>() with singleton { OPMLImporter(di) }
@@ -58,12 +49,5 @@ val archModelModule =
         bindWithActivityViewModelScope<OpenLinkInDefaultActivityViewModel>()
         bindWithActivityViewModelScope<CommonActivityViewModel>()
 
-        bindWithComposableViewModelScope<SettingsViewModel>()
-        bindWithComposableViewModelScope<EditFeedScreenViewModel>()
-        bindWithComposableViewModelScope<CreateFeedScreenViewModel>()
-        bindWithComposableViewModelScope<SearchFeedViewModel>()
-        bindWithComposableViewModelScope<ArticleViewModel>()
-        bindWithComposableViewModelScope<FeedViewModel>()
         bindWithComposableViewModelScope<NavigationDeepLinkViewModel>()
-        bindWithComposableViewModelScope<TextSettingsViewModel>()
     }

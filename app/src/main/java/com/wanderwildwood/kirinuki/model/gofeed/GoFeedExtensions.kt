@@ -11,7 +11,7 @@ import okhttp3.internal.toLongOrDefault
 import java.net.URI
 import java.net.URL
 
-class FeederGoItem(
+class KirinukiGoItem(
     private val goItem: GoItem,
     private val feedAuthor: GoPerson?,
     private val feedBaseUrl: URL,

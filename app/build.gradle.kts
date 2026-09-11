@@ -9,16 +9,6 @@ plugins {
     alias(libs.plugins.ktlint.gradle)
 }
 
-val commitCount by project.extra {
-    providers
-        .exec {
-            commandLine("git", "rev-list", "--count", "HEAD")
-        }.standardOutput.asText
-        .get()
-        .trim()
-        .toInt()
-}
-
 val kotlinToolchainVersion =
     JavaVersion
         .current()
@@ -37,11 +27,8 @@ android {
 
     defaultConfig {
         applicationId = "com.wanderwildwood.kirinuki"
-        // The version fields are set with actual values to support F-Droid
-        // In Play variant, they are overridden and taken from git to support alpha/beta testing.
-        // For actual releases they match.
-        versionCode = 4094
-        versionName = "2.23.1"
+        versionCode = 1
+        versionName = "0.1.0"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
@@ -126,20 +113,6 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
-        // See androidComponents below for related configurations
-        flavorDimensions += "store"
-        productFlavors {
-            create("fdroid") {
-                dimension = "store"
-                // Keeping default version values for F-Droid
-            }
-            create("play") {
-                dimension = "store"
-                versionName = "2.23.1"
-                versionCode = commitCount
-                applicationIdSuffix = ".play"
-            }
-        }
     }
     testOptions {
         unitTests {
@@ -206,15 +179,6 @@ android {
     }
 }
 
-androidComponents {
-    beforeVariants { variantBuilder ->
-        if (variantBuilder.buildType == "debug") {
-            // Only allow debug build of fdroid flavor
-            variantBuilder.enable = variantBuilder.productFlavors.containsAll(listOf("store" to "fdroid"))
-        }
-    }
-}
-
 composeCompiler {
     includeSourceInformation = true
     // reportsDestination = layout.buildDirectory.dir("compose_metrics")
@@ -241,6 +205,9 @@ ktlint {
 }
 
 dependencies {
+    // MMD decides type, switches, buttons and dividers -- see /opt/projects/STYLE.md.
+    implementation("com.mudita:MMD:1.0.2")
+
     ktlintRuleset(libs.ktlint.compose)
     ksp(libs.room)
     // For java time

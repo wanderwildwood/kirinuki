@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,7 +20,7 @@ import kotlin.test.assertTrue
 @LargeTest
 class TestMigrationFrom26To27 : DIAware {
     private val dbName = "testDb"
-    private val feederApplication: FeederApplication = ApplicationProvider.getApplicationContext()
+    private val feederApplication: KirinukiApplication = ApplicationProvider.getApplicationContext()
     override val di: DI by closestDI(feederApplication)
 
     @Rule

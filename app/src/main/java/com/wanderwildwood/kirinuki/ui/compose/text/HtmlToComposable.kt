@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui.compose.text
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import com.wanderwildwood.kirinuki.model.html.isCollapsableWhiteSpaceCode
-import com.wanderwildwood.kirinuki.ui.compose.feed.PlainTooltipBox
 import com.wanderwildwood.kirinuki.ui.compose.theme.TypographySettings
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
@@ -157,7 +157,7 @@ fun WithTooltipIfNotBlank(
 ) {
     val content = remember(tooltip) { movableContentOf { content() } }
     if (tooltip.isNotBlank()) {
-        PlainTooltipBox(modifier = modifier, tooltip = { Text(tooltip) }) {
+        Box(modifier = modifier) {
             content()
         }
     } else {

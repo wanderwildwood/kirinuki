@@ -50,7 +50,7 @@ fun runOnceFullTextSync(
         return
     }
 
-    val componentName = ComponentName(context, FeederJobService::class.java)
+    val componentName = ComponentName(context, KirinukiJobService::class.java)
     val builder =
         JobInfo
             .Builder(BackgroundJobId.FULL_TEXT_SYNC.jobId, componentName)

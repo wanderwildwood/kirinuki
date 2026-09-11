@@ -65,7 +65,7 @@ fun runOnceBlocklistUpdate(di: DI) {
         return
     }
 
-    val componentName = ComponentName(context, FeederJobService::class.java)
+    val componentName = ComponentName(context, KirinukiJobService::class.java)
     val jobInfo =
         JobInfo
             .Builder(BackgroundJobId.BLOCKLIST_UPDATE.jobId, componentName)

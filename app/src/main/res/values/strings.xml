@@ -405,4 +405,14 @@
   <string name="widget_title">Feeder</string>
   <string name="widget_refreshing">Refreshing</string>
   <string name="force_single_column">Force single column</string>
+  <!-- kirinuki -->
+  <string name="show_summary">Summary</string>
+  <string name="add_bookmark">Keep</string>
+  <string name="remove_bookmark">Kept</string>
+  <string name="empty_article">This one came through empty.</string>
+  <string name="no_feeds_yet">No feeds yet. Add one, or import an OPML file.</string>
+  <string name="nothing_here">Nothing here.</string>
+  <string name="summary_only_notice">Only the summary the feed carried. Fetching the whole article does not always work.</string>
+  <string name="add_feed_url">Feed address</string>
+  <string name="add_feed_url_invalid">That does not look like an address.</string>
 </resources>

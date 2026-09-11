@@ -85,7 +85,7 @@ fun Context.addDynamicShortcutToFeed(
             shortcutManager.addDynamicShortcuts(listOf(shortcut))
         }
     } catch (error: Throwable) {
-        Log.d("FeederDynamicShortcut", "Error during add of shortcut: ${error.message}")
+        Log.d("KirinukiDynamicShortcut", "Error during add of shortcut: ${error.message}")
     }
 }
 
@@ -98,7 +98,7 @@ fun Context.reportShortcutToFeedUsed(id: Any) {
         val shortcutManager = getSystemService(ShortcutManager::class.java) ?: return
         shortcutManager.reportShortcutUsed("$id")
     } catch (error: Throwable) {
-        Log.d("FeederDynamicShortcut", "Error during report use of shortcut: ${error.message}")
+        Log.d("KirinukiDynamicShortcut", "Error during report use of shortcut: ${error.message}")
     }
 }
 

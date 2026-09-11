@@ -10,7 +10,7 @@ import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.archmodel.FeedStore
 import com.wanderwildwood.kirinuki.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.wanderwildwood.kirinuki.archmodel.SettingsStore
@@ -66,8 +66,8 @@ class OPMLTest : DIAware {
             bind<FilePathProvider>() with
                 singleton {
                     filePathProvider(
-                        cacheDir = getApplicationContext<FeederApplication>().cacheDir,
-                        filesDir = getApplicationContext<FeederApplication>().filesDir,
+                        cacheDir = getApplicationContext<KirinukiApplication>().cacheDir,
+                        filesDir = getApplicationContext<KirinukiApplication>().filesDir,
                     )
                 }
             bind<ToastMaker>() with

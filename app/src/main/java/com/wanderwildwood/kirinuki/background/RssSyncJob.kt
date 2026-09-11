@@ -52,7 +52,7 @@ class RssSyncJob(
                 minFeedAgeMinutes = minFeedAgeMinutes,
             )
         } catch (e: Exception) {
-            Log.e("FeederFeedSyncer", "Failure during sync", e)
+            Log.e("KirinukiFeedSyncer", "Failure during sync", e)
         } finally {
             // Send notifications for configured feeds
             notify(context.applicationContext)
@@ -80,7 +80,7 @@ fun runOnceRssSync(
         return
     }
 
-    val componentName = ComponentName(context, FeederJobService::class.java)
+    val componentName = ComponentName(context, KirinukiJobService::class.java)
     val builder =
         JobInfo
             .Builder(BackgroundJobId.RSS_SYNC.jobId, componentName)
@@ -126,7 +126,7 @@ fun schedulePeriodicRssSync(
 
     val frequency = Duration.ofMinutes(repository.syncFrequency.value.minutes)
 
-    val componentName = ComponentName(context, FeederJobService::class.java)
+    val componentName = ComponentName(context, KirinukiJobService::class.java)
     val jobInfo =
         JobInfo
             .Builder(BackgroundJobId.RSS_SYNC_PERIODIC.jobId, componentName)

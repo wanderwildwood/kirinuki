@@ -55,11 +55,6 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.size.Precision
-import coil3.size.Scale
-import coil3.size.Size
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.model.html.Coordinate
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
@@ -93,9 +88,6 @@ import com.wanderwildwood.kirinuki.model.html.LinearTextAnnotationSuperscript
 import com.wanderwildwood.kirinuki.model.html.LinearTextAnnotationUnderline
 import com.wanderwildwood.kirinuki.model.html.LinearTextBlockStyle
 import com.wanderwildwood.kirinuki.model.html.LinearVideo
-import com.wanderwildwood.kirinuki.ui.compose.coil.RestrainedFillWidthScaling
-import com.wanderwildwood.kirinuki.ui.compose.coil.RestrainedFitScaling
-import com.wanderwildwood.kirinuki.ui.compose.coil.rememberTintedVectorPainter
 import com.wanderwildwood.kirinuki.ui.compose.layouts.Table
 import com.wanderwildwood.kirinuki.ui.compose.layouts.TableCell
 import com.wanderwildwood.kirinuki.ui.compose.layouts.TableData
@@ -330,72 +322,6 @@ fun LinearVideoContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         DisableSelection {
-            if (linearVideo.imageThumbnail != null) {
-                BoxWithConstraints(
-                    contentAlignment = Alignment.Center,
-                    modifier =
-                        Modifier
-                            .clip(RectangleShape)
-                            .clickable {
-                                linearVideo.firstSource.link.let { onLinkClick(it, null) }
-                            }.fillMaxWidth(),
-                ) {
-                    val maxImageWidth by rememberMaxImageWidth()
-                    val pixelDensity = LocalDensity.current.density
-
-                    val imageWidth: Int =
-                        remember(linearVideo.firstSource) {
-                            when {
-                                linearVideo.firstSource.widthPx != null -> linearVideo.firstSource.widthPx!!
-                                else -> maxImageWidth
-                            }
-                        }
-                    val imageHeight: Int =
-                        remember(linearVideo.firstSource) {
-                            when {
-                                linearVideo.firstSource.heightPx != null -> linearVideo.firstSource.heightPx!!
-                                else -> imageWidth
-                            }
-                        }
-                    val dimens = LocalDimens.current
-
-                    val contentScale =
-                        remember(pixelDensity, dimens.hasImageAspectRatioInReader) {
-                            if (dimens.hasImageAspectRatioInReader) {
-                                RestrainedFitScaling(pixelDensity)
-                            } else {
-                                RestrainedFillWidthScaling(pixelDensity)
-                            }
-                        }
-
-                    AsyncImage(
-                        model =
-                            ImageRequest
-                                .Builder(LocalContext.current)
-                                .data(linearVideo.imageThumbnail)
-                                .scale(Scale.FIT)
-                                // DO NOT use the actualSize parameter here
-                                .size(Size(imageWidth, imageHeight))
-                                // If image is larger than requested size, scale down
-                                // But if image is smaller, don't scale up
-                                // Note that this is the pixels, not how it is scaled inside the ImageView
-                                .precision(Precision.INEXACT)
-                                .build(),
-                        contentDescription = stringResource(R.string.touch_to_play_video),
-                        placeholder =
-                            rememberTintedVectorPainter(
-                                Icons.Outlined.PlayCircleOutline,
-                            ),
-                        error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                        contentScale = contentScale,
-                        modifier =
-                            Modifier
-                                .widthIn(max = maxWidth)
-                                .fillMaxWidth(),
-                    )
-                }
-            }
-
             ProvideScaledText(
                 style =
                     MaterialTheme.typography.bodyLarge.merge(
@@ -475,6 +401,12 @@ fun LinearListItemContent(
     }
 }
 
+/**
+ * There are no images. What an image was is said in words where the page gave us
+ * words for it -- a caption, or the alt text -- and passed over in silence where it
+ * did not. A grey rectangle standing in for a photograph is worse than nothing on a
+ * screen that has to repaint to draw it.
+ */
 @Composable
 fun LinearImageContent(
     linearImage: LinearImage,
@@ -482,136 +414,28 @@ fun LinearImageContent(
     onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    if (linearImage.sources.isEmpty()) {
-        return
-    }
+    val caption = linearImage.caption ?: return
 
-    val dimens = LocalDimens.current
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier,
     ) {
-        DisableSelection {
-            BoxWithConstraints(
-                contentAlignment = Alignment.Center,
-                modifier =
-                    Modifier
-                        .clip(RectangleShape)
-                        .clickable(
-                            enabled = linearImage.link != null,
-                        ) {
-                            linearImage.link?.let {
-                                val hashSplit = it.split("#")
-                                val index =
-                                    when {
-                                        hashSplit.size > 1 -> idToIndex[hashSplit.last()]
-                                        else -> null
-                                    }
-                                onLinkClick(it, index)
-                            }
-                        }.fillMaxWidth(),
-            ) {
-                val maxImageWidth by rememberMaxImageWidth()
-                val pixelDensity = LocalDensity.current.density
-                val bestImage =
-                    remember {
-                        linearImage.getBestImageForMaxSize(
-                            pixelDensity = pixelDensity,
-                            maxWidth = maxImageWidth,
-                        )
-                    } ?: return@BoxWithConstraints
-
-                val imageWidth: Int =
-                    remember(bestImage) {
-                        when {
-                            bestImage.pixelDensity != null -> maxImageWidth
-                            bestImage.screenWidth != null -> bestImage.screenWidth
-                            bestImage.widthPx != null -> bestImage.widthPx
-                            else -> maxImageWidth
-                        }
-                    }
-                val imageHeight: Int? =
-                    remember(bestImage) {
-                        when {
-                            bestImage.heightPx != null -> bestImage.heightPx
-                            else -> null
-                        }
-                    }
-
-                WithTooltipIfNotBlank(tooltip = linearImage.caption?.text ?: "") {
-                    val contentScale =
-                        remember(pixelDensity, dimens.hasImageAspectRatioInReader) {
-                            if (dimens.hasImageAspectRatioInReader) {
-                                RestrainedFitScaling(pixelDensity)
-                            } else {
-                                RestrainedFillWidthScaling(pixelDensity)
-                            }
-                        }
-
-                    AsyncImage(
-                        model =
-                            ImageRequest
-                                .Builder(LocalContext.current)
-                                .data(bestImage.imgUri)
-                                .scale(Scale.FIT)
-                                // DO NOT use the actualSize parameter here
-                                .size(Size(imageWidth, imageHeight ?: imageWidth))
-                                // If image is larger than requested size, scale down
-                                // But if image is smaller, don't scale up
-                                // Note that this is the pixels, not how it is scaled inside the ImageView
-                                .precision(Precision.INEXACT)
-                                .build(),
-                        contentDescription = linearImage.caption?.text,
-                        placeholder =
-                            rememberTintedVectorPainter(
-                                Icons.Outlined.Terrain,
-                            ),
-                        error = rememberTintedVectorPainter(Icons.Outlined.ErrorOutline),
-                        contentScale = contentScale,
-                        modifier =
-                            Modifier
-                                .widthIn(max = maxWidth)
-                                .fillMaxWidth(),
-                    )
-                }
-            }
-        }
-
-        linearImage.caption?.let { caption ->
-            ProvideTextStyle(
-                LocalTextStyle.current.merge(
-                    MaterialTheme.typography.labelMedium.merge(
-                        TextStyle(color = MaterialTheme.colorScheme.onBackground),
-                    ),
+        ProvideTextStyle(
+            LocalTextStyle.current.merge(
+                MaterialTheme.typography.labelMedium.merge(
+                    TextStyle(color = MaterialTheme.colorScheme.onBackground),
                 ),
-            ) {
-                LinearTextContent(
-                    linearText = caption,
-                    idToIndex = idToIndex,
-                    onLinkClick = onLinkClick,
-                )
-            }
+            ),
+        ) {
+            LinearTextContent(
+                linearText = caption,
+                idToIndex = idToIndex,
+                onLinkClick = onLinkClick,
+            )
         }
     }
 }
-
-private fun LinearImage.getBestImageForMaxSize(
-    pixelDensity: Float,
-    maxWidth: Int,
-): LinearImageSource? =
-    sources.minByOrNull { candidate ->
-        val candidateSize =
-            when {
-                candidate.pixelDensity != null -> candidate.pixelDensity / pixelDensity
-                candidate.screenWidth != null -> candidate.screenWidth / maxWidth.toFloat()
-                candidate.widthPx != null -> candidate.widthPx / maxWidth.toFloat()
-                // Assume it corresponds to 1x pixel density
-                else -> 1.0f / pixelDensity
-            }
-
-        abs(candidateSize - 1.0f)
-    }
 
 @Composable
 fun LinearTextContent(

@@ -2,7 +2,7 @@ package com.wanderwildwood.kirinuki.archmodel
 
 import android.app.Application
 import com.wanderwildwood.kirinuki.ApplicationCoroutineScope
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.ID_ALL_FEEDS
 import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
@@ -65,7 +65,7 @@ class RepositoryTest : DIAware {
     private lateinit var androidSystemStore: AndroidSystemStore
 
     @MockK
-    private lateinit var application: FeederApplication
+    private lateinit var application: KirinukiApplication
 
     @MockK
     private lateinit var syncRestClient: SyncRestClient

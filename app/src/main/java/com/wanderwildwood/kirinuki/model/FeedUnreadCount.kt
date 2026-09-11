@@ -3,7 +3,7 @@ package com.wanderwildwood.kirinuki.model
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
-import com.wanderwildwood.kirinuki.ui.compose.navdrawer.FeedIdTag
+import com.wanderwildwood.kirinuki.model.FeedIdTag
 import java.net.URL
 
 data class FeedUnreadCount

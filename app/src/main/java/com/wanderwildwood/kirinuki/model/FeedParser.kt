@@ -3,7 +3,7 @@ package com.wanderwildwood.kirinuki.model
 import android.os.Parcelable
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import com.wanderwildwood.kirinuki.model.gofeed.FeederGoItem
+import com.wanderwildwood.kirinuki.model.gofeed.KirinukiGoItem
 import com.wanderwildwood.kirinuki.model.gofeed.GoEnclosure
 import com.wanderwildwood.kirinuki.model.gofeed.GoFeed
 import com.wanderwildwood.kirinuki.model.gofeed.GoFeedAdapter
@@ -294,10 +294,10 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed =
         favicon = null,
         author = author?.asParsedAuthor(),
         expired = null,
-        items = items?.mapNotNull { it?.let { FeederGoItem(it, author, url).asParsedArticle() } },
+        items = items?.mapNotNull { it?.let { KirinukiGoItem(it, author, url).asParsedArticle() } },
     )
 
-private fun FeederGoItem.asParsedArticle() =
+private fun KirinukiGoItem.asParsedArticle() =
     ParsedArticle(
         id = guid,
         url = link,

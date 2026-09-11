@@ -14,7 +14,7 @@ import coil3.fetch.SourceFetchResult
 import coil3.request.Options
 import coil3.request.colorSpace
 import coil3.request.premultipliedAlpha
-import com.wanderwildwood.kirinuki.FeederApplication
+import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.R
 import okio.BufferedSource
 
@@ -132,7 +132,7 @@ class IcoDecoder(
     }
 
     class Factory(
-        private val application: FeederApplication,
+        private val application: KirinukiApplication,
     ) : Decoder.Factory {
         override fun create(
             result: SourceFetchResult,

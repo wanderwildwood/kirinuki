@@ -10,7 +10,6 @@ import com.wanderwildwood.kirinuki.blob.blobOutputStream
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedItem
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
-import com.wanderwildwood.kirinuki.sync.SyncRestClient
 import com.wanderwildwood.kirinuki.util.Either
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.fetchOgImage
@@ -53,7 +52,6 @@ class RssLocalSync(
     override val di: DI,
 ) : DIAware {
     private val repository: Repository by instance()
-    private val syncClient: SyncRestClient by instance()
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
     private val filePathProvider: FilePathProvider by instance()
@@ -117,17 +115,6 @@ class RssLocalSync(
                                     .minus(minFeedAgeMinutes.toLong().coerceAtLeast(1), ChronoUnit.MINUTES)
                                     .toEpochMilli()
                             }
-                        // Fetch sync stuff first - this is fast
-                        try {
-                            syncClient.getFeeds()
-                            syncClient.getRead()
-                            syncClient.getDevices()
-                            syncClient.sendUpdatedFeeds()
-                            syncClient.markAsRead()
-                        } catch (e: Exception) {
-                            Log.e(LOG_TAG, "error with syncClient: ${e.message}", e)
-                        }
-
                         val feedsToFetch =
                             feedsToSync(feedId, feedTag, staleTime = staleTime)
 
