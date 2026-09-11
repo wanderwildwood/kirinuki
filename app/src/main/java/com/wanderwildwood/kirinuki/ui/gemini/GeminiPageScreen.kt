@@ -106,6 +106,11 @@ fun GeminiPageScreen(
                         )
                     }
 
+                is GeminiPageState.Preformatted ->
+                    item {
+                        FittedPreformattedText(text = current.text)
+                    }
+
                 is GeminiPageState.Problem ->
                     item {
                         TextMMD(text = current.message, modifier = Modifier.fillMaxWidth())

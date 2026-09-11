@@ -113,7 +113,7 @@ class MainActivity : DIAwareComponentActivity() {
         intent
             ?.takeIf { it.action == Intent.ACTION_VIEW }
             ?.data
-            ?.takeIf { it.scheme == "gemini" || it.scheme == "gopher" }
+            ?.takeIf { it.scheme in setOf("gemini", "gopher", "spartan") }
             ?.toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {

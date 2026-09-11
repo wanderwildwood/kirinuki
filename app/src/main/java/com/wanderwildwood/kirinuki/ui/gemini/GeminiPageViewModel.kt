@@ -8,10 +8,11 @@ import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.model.gemtext.GemtextParser
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
 import com.wanderwildwood.kirinuki.net.isGopherUrl
+import com.wanderwildwood.kirinuki.net.isSpartanUrl
+import com.wanderwildwood.kirinuki.net.spartan.SpartanResponse
+import com.wanderwildwood.kirinuki.net.spartan.SpartanClient
 import com.wanderwildwood.kirinuki.net.gopher.GopherResponse
 import com.wanderwildwood.kirinuki.net.gopher.GopherClient
-import com.wanderwildwood.kirinuki.model.html.LinearTextBlockStyle
-import com.wanderwildwood.kirinuki.model.html.LinearText
 import com.wanderwildwood.kirinuki.model.gopher.GopherMenuParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
@@ -31,6 +32,15 @@ sealed interface GeminiPageState {
         val article: LinearArticle,
     ) : GeminiPageState
 
+    /**
+     * A gopher text file, which is fixed-width by nature: it was laid out against 80
+     * columns and reflowing it destroys tables, art and anything aligned. Kept as one
+     * block for the screen to fit rather than turned into paragraphs.
+     */
+    data class Preformatted(
+        val text: String,
+    ) : GeminiPageState
+
     /** Said in words, because an empty screen is not an answer. */
     data class Problem(
         val message: String,
@@ -43,6 +53,7 @@ class GeminiPageViewModel(
 ) : DIAwareViewModel(di) {
     private val client: GeminiClient by instance()
     private val gopherClient: GopherClient by instance()
+    private val spartanClient: SpartanClient by instance()
 
     private val _state = MutableStateFlow<GeminiPageState>(GeminiPageState.Loading)
     val state: StateFlow<GeminiPageState> = _state
@@ -74,6 +85,9 @@ class GeminiPageViewModel(
             try {
                 if (isGopherUrl(url)) {
                     return@withContext fetchGopher(url, app)
+                }
+                if (isSpartanUrl(url)) {
+                    return@withContext fetchSpartan(url, app)
                 }
                 when (val response = client.fetch(url)) {
                     is GeminiResponse.Body ->
@@ -134,24 +148,37 @@ class GeminiPageViewModel(
             is GopherResponse.Menu ->
                 GeminiPageState.Page(GopherMenuParser().parse(response.text))
 
-            is GopherResponse.Text ->
-                GeminiPageState.Page(
-                    LinearArticle(
-                        elements =
-                            listOf(
-                                LinearText(
-                                    ids = emptySet(),
-                                    text = response.text,
-                                    blockStyle = LinearTextBlockStyle.PRE_FORMATTED,
-                                ),
-                            ),
-                    ),
-                )
+            is GopherResponse.Text -> GeminiPageState.Preformatted(response.text)
 
             is GopherResponse.Unsupported ->
                 GeminiPageState.Problem(
                     app.getString(R.string.gopher_unsupported_type),
                     response.type.toString(),
+                )
+        }
+
+    /**
+     * Spartan carries gemtext, so past the status line this is the same reader as Gemini.
+     */
+    private fun fetchSpartan(
+        url: String,
+        app: Application,
+    ): GeminiPageState =
+        when (val response = spartanClient.fetch(url)) {
+            is SpartanResponse.Body ->
+                if (response.isGemtext) {
+                    GeminiPageState.Page(GemtextParser(response.url).parse(response.text))
+                } else {
+                    GeminiPageState.Problem(
+                        app.getString(R.string.gemini_not_gemtext),
+                        response.mimeType,
+                    )
+                }
+
+            is SpartanResponse.Failure ->
+                GeminiPageState.Problem(
+                    app.getString(R.string.gemini_refused, response.status),
+                    response.message.ifBlank { null },
                 )
         }
 

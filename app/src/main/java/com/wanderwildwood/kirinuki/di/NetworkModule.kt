@@ -5,6 +5,7 @@ import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.RssLocalSync
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gopher.GopherClient
+import com.wanderwildwood.kirinuki.net.spartan.SpartanClient
 import com.wanderwildwood.kirinuki.net.gemini.KnownHosts
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.nononsenseapps.jsonfeed.Feed
@@ -38,4 +39,5 @@ val networkModule =
         // Gopher has no transport security at all -- there is nothing to configure and
         // nothing to share with anything else.
         bind<GopherClient>() with singleton { GopherClient() }
+        bind<SpartanClient>() with singleton { SpartanClient() }
     }

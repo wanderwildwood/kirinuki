@@ -42,8 +42,11 @@ fun isGeminiUrl(spec: String): Boolean = spec.startsWith("gemini://", ignoreCase
 
 fun isGopherUrl(spec: String): Boolean = spec.startsWith("gopher://", ignoreCase = true)
 
+fun isSpartanUrl(spec: String): Boolean = spec.startsWith("spartan://", ignoreCase = true)
+
 /** An address this app can fetch but the JVM cannot be relied on to parse. */
-fun isSmolnetUrl(spec: String): Boolean = isGeminiUrl(spec) || isGopherUrl(spec)
+fun isSmolnetUrl(spec: String): Boolean =
+    isGeminiUrl(spec) || isGopherUrl(spec) || isSpartanUrl(spec)
 
 /**
  * Parse an address, including the schemes `java.net.URL` does not know.
