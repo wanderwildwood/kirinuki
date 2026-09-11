@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -42,7 +41,10 @@ fun AddFeedScreen(
     val saved by viewModel.saved.collectAsStateWithLifecycle()
 
     LaunchedEffect(saved) {
-        if (saved) onSaved()
+        if (saved) {
+            viewModel.savedHandled()
+            onSaved()
+        }
     }
 
     Scaffold(

@@ -25,6 +25,15 @@ class AddFeedViewModel(
     val saved: StateFlow<Boolean> = _saved
 
     /**
+     * The view model outlives the screen -- it is scoped to the activity -- so "saved"
+     * has to be taken back once it has been acted on. Left set, opening Add feed a
+     * second time closes it again before anything can be typed.
+     */
+    fun savedHandled() {
+        _saved.value = false
+    }
+
+    /**
      * A bare hostname is what people actually type, so it is treated as one rather
      * than rejected: https is assumed, and the feed says what its own title is.
      */
@@ -32,6 +41,7 @@ class AddFeedViewModel(
         url: String,
         title: String,
     ) {
+        _error.value = null
         val parsed =
             try {
                 URL(if (url.contains("://")) url else "https://$url")
