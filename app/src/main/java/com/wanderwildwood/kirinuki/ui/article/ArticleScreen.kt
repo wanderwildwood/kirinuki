@@ -33,6 +33,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.TextToDisplay
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
+import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 /**
@@ -138,9 +139,9 @@ fun ArticleScreen(
                     linearArticleContent(
                         articleContent = content,
                         onLinkClick = { url, _ ->
-                            // Nothing on the phone handles gemini://, so a link to a
-                            // capsule would simply do nothing. Keep it here instead.
-                            if (url.startsWith("gemini://")) {
+                            // Nothing else on the phone handles gemini:// or gopher://,
+                            // so such a link would simply do nothing. Keep it here.
+                            if (isSmolnetUrl(url)) {
                                 onFollowGemini(url)
                             } else {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))

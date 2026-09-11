@@ -29,6 +29,7 @@ import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
+import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import java.net.URI
@@ -115,9 +116,10 @@ fun GeminiPageScreen(
                     linearArticleContent(
                         articleContent = current.article,
                         onLinkClick = { target, _ ->
-                            // A gemini link stays in the app. Anything else is somebody
-                            // else's protocol and goes to whatever handles it.
-                            if (target.startsWith("gemini://")) {
+                            // A smolnet link stays in the app. Anything else is somebody
+                            // else's protocol and goes to whatever handles it -- a gopher
+                            // menu can point at the web, and often does.
+                            if (isSmolnetUrl(target)) {
                                 onFollow(target)
                             } else {
                                 context.startActivity(Intent(Intent.ACTION_VIEW, target.toUri()))

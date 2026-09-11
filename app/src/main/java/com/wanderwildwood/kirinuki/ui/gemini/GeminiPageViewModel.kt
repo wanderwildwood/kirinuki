@@ -7,6 +7,12 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.model.gemtext.GemtextParser
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
+import com.wanderwildwood.kirinuki.net.isGopherUrl
+import com.wanderwildwood.kirinuki.net.gopher.GopherResponse
+import com.wanderwildwood.kirinuki.net.gopher.GopherClient
+import com.wanderwildwood.kirinuki.model.html.LinearTextBlockStyle
+import com.wanderwildwood.kirinuki.model.html.LinearText
+import com.wanderwildwood.kirinuki.model.gopher.GopherMenuParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +42,7 @@ class GeminiPageViewModel(
     di: DI,
 ) : DIAwareViewModel(di) {
     private val client: GeminiClient by instance()
+    private val gopherClient: GopherClient by instance()
 
     private val _state = MutableStateFlow<GeminiPageState>(GeminiPageState.Loading)
     val state: StateFlow<GeminiPageState> = _state
@@ -65,6 +72,9 @@ class GeminiPageViewModel(
         withContext(Dispatchers.IO) {
             val app = getApplication<Application>()
             try {
+                if (isGopherUrl(url)) {
+                    return@withContext fetchGopher(url, app)
+                }
                 when (val response = client.fetch(url)) {
                     is GeminiResponse.Body ->
                         if (response.isGemtext) {
@@ -109,6 +119,40 @@ class GeminiPageViewModel(
                     e.message,
                 )
             }
+        }
+
+    /**
+     * Gopher says what a thing is in its *address* rather than its response, so a menu
+     * and a text file are told apart before the fetch. Both end up as the same
+     * [LinearArticle] gemtext does, which is why this screen renders either.
+     */
+    private fun fetchGopher(
+        url: String,
+        app: Application,
+    ): GeminiPageState =
+        when (val response = gopherClient.fetch(url)) {
+            is GopherResponse.Menu ->
+                GeminiPageState.Page(GopherMenuParser().parse(response.text))
+
+            is GopherResponse.Text ->
+                GeminiPageState.Page(
+                    LinearArticle(
+                        elements =
+                            listOf(
+                                LinearText(
+                                    ids = emptySet(),
+                                    text = response.text,
+                                    blockStyle = LinearTextBlockStyle.PRE_FORMATTED,
+                                ),
+                            ),
+                    ),
+                )
+
+            is GopherResponse.Unsupported ->
+                GeminiPageState.Problem(
+                    app.getString(R.string.gopher_unsupported_type),
+                    response.type.toString(),
+                )
         }
 
     companion object {

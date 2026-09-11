@@ -25,7 +25,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
-import com.wanderwildwood.kirinuki.net.gemini.isGeminiUrl
+import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,7 +101,7 @@ fun AddFeedScreen(
             // A capsule address is as likely to be a page as a gemlog, and subscribing to
             // a page gets you a feed that can never have an entry in it. Offer the other
             // thing here rather than making that the only way in.
-            if (isGeminiUrl(url.trim())) {
+            if (isSmolnetUrl(url.trim())) {
                 OutlinedButtonMMD(
                     onClick = { onRead(url.trim()) },
                     modifier = Modifier.fillMaxWidth(),

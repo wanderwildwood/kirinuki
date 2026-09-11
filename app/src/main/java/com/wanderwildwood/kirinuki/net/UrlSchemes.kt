@@ -1,4 +1,4 @@
-package com.wanderwildwood.kirinuki.net.gemini
+package com.wanderwildwood.kirinuki.net
 
 import java.net.URL
 import java.net.URLConnection
@@ -18,13 +18,13 @@ import java.net.URLStreamHandler
  * at startup. The three-argument `URL` constructor takes a handler directly and skips the
  * lookup entirely, so the handler stays local to this app's parsing.
  */
-object GeminiUrlHandler : URLStreamHandler() {
+object SmolnetUrlHandler : URLStreamHandler() {
     /**
-     * Nothing opens a Gemini connection this way -- [GeminiClient] owns its own socket,
-     * because the protocol needs trust on first use rather than the JVM's trust store.
+     * Nothing opens one of these this way. Gemini needs trust on first use rather than the
+     * JVM's trust store, and gopher is a bare socket; both own their own connection.
      */
     override fun openConnection(u: URL?): URLConnection =
-        throw UnsupportedOperationException("Gemini is fetched by GeminiClient, not by URL")
+        throw UnsupportedOperationException("Fetched by its own client, not through URL")
 
     /**
      * The inherited implementations resolve the host to compare and hash, which means a
@@ -38,14 +38,22 @@ object GeminiUrlHandler : URLStreamHandler() {
     ): Boolean = u1.toString() == u2.toString()
 }
 
-/** True for an address this app can fetch but the JVM cannot parse unaided. */
 fun isGeminiUrl(spec: String): Boolean = spec.startsWith("gemini://", ignoreCase = true)
+
+fun isGopherUrl(spec: String): Boolean = spec.startsWith("gopher://", ignoreCase = true)
+
+/** An address this app can fetch but the JVM cannot be relied on to parse. */
+fun isSmolnetUrl(spec: String): Boolean = isGeminiUrl(spec) || isGopherUrl(spec)
 
 /**
  * Parse an address, including the schemes `java.net.URL` does not know.
+ *
+ * Gopher is the awkward one: the JDK used to ship a handler and dropped it, and Android
+ * never had one, so whether `URL("gopher://...")` works depends on where the code is
+ * running. Handling it here rather than finding out at runtime.
  */
-fun parseUrlWithGemini(spec: String): URL =
+fun parseUrlLeniently(spec: String): URL =
     when {
-        isGeminiUrl(spec) -> URL(null, spec, GeminiUrlHandler)
+        isSmolnetUrl(spec) -> URL(null, spec, SmolnetUrlHandler)
         else -> URL(spec)
     }

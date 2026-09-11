@@ -4,6 +4,7 @@ import com.wanderwildwood.kirinuki.model.FeedParser
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.RssLocalSync
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
+import com.wanderwildwood.kirinuki.net.gopher.GopherClient
 import com.wanderwildwood.kirinuki.net.gemini.KnownHosts
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.nononsenseapps.jsonfeed.Feed
@@ -34,4 +35,7 @@ val networkModule =
                 KnownHosts(instance<FilePathProvider>().filesDir.resolve("gemini-known-hosts"))
             }
         bind<GeminiClient>() with singleton { GeminiClient(instance()) }
+        // Gopher has no transport security at all -- there is nothing to configure and
+        // nothing to share with anything else.
+        bind<GopherClient>() with singleton { GopherClient() }
     }

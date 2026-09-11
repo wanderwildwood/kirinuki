@@ -1,4 +1,4 @@
-package com.wanderwildwood.kirinuki.net.gemini
+package com.wanderwildwood.kirinuki.net
 
 import com.wanderwildwood.kirinuki.util.sloppyLinkToStrictURLNoThrows
 import org.junit.Test
@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
 
-class GeminiUrlTest {
+class UrlSchemesTest {
     @Test
     fun `the jvm really cannot parse a gemini address unaided`() {
         // The control. Without this failing, nothing below proves anything.
@@ -18,7 +18,7 @@ class GeminiUrlTest {
 
     @Test
     fun `a gemini address survives being parsed`() {
-        val url = parseUrlWithGemini("gemini://example.space/log/")
+        val url = parseUrlLeniently("gemini://example.space/log/")
 
         assertEquals("gemini", url.protocol)
         assertEquals("example.space", url.host)
@@ -36,6 +36,23 @@ class GeminiUrlTest {
     }
 
     @Test
+    fun `a gopher address survives too`() {
+        val url = parseUrlLeniently("gopher://example.org:70/1/phlog")
+
+        assertEquals("gopher", url.protocol)
+        assertEquals("example.org", url.host)
+        assertEquals(70, url.port)
+    }
+
+    @Test
+    fun `a gopher address survives the database round trip`() {
+        assertEquals(
+            "gopher://example.org/1/phlog",
+            sloppyLinkToStrictURLNoThrows("gopher://example.org/1/phlog").toString(),
+        )
+    }
+
+    @Test
     fun `ordinary addresses are untouched`() {
         assertEquals(
             "https://example.com/feed.xml",
@@ -47,9 +64,9 @@ class GeminiUrlTest {
     fun `comparing two gemini addresses does not need the network`() {
         // The inherited handler resolves the host to compare, which is a DNS lookup on
         // whichever thread happened to put a feed in a set.
-        val one = parseUrlWithGemini("gemini://example.space/a")
-        val two = parseUrlWithGemini("gemini://example.space/a")
-        val three = parseUrlWithGemini("gemini://example.space/b")
+        val one = parseUrlLeniently("gemini://example.space/a")
+        val two = parseUrlLeniently("gemini://example.space/a")
+        val three = parseUrlLeniently("gemini://example.space/b")
 
         assertEquals(one, two)
         assertEquals(one.hashCode(), two.hashCode())

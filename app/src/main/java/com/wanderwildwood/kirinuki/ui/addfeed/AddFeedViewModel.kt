@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
-import com.wanderwildwood.kirinuki.net.gemini.parseUrlWithGemini
+import com.wanderwildwood.kirinuki.net.parseUrlLeniently
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -47,7 +47,7 @@ class AddFeedViewModel(
                 // A bare hostname is what people type, so https is assumed -- but never
                 // over a scheme that was given, including gemini, which java.net.URL
                 // cannot parse without a handler of its own.
-                parseUrlWithGemini(if (url.contains("://")) url else "https://$url")
+                parseUrlLeniently(if (url.contains("://")) url else "https://$url")
             } catch (e: MalformedURLException) {
                 _error.value = url
                 return

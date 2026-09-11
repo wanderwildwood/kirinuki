@@ -71,6 +71,7 @@
         <category android:name="android.intent.category.BROWSABLE" />
 
         <data android:scheme="gemini" />
+        <data android:scheme="gopher" />
       </intent-filter>
 
       <meta-data

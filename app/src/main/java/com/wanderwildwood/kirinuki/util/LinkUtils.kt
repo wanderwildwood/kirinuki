@@ -1,7 +1,7 @@
 package com.wanderwildwood.kirinuki.util
 
-import com.wanderwildwood.kirinuki.net.gemini.parseUrlWithGemini
-import com.wanderwildwood.kirinuki.net.gemini.isGeminiUrl
+import com.wanderwildwood.kirinuki.net.parseUrlLeniently
+import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import java.net.MalformedURLException
 import java.net.URI
 import java.net.URISyntaxException
@@ -53,9 +53,9 @@ fun urlHasNoQueryParams(url: URL): Boolean = url.query?.isEmpty() != false
  */
 fun sloppyLinkToStrictURLNoThrows(url: String): URL =
     try {
-        // Gemini first: the JVM has no handler for it, so the strict parse below would
-        // throw and this would quietly hand back http:// instead of the capsule.
-        if (isGeminiUrl(url)) parseUrlWithGemini(url) else sloppyLinkToStrictURL(url)
+        // Smolnet first: the JVM has no handler for these, so the strict parse below would
+        // throw and this would quietly hand back http:// instead of the address.
+        if (isSmolnetUrl(url)) parseUrlLeniently(url) else sloppyLinkToStrictURL(url)
     } catch (_: MalformedURLException) {
         URL("http://")
     }

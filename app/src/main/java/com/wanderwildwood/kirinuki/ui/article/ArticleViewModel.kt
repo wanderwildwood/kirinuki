@@ -16,7 +16,7 @@ import com.wanderwildwood.kirinuki.blob.blobOutputStream
 import com.wanderwildwood.kirinuki.model.gemtext.GemtextParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
-import com.wanderwildwood.kirinuki.net.gemini.isGeminiUrl
+import com.wanderwildwood.kirinuki.net.isGeminiUrl
 import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
