@@ -223,7 +223,6 @@
     <string name="remove_device">Eemalda seade</string>
     <string name="remove_device_question">Kas oled kindel, et soovid kustutada %1$s seadme?</string>
     <string name="qr_code">QR-kood</string>
-    <string name="feeder_device_sync_code">Feederi seadme sünkroonimiskood</string>
     <string name="leave_sync_chain">Lahku sünkroonimisahelast</string>
     <string name="device_sync_description_1">Seadme sünkroonimine võimaldab sul oma erinevates seadmetes sünkroonida uudisvoogude tellimusi ja sisu lugeda.</string>
     <string name="article_image">Artikli pilt</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Ava kohendatud vahekaardil</string>
     <string name="no_article_link_browser">Artikli avamine veebibrauseris ei õnnestu</string>
     <string name="no_article_link_custom_tab">Artikli avamine kohendatud vahekaardil ei õnnestu</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Andmed on uuendamisel</string>
     <string name="pref_paging_mode_title">Lehekülgedeks jagamine</string>
     <string name="pref_animated_paging_title">Animeeritud lehekülgedeks jagamine</string>
     <string name="pref_paging_mode_description">Tavalise kerimise asemel liigu artiklite vahel nii, et see tundub „lehtede pööramisena“. Sobib e-tindi seadmetele.</string>
@@ -331,7 +328,6 @@
     <string name="show_original_language">Näita algset varianti (%1$s)</string>
     <string name="original_article">algne</string>
     <string name="preferred_translation_language">Eelistatud tõlkekeel</string>
-    <string name="preferred_translation_language_description">Vali keel, kuhu Feeder peaks tõlkima.</string>
     <string name="preferred_translation_language_fallback">eelistatud keel</string>
     <string name="translate_feed_cards_by_default">Tõlgi artiklite eelvaateid</string>
     <string name="translate_articles_by_default">Vaikimisi tõlgi artiklid</string>
@@ -371,7 +367,6 @@
     <string name="bergamot_response_parse_failed">Bergamoti tõlkeliidese vastuse töötlemine ei õnnestuud.</string>
     <string name="downloaded_translation_models">Laadi tõlkemudelid alla</string>
     <string name="delete_model_pair">Kustuta mudel</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamoti mudelid salvestuvad sinu nutiseadmesse kasutamiseks vallasrežiimis. Kui tahad andmeruumi vabastada, siis kustuta mudelipaarid, mida sa ei kasuta.</string>
     <string name="delete_model_pair_desc">Kas kustutad tõlkemudeli: „%1$s“ → „%2$s“ (%3$s)?</string>
     <string name="delete_all_models">Kustuta kõik allalaaditud tõlkemudelid</string>
     <string name="delete_all_models_desc">Kas kustutad kõik %1$d allalaaditud tõlkemudeli(d) (%2$s)?</string>
@@ -379,7 +374,6 @@
     <string name="deleted_all_models">Kõik allalaaditud tõlkemudelid on kustutatud</string>
     <string name="no_downloaded_models">Ühtegi tõlkemudelit pole veel allalaaditud. Tõlkeprotsessi käigus laaditakse vajalik mudel automaatselt alla.</string>
     <string name="local_translation_setup_system">Kasutab Androidi süsteemiülest tõlkeliidestust, mille pead süsteemi seadistustest esmalt alla laadima.</string>
-    <string name="local_translation_setup_bergamot">Kui operatsioonisüsteemipoolset kohalikku tõlkeliidest ei leidu, laadib Feeder alla Mozilla/Bergamoti tõlkemudelid toetatud %1$s keelapaari jaoks.</string>
     <string name="show_only_bergamot_languages">Näita vaid sihtkeeli iga Mozilla/Bergamoti tõlkemudeli jaoks</string>
     <string name="force_single_column">Kuva sundkorras üheveerulisena</string>
     <string name="apply_blocklist_to_links">Rakenda linkidele</string>

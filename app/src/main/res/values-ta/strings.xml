@@ -185,7 +185,6 @@
     <string name="article_list_settings">கட்டுரை பட்டியல்</string>
     <string name="add_item">உருப்படியைச் சேர்க்கவும்</string>
     <string name="show_message">செய்தியைக் காட்டு</string>
-    <string name="feeder_device_sync_code">ஊட்டி சாதன ஒத்திசைவு குறியீடு</string>
     <string name="permission_read_label">ஊட்டி படிக்க மட்டும் அணுகல்</string>
     <string name="no_body_in_response">பதிலளிக்கும் உடல் இல்லை</string>
     <string name="unsupported_content_type">ஆதரிக்கப்படாத உள்ளடக்க வகை</string>
@@ -330,12 +329,9 @@
     <string name="show_original_language">அசலைக் காட்டு (%1$s)</string>
     <string name="original_article">அசல்</string>
     <string name="preferred_translation_language">விருப்பமான மொழிபெயர்ப்பு மொழி</string>
-    <string name="preferred_translation_language_description">ஃபீடர் மொழிபெயர்க்கப்பட வேண்டிய மொழியைத் தேர்ந்தெடுக்கவும்.</string>
     <string name="preferred_translation_language_fallback">விருப்பமான மொழி</string>
     <string name="translation_language_placeholder">ஒரு மொழியைத் தேர்ந்தெடு</string>
     <string name="set_translation_language_first">AI அமைப்புகளில் விருப்பமான மொழிபெயர்ப்பு மொழியை அமைக்கவும்</string>
     <string name="translate_feed_cards_by_default">கட்டுரை முன்னோட்டங்களை மொழிபெயர்க்கவும்</string>
     <string name="translate_articles_by_default">கட்டுரைகளை இயல்பாக மொழிபெயர்க்கவும்</string>
-    <string name="widget_title">ஊட்டி</string>
-    <string name="widget_refreshing">புத்துணர்ச்சி தரும்</string>
 </resources>

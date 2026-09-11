@@ -146,7 +146,6 @@
     <string name="remove_device_question">Sei sicuro/a di voler eliminare il dispositivo %1$s\?</string>
     <string name="press_scan_sync">Sul tuo dispositivo, vai a Sincronizzazione dispositivo e premi Scansiona codice di sincronizzazione.</string>
     <string name="qr_code">Codice QR</string>
-    <string name="feeder_device_sync_code">Codice di sincronizzazione del dispositivo di alimentazione</string>
     <string name="leave_sync_chain">Lascia la catena di sincronizzazione</string>
     <string name="device_sync_description_1">La sincronizzazione del dispositivo ti permette di sincronizzare le iscrizioni ai feed e gli articoli letti tra i tuoi dispositivi.</string>
     <string name="scan_or_enter_code">Scansiona o inserisci il codice di sincronizzazione</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Apri in scheda personalizzata</string>
     <string name="no_article_link_browser">Impossibile aprire l\'articolo nel browser</string>
     <string name="no_article_link_custom_tab">Impossibile aprire l\'articolo nella scheda personalizzata</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Aggiornamento</string>
     <string name="pref_paging_mode_title">Modalità a pagine</string>
     <string name="pref_paging_mode_description">Naviga gli articoli \"voltando pagina\" invece dello scorrimento continuo. Ottimizzata per dispositivi e-ink.</string>
     <string name="pref_animated_paging_title">Cambio pagina animato</string>
@@ -332,7 +329,6 @@
     <string name="show_original_language">Mostra l\'originale (%1$s)</string>
     <string name="original_article">originale</string>
     <string name="preferred_translation_language">Lingua di traduzione preferita</string>
-    <string name="preferred_translation_language_description">Scegli la lingua di destinazione per le traduzioni di Feeder.</string>
     <string name="preferred_translation_language_fallback">la lingua preferita</string>
     <string name="translation_language_placeholder">Ad esempio: inglese o en</string>
     <string name="set_translation_language_first">Imposta una lingua di traduzione preferita nelle impostazioni IA</string>

@@ -153,7 +153,6 @@
     <string name="or_open_device_sync_link">Alternativ, deschideți linkul pe dispozitivul dumneavoastră.</string>
     <string name="treat_like_password">Tratați-o ca pe o parolă. Oricine vă poate citi datele sincronizate dacă are linkul.</string>
     <string name="qr_code">Cod QR</string>
-    <string name="feeder_device_sync_code">Codul de sincronizare a dispozitivului de alimentare</string>
     <string name="leave_sync_chain">Părăsiți lanțul de sincronizare</string>
     <string name="device_sync_description_2">Pur și simplu scanați codul din lanțul de sincronizare pe care l-ați creat pe un alt dispozitiv sau inițiați un nou lanț de sincronizare.</string>
     <string name="scan_or_enter_code">Scanați sau introduceți codul de sincronizare</string>
@@ -285,6 +284,5 @@
     <string name="feed_search_suggestions_header">Sugestii</string>
     <string name="apply_blocklist_to_summaries">Aplică la rezumate</string>
     <string name="open_article_in_reader">Deschideți in cititor</string>
-    <string name="widget_title">Feeder</string>
     <string name="openai_settings_info">Compatibil cu mulți furnizori IA, dar nu toți</string>
 </resources>

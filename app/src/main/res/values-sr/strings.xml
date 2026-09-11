@@ -152,7 +152,6 @@
     <string name="start_new_sync_chain">Покрените нови ланац синхронизације</string>
     <string name="join_sync_chain">Приступи ланцу сихронизације</string>
     <string name="qr_code">QR кôд</string>
-    <string name="feeder_device_sync_code">Feeder кôд за синхронизацију уређаја</string>
     <string name="sync_code">Кôд синхронизације</string>
     <string name="failed_to_open_article">Није успело отварање чланка</string>
     <string name="generate_extra_unique_ids">Генериши додатне јединствене ИД вредности</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Отвори у произвољној картици</string>
     <string name="no_article_link_browser">Чланак није могао да се отвори у прегледачу</string>
     <string name="no_article_link_custom_tab">Чланак није могао да се отвори у произвољној картици</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Освежава се</string>
     <string name="pref_paging_mode_title">Режим страница</string>
     <string name="pref_paging_mode_description">Кретање по чланцима „окретањем страница” уместо континуалним скроловањем. Оптимизовано за e-ink уређаје.</string>
     <string name="pref_animated_paging_title">Анимирано страничење</string>
@@ -333,7 +330,6 @@
     <string name="show_original_language">Прикажи оригинал (%1$s)</string>
     <string name="original_article">оригинал</string>
     <string name="preferred_translation_language">Жељени језик за превод</string>
-    <string name="preferred_translation_language_description">Изаберите језик на који Feeder треба да преводи.</string>
     <string name="preferred_translation_language_fallback">жељени језик</string>
     <string name="local_translation_requires_android_12">За локално превођење је потребна Android 12 или новији.</string>
     <string name="translation_language_placeholder">Изаберите језик</string>
@@ -366,10 +362,8 @@
     <string name="bergamot_webview_not_initialized">Bergamot WebView није иницијализован.</string>
     <string name="bergamot_response_parse_failed">Није могао да се парсира Bergamot одговор.</string>
     <string name="local_translation_setup_system">Користи превођење Android система на уређају, што прво мора да се преузме у подешавањима система.</string>
-    <string name="local_translation_setup_bergamot">Ако ОС нема преводиоца на уређају, Feeder преузима Mozilla/Bergamot моделе за подржане %1$s парове језика.</string>
     <string name="show_only_bergamot_languages">Прикажи само циљне језике за било који Mozilla/Bergamot модел</string>
     <string name="downloaded_translation_models">Преузети модели превођења</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamot модели за превођење ван мреже који се чувају на уређају. Обришите парове језика које не користите да ослободите простор.</string>
     <string name="delete_model_pair">Обриши модел</string>
     <string name="delete_model_pair_desc">Желите ли да обришете модел за превод са %1$s на %2$s (%3$s)?</string>
     <string name="delete_all_models">Обриши све преузете моделе</string>

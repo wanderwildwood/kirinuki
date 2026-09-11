@@ -156,7 +156,6 @@
     <string name="remove_device_question">Möchtest du das Gerät %1$s wirklich löschen\?</string>
     <string name="scan_or_enter_code">Synchronisierungscode scannen oder eingeben</string>
     <string name="leave_sync_chain">Synchronisierungskette verlassen</string>
-    <string name="feeder_device_sync_code">Feeder-Synchronisierungscode</string>
     <string name="device_sync_description_1">Mit der Gerätesynchronisierung kannst du Feed-Abonnements und gelesene Artikel zwischen deinen verschiedenen Geräten synchronisieren.</string>
     <string name="start_new_sync_chain">Neue Synchronisierungskette starten</string>
     <string name="sync_code">Synchronisierungscode</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Im In‑App‑Browser öffnen</string>
     <string name="no_article_link_browser">Artikel kann im Browser nicht geöffnet werden</string>
     <string name="no_article_link_custom_tab">Artikel kann nicht im In‑App‑Browser geöffnet werden</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Aktualisierung</string>
     <string name="pref_paging_mode_title">Seitenmodus</string>
     <string name="pref_paging_mode_description">Navigiere durch die Artikel mit „Seiten umblättern“, anstatt endlos zu scrollen. Optimiert für E-Papier-Geräte.</string>
     <string name="pref_animated_paging_title">Animiertes Umblättern</string>
@@ -330,7 +327,6 @@
     <string name="show_original_language">Original anzeigen (%1$s)</string>
     <string name="original_article">Original</string>
     <string name="preferred_translation_language">Bevorzugte Übersetzungssprache</string>
-    <string name="preferred_translation_language_description">Die Sprache auswählen, in die Feeder übersetzen soll.</string>
     <string name="translation_language_placeholder">Eine Sprache auswählen</string>
     <string name="set_translation_language_first">In den KI-Einstellungen eine bevorzugte Übersetzungssprache festlegen</string>
     <string name="translate_feed_cards_by_default">Artikelvorschauen übersetzen</string>
@@ -359,7 +355,6 @@
     <string name="deleted_all_models">Alle heruntergeladenen Modelle gelöscht</string>
     <string name="delete_all_models_desc">Alle %1$d heruntergeladenen Übersetzungsmodelle (%2$s) löschen?</string>
     <string name="downloaded_translation_models">Heruntergeladene Übersetzungsmodelle</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamot-Modelle, die für die Offline-Übersetzung auf dem Gerät gespeichert sind. Lösche nicht verwendete Sprachpaare, um Speicherplatz freizugeben.</string>
     <string name="delete_button_text">Löschen</string>
     <string name="cancel">Abbrechen</string>
     <string name="no_downloaded_models">Es wurden noch keine Übersetzungsmodelle heruntergeladen. Die Übersetzungsfunktion lädt das erforderliche Modell automatisch herunter.</string>
@@ -375,7 +370,6 @@
     <string name="bergamot_model_download_failed">Das Modell %1$s -&gt; %2$s konnte nicht heruntergeladen werden.</string>
     <string name="bergamot_response_parse_failed">Die Antwort von Bergamot konnte nicht ausgewertet werden.</string>
     <string name="local_translation_setup_system">Es wird zunächst die geräteinterne Übersetzungsfunktion des Android-Systems verwendet, die in den Systemeinstellungen heruntergeladen werden muss.</string>
-    <string name="local_translation_setup_bergamot">Wenn das Betriebssystem über keinen geräteinternen Übersetzer verfügt, lädt Feeder Mozilla/Bergamot-Modelle für die unterstützten %1$s-Sprachpaare herunter.</string>
     <string name="preparing_offline_translation_model">Offline-Übersetzungsmodell %1$s bis %2$s wird vorbereitet …</string>
     <string name="downloading_offline_translation_model">Offline-Übersetzungsmodell %1$s bis %2$s wird heruntergeladen: %3$d%%</string>
     <string name="delete_model_pair_desc">Das Übersetzungsmodell %1$s bis %2$s (%3$s) löschen?</string>

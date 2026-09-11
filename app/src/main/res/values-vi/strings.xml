@@ -161,7 +161,6 @@
     <string name="press_scan_sync">Ở thiết bị, đi đến đồng bộ thiết bị, và nhấn quét mã đồng bộ.</string>
     <string name="or_open_device_sync_link">Hoặc là mở liên kết trên thiết bị.</string>
     <string name="qr_code">Mã QR</string>
-    <string name="feeder_device_sync_code">Mã đồng bộ thiết bị của Feeder</string>
     <string name="leave_sync_chain">Rời khỏi chuỗi đồng bộ</string>
     <string name="device_sync_description_2">Chỉ cần quét mã từ chuỗi đồng bộ mà bạn tạo ở thiết bị khác, hoặc bắt đầu chuỗi đồng bộ mới.</string>
     <string name="scan_or_enter_code">Quét hoặc nhập mã đồng bộ</string>

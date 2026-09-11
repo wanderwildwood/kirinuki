@@ -170,7 +170,6 @@
     <string name="or_open_device_sync_link">Alebo otvorte odkaz na Vašom zariadení.</string>
     <string name="treat_like_password">Chovajte sa k tomu ako k heslu. Každý kto má tento odkaz môže čítať Vaše synchronizované dáta.</string>
     <string name="qr_code">QR kód</string>
-    <string name="feeder_device_sync_code">Synchornizačný kód zariadenia pre Feeder</string>
     <string name="leave_sync_chain">Opustiť synchronizačnú reťaz</string>
     <string name="device_sync_description_1">Synchronizácia zariadenia Vám umožňuje synchronizovať odbery kanálov a čítať články medzi Vašimi rôznymi zariadeniami.</string>
     <string name="device_sync_description_2">Jednoducho naskenujte kód z Vašej synchronizačnej reťaze, ktorú Ste vytvorili na inom zariadení, alebo začnite novú synchronizačnú reťaz.</string>

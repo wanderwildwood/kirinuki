@@ -146,7 +146,6 @@
     <string name="press_scan_sync">Sur votre autre appareil allez sur synchronisation de l’appareil puis appuyez sur scanner ou entrer un code.</string>
     <string name="or_open_device_sync_link">Il est aussi possible d\'ouvrir le lien sur votre autre appareil.</string>
     <string name="qr_code">Code QR</string>
-    <string name="feeder_device_sync_code">Code de synchronisation de l’appareil</string>
     <string name="leave_sync_chain">Quitter la chaîne de synchronisation</string>
     <string name="device_sync_description_2">Il suffit de scanner le code de la chaîne de synchronisation que vous avez créée sur un autre appareil, ou de démarrer une nouvelle chaîne de synchronisation.</string>
     <string name="start_new_sync_chain">Démarrer une nouvelle chaîne</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Ouvrir dans un onglet personnalisé</string>
     <string name="no_article_link_browser">Impossible d\'ouvrir l\'article dans le navigateur</string>
     <string name="no_article_link_custom_tab">Impossible d\'ouvrir l\'article dans un onglet personnalisé</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Actualisation</string>
     <string name="pref_paging_mode_title">Mode Page</string>
     <string name="pref_paging_mode_description">Naviguer dans la liste des articles en \"tournant les pages\" au lieu de scroller de manière continu. Optimisé pour les appareils à encre électronique (e-ink).</string>
     <string name="pref_animated_paging_title">Animation des pages</string>
@@ -330,7 +327,6 @@
     <string name="show_original_language">Afficher la version originale (%1$s)</string>
     <string name="original_article">Original</string>
     <string name="preferred_translation_language">Langage préféré de traduction</string>
-    <string name="preferred_translation_language_description">Choisir vers quelle langue Feeder doit traduire.</string>
     <string name="translation_language_placeholder">Sélectionner une langue</string>
     <string name="set_translation_language_first">Définissez un langage préféré de traduction dans les paramètres IA</string>
     <string name="translate_feed_cards_by_default">Traduire les prévisualisations d\'articles</string>
@@ -366,10 +362,8 @@
     <string name="bergamot_webview_not_initialized">WebView avec Bergamot n\'est pas initialisé.</string>
     <string name="bergamot_response_parse_failed">Impossible d\'analyser la réponse de Bergamot.</string>
     <string name="local_translation_setup_system">Utilise la traduction locale d\'Android en priorité. Celle-ci doit être téléchargée à partir des paramètres système.</string>
-    <string name="local_translation_setup_bergamot">Si le système n\'a pas de traducteur local, Feeder téléchargera les modèles Mozilla/Bergamot pour les paires de langues avec %1$s.</string>
     <string name="show_only_bergamot_languages">N\'afficher que les langues cibles ayant un modèle Mozilla/Bergamot</string>
     <string name="downloaded_translation_models">Modèles de traduction téléchargés</string>
-    <string name="downloaded_translation_models_desc">Modèles de traduction locaux Mozilla/Bergamot sur l\'appareil. Supprimez les paires de langues inutilisées pour libérer de l\'espace.</string>
     <string name="delete_model_pair">Supprimer le modèle</string>
     <string name="delete_model_pair_desc">Supprimer le modèle de traduction %1$s vers %2$s (%3$s) ?</string>
     <string name="delete_all_models">Supprimer tous les modèles téléchargés</string>

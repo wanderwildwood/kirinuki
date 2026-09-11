@@ -120,7 +120,6 @@
     <string name="feed_icon">Ícone do feed</string>
     <string name="showing_only_unread_articles">Mostrar somente artigos não lidos</string>
     <string name="swipe_to_mark_as_read">Deslize para marcar como lido</string>
-    <string name="feeder_device_sync_code">Código de sincronização de aparelhos do Feeder</string>
     <string name="are_you_sure_leave_sync_chain">Quer mesmo sair da cadeia de sincronização\?</string>
     <string name="no_barcode_scanner_installed">Não foi possível encontrar um leitor de código de barras</string>
     <string name="go_back">Voltar</string>
@@ -330,12 +329,9 @@
     <string name="show_original_language">Mostrar original (%1$s)</string>
     <string name="original_article">original</string>
     <string name="preferred_translation_language">Idioma de tradução preferido</string>
-    <string name="preferred_translation_language_description">Use um nome de idioma ou código como Spanish, es, French, ou fr-CA.</string>
     <string name="preferred_translation_language_fallback">o idioma preferido</string>
     <string name="translation_language_placeholder">Por exemplo: English ou en</string>
     <string name="set_translation_language_first">Defina um idioma de tradução preferida nas definições IA</string>
     <string name="translate_feed_cards_by_default">Traduzir artigos prévios</string>
     <string name="translate_articles_by_default">Traduzir artigos por predefinição</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Atualizando</string>
 </resources>

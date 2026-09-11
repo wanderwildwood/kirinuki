@@ -159,7 +159,6 @@
     <string name="failed_to_export_OPML">أخفق تصدير OPML</string>
     <string name="device_sync">مزامنة جهاز</string>
     <string name="press_scan_sync">على جهازك، تنقل إلى مزامنة جهاز واضغط على امسح رمز المزامنة.</string>
-    <string name="feeder_device_sync_code">رمز المزامنة للجهاز المزود</string>
     <string name="leave_sync_chain">اخرج من سلسلة المزامنة</string>
     <string name="scan_or_enter_code">امسح أو أدخل رمز المزامنة</string>
     <string name="start_new_sync_chain">ابدأ سلسلة مزامنة جديدة</string>

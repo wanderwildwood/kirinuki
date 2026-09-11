@@ -164,7 +164,6 @@
     <string name="press_scan_sync">Na vašem uređaju, pronađite sinhronizaciju uređaja i pritisnite \'skeniraj sinhro-kod\'.</string>
     <string name="treat_like_password">Tretirajte ovo kao lozinku. Svako može čitati sinhronizovane podatke ukoliko ima link.</string>
     <string name="start_new_sync_chain">Pokreni novu sinhronizacijsku mrežu</string>
-    <string name="feeder_device_sync_code">Feederov sinhro-kod uređaja</string>
     <string name="sync_code">Sinhro-kod</string>
     <string name="disabled">Onemogućeno</string>
     <string name="block_list">Lista blokiranja</string>
@@ -331,13 +330,10 @@
     <string name="show_original_language">Prikaži original (%1$s)</string>
     <string name="original_article">original</string>
     <string name="preferred_translation_language">Preferirani jezik za prijevod</string>
-    <string name="preferred_translation_language_description">Koristi naziv jezika ili kod poput npr. španski, es, francuski ili fr-CA.</string>
     <string name="preferred_translation_language_fallback">preferirani jezik</string>
     <string name="local_translation_requires_android_12">Lokalni prijevod zahtijeva Android 12 ili noviji.</string>
     <string name="translation_language_placeholder">Na primjer: Engleski ili en</string>
     <string name="set_translation_language_first">Postavi preferirani jezik prevođenja u AI postavkama</string>
     <string name="translate_feed_cards_by_default">Prevedi preglede članaka</string>
     <string name="translate_articles_by_default">Prevedi članke po zadanom</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Osvježavanje</string>
 </resources>

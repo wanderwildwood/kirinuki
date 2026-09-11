@@ -147,7 +147,6 @@
     <string name="or_open_device_sync_link">Můžete také otevřít ten odkaz na vašem zařízení.</string>
     <string name="qr_code">QR kód</string>
     <string name="leave_sync_chain">Odejít ze synchronizačního řetězu</string>
-    <string name="feeder_device_sync_code">Synchronizační kód zařízení pro Feeder</string>
     <string name="device_sync_description_1">Synchronizace zařízení vám umožní synchronizovat vaše odběry kanálů a články mezi vašimi různými zařízeními.</string>
     <string name="scan_or_enter_code">Skenovat synchronizační kód</string>
     <string name="start_new_sync_chain">Utvořit nový synchronizační řetěz</string>
@@ -290,14 +289,11 @@
     <string name="open_article_in_custom_tab">Otevřít ve vlastní kartě</string>
     <string name="no_article_link_browser">Nepodařilo se otevřít článek v prohlížeči</string>
     <string name="no_article_link_custom_tab">Nepodařilo se otevřít článek ve vlastní kartě</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Obnovování</string>
     <string name="pref_paging_mode_title">Režim stránkování</string>
     <string name="pref_paging_mode_description">Navigovat se po článcích „otáčením stránek“ namísto průběžného posouvání. Optimalizováno pro zařízení s technologií e-ink.</string>
     <string name="pref_animated_paging_title">Animované otáčení stránek</string>
     <string name="pref_animated_paging_description">Animovat otáčení stránek. Na některých e-ink zařízeních může způsobit ghosting.</string>
     <string name="preferred_translation_language">Preferovaný jazyk překladu</string>
-    <string name="preferred_translation_language_description">Vyberte jazyk, do kterého má Feeder překládat.</string>
     <string name="translation_language_placeholder">Vybrat jazyk</string>
     <string name="import_saved_articles">Importovat uložené články</string>
     <string name="failed_to_import_saved_articles">Nepodařilo se importovat uložené články</string>
@@ -368,10 +364,8 @@
     <string name="bergamot_webview_not_initialized">Bergamot WebView není připraven.</string>
     <string name="bergamot_response_parse_failed">Nepodařilo se zpracovat odpověď Bergamotu.</string>
     <string name="local_translation_setup_system">Nejprve používá překlad na zařízení systému Android, který musí být stažen v nastavení systému.</string>
-    <string name="local_translation_setup_bergamot">Pokud OS nemá překlad na zařízení, stáhne si Feeder modely Mozilla/Bergamot pro podporovaných %1$s jazykových párů.</string>
     <string name="show_only_bergamot_languages">Zobrazit pouze cílové jazyky u kteréhokoli modelu Mozilla/Bergamot</string>
     <string name="downloaded_translation_models">Stažené modely překladu</string>
-    <string name="downloaded_translation_models_desc">Modely Mozilla/Bergamot uložené na zařízení pro offline překlad. Pro uvolnění místa smažte nepoužívané jazykové páry.</string>
     <string name="delete_model_pair">Smazat model</string>
     <string name="delete_model_pair_desc">Smazat překladový model z %1$s do %2$s (%3$s)?</string>
     <string name="delete_all_models">Smazat všechny stažené modely</string>

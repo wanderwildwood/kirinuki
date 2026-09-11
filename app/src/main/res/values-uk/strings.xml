@@ -145,7 +145,6 @@
     <string name="remove_device">Вилучити пристрій</string>
     <string name="qr_code">QR-код</string>
     <string name="press_scan_sync">Перейдіть на вашому пристрої до синхронізованих пристроїв та натисніть «Відсканувати код синхронізації».</string>
-    <string name="feeder_device_sync_code">Код синхронізації пристрою Feeder</string>
     <string name="device_sync_description_1">Синхронізація пристроїв дозволяє синхронізувати підписки на стрічки та читати статті між різними вашими пристроями.</string>
     <string name="scan_or_enter_code">Відскануйте або введіть код синхронізації</string>
     <string name="sync_code">Код синхронізації</string>
@@ -289,8 +288,6 @@
     <string name="open_article_in_custom_tab">Відкрити у власній вкладці</string>
     <string name="no_article_link_browser">Неможливо відкрити статтю в браузері</string>
     <string name="no_article_link_custom_tab">Не вдалося відкрити статтю у власній вкладці</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Оновлення</string>
     <string name="apply_blocklist_to_summaries">Застосувати до коротких описів</string>
     <string name="ai_provider">Постачальник</string>
     <string name="api_provider_summary">Постачальник: %1$s</string>
@@ -312,7 +309,6 @@
     <string name="translation_language_placeholder">Виберіть мову</string>
     <string name="translate_articles_by_default">Перекладати статті типово</string>
     <string name="translate_feed_cards_by_default">Перекладати попередній перегляд статей</string>
-    <string name="preferred_translation_language_description">Оберіть мову, на яку потрібно перекласти Feeder.</string>
     <string name="show_original_language">Показати оригінал (%1$s)</string>
     <string name="original_article">оригінал</string>
     <string name="set_translation_language_first">Встановіть бажану мову перекладу в налаштуваннях ШІ</string>
@@ -368,10 +364,8 @@
     <string name="bergamot_webview_not_initialized">Bergamot WebView не ініціалізовано.</string>
     <string name="bergamot_response_parse_failed">Не вдалося розпізнати відповідь Bergamot.</string>
     <string name="local_translation_setup_system">Спершу використовується системний переклад Android, який слід завантажити в налаштуваннях.</string>
-    <string name="local_translation_setup_bergamot">Якщо в ОС відсутній локальний перекладач, Feeder завантажує моделі Mozilla/Bergamot для підтримуваних мовних пар %1$s.</string>
     <string name="show_only_bergamot_languages">Показувати лише мови перекладу з будь-якою моделлю Mozilla/Bergamot</string>
     <string name="downloaded_translation_models">Завантажені моделі перекладу</string>
-    <string name="downloaded_translation_models_desc">Моделі Mozilla/Bergamot, збережені на пристрої для офлайн-перекладу. Видаліть невикористовувані мовні пари, щоб звільнити місце.</string>
     <string name="delete_model_pair">Видалити модель</string>
     <string name="delete_model_pair_desc">Видалити модель перекладу з %1$s на %2$s (%3$s)?</string>
     <string name="delete_all_models">Видалити всі завантажені моделі</string>

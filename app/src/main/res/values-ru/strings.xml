@@ -156,7 +156,6 @@
     <string name="or_open_device_sync_link">Также, вы можете открыть ссылку на своем устройстве.</string>
     <string name="treat_like_password">Относитесь к этому как к паролю. Любой может прочитать ваши синхронизированные данные, если у него есть ссылка.</string>
     <string name="qr_code">QR-код</string>
-    <string name="feeder_device_sync_code">Код синхронизации Feeder</string>
     <string name="leave_sync_chain">Выйти из группы синхронизации</string>
     <string name="device_sync_description_2">Просто отсканируйте код синхронизации, созданный на другом устройстве, или создайте новую группу синхронизации.</string>
     <string name="scan_or_enter_code">Отсканируйте или введите код синхронизации</string>

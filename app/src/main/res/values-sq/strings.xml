@@ -170,7 +170,6 @@
     <string name="or_open_device_sync_link">Ose, hap lidhjen në pajisjen tënde.</string>
     <string name="treat_like_password">Trajtoje këtë si një fjalëkalim. Kushdo mund të lexojë të dhënat e tua të sinkronizuara nëse ka lidhjen.</string>
     <string name="qr_code">Kodi QR</string>
-    <string name="feeder_device_sync_code">Kodi i sinkronizimit të pajisjes Feeder</string>
     <string name="leave_sync_chain">Largohu nga zinxhiri i sinkronizimit</string>
     <string name="device_sync_description_1">Sinkronizimi i pajisjes të lejon të sinkronizosh abonimet e prurjeve dhe artikujt e lexuar midis pajisjeve të tua të ndryshme.</string>
     <string name="device_sync_description_2">Thjesht skano kodin nga zinxhiri i sinkronizimit që ke krijuar në një pajisje tjetër, ose nis një zinxhir të ri sinkronizimi.</string>

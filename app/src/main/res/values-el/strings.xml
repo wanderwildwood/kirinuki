@@ -166,7 +166,6 @@
     <string name="remove_device_question">Σίγουρα θέλετε να διαγράψετε τη συσκευή %1$s;</string>
     <string name="disconnect_device_from_sync">Αποσύνδεση της συσκευής από την αλυσίδα συγχρονισμού</string>
     <string name="leave_sync_chain">Έξοδος από την αλυσίδα συγχρονισμού</string>
-    <string name="feeder_device_sync_code">Κωδικός συγχρονισμού συσκευής Feeder</string>
     <string name="device_sync_description_1">Ο συγχρονισμός της συσκευής σάς επιτρέπει να συγχρονίζετε συνδρομές τροφοδοσίας και να διαβάζετε άρθρα μεταξύ των διαφόρων συσκευών σας.</string>
     <string name="device_sync_description_2">Απλά σαρώστε τον κώδικα από την αλυσίδα συγχρονισμού που δημιουργήσατε σε άλλη συσκευή ή ξεκινήστε μια νέα αλυσίδα συγχρονισμού.</string>
     <string name="scan_or_enter_code">Σαρώστε ή εισαγάγετε τον κωδικό συγχρονισμού</string>

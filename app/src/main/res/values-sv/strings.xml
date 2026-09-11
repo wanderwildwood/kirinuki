@@ -158,7 +158,6 @@
     <string name="this_device">%1$s (denna enhet)</string>
     <string name="or_open_device_sync_link">Annars öppna länken på din enhet.</string>
     <string name="qr_code">QR-kod</string>
-    <string name="feeder_device_sync_code">Feeder enhetssynkkod</string>
     <string name="leave_sync_chain">Lämna synkkedja</string>
     <string name="device_sync_description_2">Skanna bara koden från din synkkedja som du skapade på en annan enhet, eller starta en ny synkkedja.</string>
     <string name="scan_or_enter_code">Skanna eller skriv in synkkoden</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Öppna i custom tab</string>
     <string name="no_article_link_browser">Kan inte öppna artikeln med webbläsare</string>
     <string name="no_article_link_custom_tab">Kan inte öppna artiklen med custom tab</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Uppdaterar</string>
     <string name="rename_tag">Döp om tagg</string>
     <string name="audio_playback_failed">Kan inte spela ljudfilen</string>
     <string name="play_audio">Spela</string>
@@ -340,7 +337,6 @@
     <string name="show_original_language">Visa original (%1$s)</string>
     <string name="original_article">original</string>
     <string name="preferred_translation_language">Föredraget översättningsspråk</string>
-    <string name="preferred_translation_language_description">Använd ett språknamn eller en språkkod som spanska, es, franska eller fr-CA.</string>
     <string name="preferred_translation_language_fallback">föredraget språk</string>
     <string name="local_translation_requires_android_12">Lokal översättning kräver Android 12 eller senare.</string>
     <string name="translation_language_placeholder">Till exempel: Swedish eller sv</string>

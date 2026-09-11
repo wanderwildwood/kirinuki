@@ -130,7 +130,6 @@
     <string name="remove">Eltávolítás</string>
     <string name="treat_like_password">Kezelje ezt mint egy jelszót. Bárki elolvashatja a szinkronizált adatait, ha megszerzi a hivatkozást.</string>
     <string name="qr_code">QR-kód</string>
-    <string name="feeder_device_sync_code">Feeder eszközszinkronizálási kód</string>
     <string name="leave_sync_chain">Szinkronizálási lánc elhagyása</string>
     <string name="remove_device_question">Biztosan el akarja távolítani ezt az eszközt: %1$s?</string>
     <string name="press_scan_sync">Az eszközén navigáljon az eszköz szinkronizációhoz, és nyomjon a szinkronizálási kód beolvasására.</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Megnyitás egyéni lapon</string>
     <string name="no_article_link_browser">A cikk nem nyitható meg a böngészőben</string>
     <string name="no_article_link_custom_tab">A cikk nem nyitható meg egyéni lapon</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Frissítés</string>
     <string name="pref_paging_mode_title">Lapozási mód</string>
     <string name="pref_paging_mode_description">A cikkek böngészése „oldalanként” a folyamatos görgetés helyett. E-ink-eszközökhöz optimalizálva.</string>
     <string name="pref_animated_paging_title">Animált lapozás</string>
@@ -327,7 +324,6 @@
     <string name="show_original_language">Eredeti megjelenítése (%1$s)</string>
     <string name="original_article">eredeti</string>
     <string name="preferred_translation_language">Előnyben részesített fordítási nyelv</string>
-    <string name="preferred_translation_language_description">Válassza ki azt a nyelvet, amelyre a Feedernek le kell fordítania a cikkeket.</string>
     <string name="translation_language_placeholder">Válasszon nyelvet</string>
     <string name="set_translation_language_first">Állítsa be a kívánt fordítási nyelvet az MI-beállításokban</string>
     <string name="translate_feed_cards_by_default">Cikkek előnézetének fordítása</string>
@@ -366,10 +362,8 @@
     <string name="bergamot_webview_not_initialized">Nincs előkészítve a Bergamot WebView.</string>
     <string name="bergamot_response_parse_failed">Nem sikerült elemezni a Bergamot választ.</string>
     <string name="local_translation_setup_system">Először az Android rendszer beépített fordítási funkciójának használata, amelyet a rendszerbeállításokban kell letölteni.</string>
-    <string name="local_translation_setup_bergamot">Ha az operációs rendszer nem rendelkezik beépített fordítóval, a Feeder letölti a Mozilla/Bergamot modelleket a támogatott %1$s nyelvpárokhoz.</string>
     <string name="show_only_bergamot_languages">Csak azon célnyelvek megjelenítése, amelyekhez tartozik Mozilla/Bergamot modell</string>
     <string name="downloaded_translation_models">Letöltött fordítási modellek</string>
-    <string name="downloaded_translation_models_desc">A Mozilla/Bergamot modellek az eszközön tárolódnak az offline fordításhoz. A helymegtakarítás érdekében törölje a nem használt nyelvpárokat.</string>
     <string name="delete_model_pair">Modell törlése</string>
     <string name="delete_model_pair_desc">Biztosan törli a(z) %1$s-%2$s fordítási modellt (%3$s)?</string>
     <string name="delete_all_models">Az összes letöltött modell törlése</string>

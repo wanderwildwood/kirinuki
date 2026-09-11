@@ -140,7 +140,6 @@
     <string name="press_scan_sync">अपने डिवाइस पर, डिवाइस सिंक पर जाएं, और स्कैन सिंक कोड दबाएं।</string>
     <string name="treat_like_password">इसे पासवर्ड की तरह समझें। यदि किसी के पास लिंक है तो वह आपके सिंक किए गए डेटा को पढ़ सकता है।</string>
     <string name="qr_code">QR कोड</string>
-    <string name="feeder_device_sync_code">फीडर डिवाइस सिंक कोड</string>
     <string name="leave_sync_chain">सिंक चेन छोड़ें</string>
     <string name="sync_code">कोड सिंक करें</string>
     <string name="join_sync_chain">सिंक श्रृंखला से जुड़ें</string>

@@ -146,7 +146,6 @@
     <string name="start_new_sync_chain">Start ny synkronisering</string>
     <string name="block_list">Svarteliste</string>
     <string name="add_item">Legg til element</string>
-    <string name="feeder_device_sync_code">Enhetssynkroniseringskode for Feeder</string>
     <string name="treat_like_password">Behandle dette som et passord. Alle kan lese din synkroniserte data hvis de har lenken.</string>
     <string name="leave_sync_chain">Fjern fra synkronisering</string>
     <string name="device_sync_description_1">Enhetssynkronisering lar deg synkronisere abonnementer og leste artikler mellom dine forskjellige enheter.</string>

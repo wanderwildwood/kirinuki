@@ -15,7 +15,6 @@
     <string name="save">Запази</string>
     <string name="failed_to_parse_full_article">Неуспешно анализиране на цялата статия</string>
     <string name="generate_extra_unique_ids">Генерирай допълнителни уникални идентификатори</string>
-    <string name="feeder_device_sync_code">Feeder код за синхронизиране на устройство</string>
     <string name="title">Заглавие</string>
     <string name="sort_oldest_first">Първо най-старите</string>
     <string name="failed_to_open_article">Не може да се отвори статия</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Отваряне в персонализиран раздел</string>
     <string name="no_article_link_browser">Не мога да отворя статията в браузъра</string>
     <string name="no_article_link_custom_tab">Не може да се отвори статията в персонализиран раздел</string>
-    <string name="widget_refreshing">Обновяване</string>
-    <string name="widget_title">Feeder</string>
     <string name="pref_paging_mode_title">Режим на прелистване</string>
     <string name="pref_paging_mode_description">Навигирайте в статиите, като „прелиствате страници“, вместо да превъртате непрекъснато. Оптимизирано за устройства с електронно мастило.</string>
     <string name="pref_animated_paging_title">Анимирано прелистване</string>

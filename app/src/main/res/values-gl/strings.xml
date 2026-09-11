@@ -176,7 +176,6 @@
     <string name="or_open_device_sync_link">Ou ben, abre a ligazón no teu dispositivo.</string>
     <string name="treat_like_password">Trata isto como un contrasinal. Calquera podería ver os teus datos sincronizados se teñen a ligazón.</string>
     <string name="qr_code">Código QR</string>
-    <string name="feeder_device_sync_code">Código de sincr de dispositivo Feeder</string>
     <string name="leave_sync_chain">Saír da rolda de sincronización</string>
     <string name="device_sync_description_1">A sincronización de dispositivos permíteche sincronizar a subscrición a canles e artigos lidos entre os teus dispositivos.</string>
     <string name="device_sync_description_2">Simplemente escanea o código da túa rolda de sincronización que creaches noutro dispositivo, ou inicia aquí dito mecanismo.</string>

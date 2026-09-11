@@ -157,7 +157,6 @@
     <string name="press_scan_sync">Pada perangkat Anda, kunjungi sinkronisasi perangkat, dan tekan pindai kode sinkronisasi.</string>
     <string name="or_open_device_sync_link">Atau, buka tautan pada perangkat Anda.</string>
     <string name="qr_code">Kode QR</string>
-    <string name="feeder_device_sync_code">Kode sinkronisasi perangkat Feeder</string>
     <string name="leave_sync_chain">Tinggalkan tautan sinkronisasi</string>
     <string name="start_new_sync_chain">Mulai tautan sinkronisasi baru</string>
     <string name="sync_code">Kode sinkronisasi</string>
@@ -329,14 +328,11 @@
     <string name="show_original_language">Tampilkan asli (%1$s)</string>
     <string name="original_article">asli</string>
     <string name="preferred_translation_language">Bahasa terjemahan pilihan</string>
-    <string name="preferred_translation_language_description">Pilih bahasa yang akan digunakan Feeder untuk menerjemahkan.</string>
     <string name="preferred_translation_language_fallback">bahasa pilihan</string>
     <string name="translation_language_placeholder">Pilih bahasa</string>
     <string name="set_translation_language_first">Tetapkan bahasa terjemahan pilihan di pengaturan AI</string>
     <string name="translate_feed_cards_by_default">Terjemahkan pratinjau artikel</string>
     <string name="translate_articles_by_default">Terjemahkan artikel secara bawaan</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Menyegarkan</string>
     <string name="failed_to_fetch_full_article_too_large">Artikel terlalu besar. Buka di peramban?</string>
     <string name="device_sync_beta_warning">PERINGATAN! Ini adalah fitur Beta. Ekspor dan cadangkan seluruh feed Anda terlebih dulu.</string>
     <string name="local_translation_requires_android_12">Penerjemahan lokal membutuhkan Android 12 atau yang lebih baru.</string>
@@ -370,10 +366,8 @@
     <string name="bergamot_webview_not_initialized">WebView Bergamot tidak diinisialisasi.</string>
     <string name="bergamot_response_parse_failed">Tidak dapat mengurai respons Bergamot.</string>
     <string name="local_translation_setup_system">Menggunakan terjemahan pada perangkat sistem Android terlebih dahulu yang harus diunduh dalam pengaturan sistem.</string>
-    <string name="local_translation_setup_bergamot">Jika OS tidak memiliki penerjemah pada perangkat, Feeder mengunduh model Mozilla/Bergamot untuk pasangan bahasa %1$s yang didukung.</string>
     <string name="show_only_bergamot_languages">Tampilkan hanya bahasa target dengan model Mozilla/Bergamot apa pun</string>
     <string name="downloaded_translation_models">Model terjemahan yang diunduh</string>
-    <string name="downloaded_translation_models_desc">Model Mozilla/Bergamot disimpan pada perangkat untuk terjemahan offline. Hapus pasangan bahasa yang tidak digunakan untuk mengosongkan ruang.</string>
     <string name="delete_model_pair">Hapus model</string>
     <string name="delete_model_pair_desc">Hapus model terjemahan %1$s ke %2$s (%3$s)?</string>
     <string name="delete_all_models">Hapus semua model yang diunduh</string>

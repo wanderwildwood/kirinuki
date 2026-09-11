@@ -107,7 +107,6 @@
     <string name="or_open_device_sync_link">Alternativt kan du åbne linket på din enhed.</string>
     <string name="treat_like_password">Behandl dette som en adgangskode. Alle kan læse dine synkroniserede data, hvis de har linket.</string>
     <string name="qr_code">QR-kode</string>
-    <string name="feeder_device_sync_code">Synkroniseringskode for feeder-enhed</string>
     <string name="leave_sync_chain">Forlad synkroniseringskæde</string>
     <string name="device_sync_description_1">Enhedssynkronisering giver dig mulighed for at synkronisere feed-abonnementer og læste artikler mellem dine forskellige enheder.</string>
     <string name="scan_or_enter_code">Scan eller indtast synkroniseringskode</string>
@@ -290,8 +289,6 @@
     <string name="no_article_link_browser">Kan ikke åbne artikel i browser</string>
     <string name="no_article_link_custom_tab">Kan ikke åbne artikel i brugerdefineret fane</string>
     <string name="openai_settings_info">Kompatibel med mange AI-udbydere, men ikke alle</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Opfrisker</string>
     <string name="import_saved_articles">Importer gemte artikler</string>
     <string name="failed_to_import_saved_articles">Kunne ikke importere gemte artikler</string>
     <string name="failed_to_fetch_full_article_too_large">Artiklen er for stor. Vil du åbne den i browseren i stedet?</string>
@@ -344,7 +341,6 @@
     <string name="downloading_offline_translation_model">Downloader offline oversættelsesmodel %1$s til %2$s: %3$d%%</string>
     <string name="offline_translation_model_download_hint">Den første download kan være på 20–50 MB og kan tage et par minutter. Herefter fungerer oversættelsen offline.</string>
     <string name="preferred_translation_language">Foretrukket oversættelsessprog</string>
-    <string name="preferred_translation_language_description">Vælg det sprog, som Feeder skal oversætte til.</string>
     <string name="preferred_translation_language_fallback">det foretrukne sprog</string>
     <string name="local_translation_requires_android_12">Lokal oversættelse kræver Android 12 eller nyere.</string>
     <string name="local_translation_unavailable">Lokal oversættelse er ikke tilgængelig på denne enhed.</string>

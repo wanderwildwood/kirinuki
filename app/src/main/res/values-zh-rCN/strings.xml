@@ -152,7 +152,6 @@
     <string name="press_scan_sync">在你的设备上，导航到设备同步，并按扫描同步代码。</string>
     <string name="or_open_device_sync_link">或者，打开设备上的链接。</string>
     <string name="qr_code">二维码</string>
-    <string name="feeder_device_sync_code">Feeder 设备同步码</string>
     <string name="leave_sync_chain">离开同步链</string>
     <string name="device_sync_description_2">只需扫描您在另一个设备上创建的同步链的代码，或启动一个新的同步链。</string>
     <string name="scan_or_enter_code">扫描或输入同步代码</string>
@@ -290,8 +289,6 @@
     <string name="no_article_link_browser">无法在浏览器中打开文章</string>
     <string name="no_article_link_custom_tab">无法在自定义标签页中打开文章</string>
     <string name="apply_blocklist_to_summaries">应用于摘要</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">刷新中</string>
     <string name="pref_paging_mode_title">分页模式</string>
     <string name="pref_paging_mode_description">通过“翻页”而非持续滚动来浏览文章。为 e-ink 设备优化。</string>
     <string name="pref_animated_paging_title">翻页动画</string>
@@ -330,7 +327,6 @@
     <string name="show_original_language">显示原文（%1$s）</string>
     <string name="original_article">原文</string>
     <string name="preferred_translation_language">首选翻译语言</string>
-    <string name="preferred_translation_language_description">选择 Feeder 应翻译成的语言。</string>
     <string name="translation_language_placeholder">选择语言</string>
     <string name="set_translation_language_first">在 AI 设置中设置首选翻译语言</string>
     <string name="translate_feed_cards_by_default">翻译文章预览</string>
@@ -366,11 +362,9 @@
     <string name="bergamot_webview_not_initialized">Bergamot WebView 未初始化。</string>
     <string name="bergamot_response_parse_failed">无法解析 Bergamot 响应。</string>
     <string name="local_translation_setup_system">首先使用 Android 系统设备端翻译，必须在系统设置中下载。</string>
-    <string name="local_translation_setup_bergamot">如果操作系统没有设备端翻译器，Feeder 将为支持的 %1$s 语言对下载 Mozilla/Bergamot 模型。</string>
     <string name="show_only_bergamot_languages">仅显示拥有任何 Mozilla/Bergamot 模型的目标语言</string>
     <string name="downloaded_translation_models">已下载的翻译模型</string>
     <string name="delete_model_pair">删除模型</string>
-    <string name="downloaded_translation_models_desc">Mozilla/Bergamot 模型存储在设备端用于离线翻译。删除未使用的语言对以释放空间。</string>
     <string name="delete_model_pair_desc">删除 %1$s 到 %2$s 的翻译模型（%3$s）？</string>
     <string name="delete_all_models">删除所有已下载的模型</string>
     <string name="delete_all_models_desc">删除所有 %1$d 个已下载的翻译模型（%2$s）？</string>

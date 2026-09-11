@@ -154,7 +154,6 @@
     <string name="remove_device_question">¿Estás seguro de que quieres eliminar el dispositivo %1$s\?</string>
     <string name="or_open_device_sync_link">Alternativamente, abrir el enlace en tu dispositivo.</string>
     <string name="treat_like_password">Tratar esto como si fuera una contraseña. Cualquiera puede leer tus datos si tienen en enlace.</string>
-    <string name="feeder_device_sync_code">Código de sincronización de dispositivo Feeder</string>
     <string name="device_sync_description_1">La sincronización de dispositivos te permite sincronizar suscripciones de fuentes y leer artículos entre tus diversos dispositivos.</string>
     <string name="scan_or_enter_code">Escanea o entra el código de sincronización</string>
     <string name="start_new_sync_chain">Crear nueva cadena de sincronización</string>
@@ -290,8 +289,6 @@
     <string name="no_article_link_browser">No se pudo abrir el artículo en el navegador</string>
     <string name="no_article_link_custom_tab">No se pudo abrir el artículo en una pestaña personalizada</string>
     <string name="apply_blocklist_to_summaries">Aplicar a los resúmenes</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Actualizar</string>
     <string name="pref_paging_mode_title">Modo de paginación</string>
     <string name="pref_animated_paging_title">Paginación animada</string>
     <string name="pref_paging_mode_description">Navega por los artículos girando páginas en lugar de desplazándote continuamente. Optimizado para dispositivos de tinta electrónica.</string>
@@ -328,7 +325,6 @@
     <string name="show_original_language">Mostrar el original (%1$s)</string>
     <string name="original_article">original</string>
     <string name="preferred_translation_language">Idioma preferido para la traducción</string>
-    <string name="preferred_translation_language_description">Escoja el idioma al que Feeder debería traducir.</string>
     <string name="translation_language_placeholder">Seleccione un idioma</string>
     <string name="set_translation_language_first">Establece un idioma de traducción preferido en la configuración de la IA</string>
     <string name="translate_feed_cards_by_default">Traducir las vistas previas de los artículos</string>
@@ -372,10 +368,8 @@
     <string name="bergamot_webview_not_initialized">WebView de Bergamot no inicializada.</string>
     <string name="bergamot_response_parse_failed">No se pudo analizar la respuesta de Bergamot.</string>
     <string name="local_translation_setup_system">Utiliza la traducción en dispositivo del sistema Android primero, la cual debe ser descargada en los ajustes del sistema.</string>
-    <string name="local_translation_setup_bergamot">Si el SO no tiene traductor en dispositivo, Feeder descarga modelos de Mozilla/Bergamot para los %1$s pares de idiomas soportados.</string>
     <string name="show_only_bergamot_languages">Mostrar solo idiomas objetivo con modelos Mozilla/Bergamot</string>
     <string name="downloaded_translation_models">Modelos de traducción descargados</string>
-    <string name="downloaded_translation_models_desc">Modelos Mozilla/Bergamot almacenados en el dispositivo para traducción sin conexión. Borre los pares de idiomas no usados para liberar espacio.</string>
     <string name="delete_model_pair">Eliminar modelo</string>
     <string name="delete_model_pair_desc">¿Eliminar el modelo de traducción %1$s a %2$s (%3$s)?</string>
     <string name="delete_all_models">Eliminar todos los modelos descargados</string>

@@ -164,7 +164,6 @@
     <string name="or_open_device_sync_link">Arba atidarykite nuorodą savo įrenginyje.</string>
     <string name="treat_like_password">Laikykite tai kaip slaptažodį. Bet kas gali perskaityti sinchronizuotus duomenis, jei turi nuorodą.</string>
     <string name="qr_code">QR kodas</string>
-    <string name="feeder_device_sync_code">Feeder įrenginio sinchronizavimo kodas</string>
     <string name="device_sync_description_1">Įrenginio sinchronizavimas leidžia sinchronizuoti kanalų prenumeratas ir skaityti straipsnius įvairiuose įrenginiuose.</string>
     <string name="leave_sync_chain">Palikti sinchronizavimo grandinę</string>
     <string name="device_sync_description_2">Tiesiog nuskaitykite kodą iš jūsų sinchronizavimo grandinės, kurią sukūrėte kitame prietaise, arba pradėkite naują sinchronizavimo grandinę.</string>

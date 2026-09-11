@@ -148,7 +148,6 @@
     <string name="or_open_device_sync_link">または、デバイスのリンクを開いてください。</string>
     <string name="treat_like_password">これはパスワードのようなものです。リンクがあれば、誰でも同期されたデータを読むことができます。</string>
     <string name="qr_code">QRコード</string>
-    <string name="feeder_device_sync_code">Feederのデバイス同期コード</string>
     <string name="device_sync_description_1">デバイス同期を使用すると、様々なデバイス間で購読フィードを同期して記事を読むことができます。</string>
     <string name="device_sync_description_2">他のデバイスで作成した同期チェーンからコードをスキャンするか、新しい同期チェーンを開始します。</string>
     <string name="scan_or_enter_code">同期コードのスキャンまたは入力</string>

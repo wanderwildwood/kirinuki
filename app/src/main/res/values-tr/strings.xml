@@ -170,7 +170,6 @@
     <string name="or_open_device_sync_link">Alternatif olarak, bağlantıyı cihazınızda açın.</string>
     <string name="treat_like_password">Bunu bir şifre gibi değerlendirin. Bağlantıya sahip olan herkes senkronize verilerinizi okuyabilir.</string>
     <string name="qr_code">QR Kodu</string>
-    <string name="feeder_device_sync_code">Feeder cihaz senkronizasyon kodu</string>
     <string name="leave_sync_chain">Senkronizasyon zincirinden ayrıl</string>
     <string name="device_sync_description_1">Cihaz senkronizasyonu, akış aboneliklerini ve okunan makaleleri farklı cihazlarınız arasında senkronize etmenizi sağlar.</string>
     <string name="device_sync_description_2">Başka bir cihazda oluşturduğunuz senkronizasyon zincirinden kodu tarayın veya yeni bir senkronizasyon zinciri başlatın.</string>
@@ -343,9 +342,7 @@
     <string name="translate_article">Makaleyi çevir</string>
     <string name="show_original_language">Orijinali göster (%1$s)</string>
     <string name="original_article">orijinal</string>
-    <string name="widget_refreshing">Yenileniyor</string>
     <string name="preferred_translation_language">Tercih edilen çeviri dili</string>
-    <string name="preferred_translation_language_description">Feeder\'ın çeviri yapacağı dili seçin.</string>
     <string name="preferred_translation_language_fallback">tercih edilen dil</string>
     <string name="local_translation_requires_android_12">Yerel çeviri için Android 12 veya daha yeni bir sürüm gereklidir.</string>
     <string name="local_translation_unavailable">Bu cihazda yerel çeviri özelliği mevcut değildir.</string>
@@ -369,7 +366,6 @@
     <string name="no_downloaded_models">Henüz hiçbir çeviri modeli yüklü değil. Çeviri, gerekli modeli otomatik olarak indirecektir.</string>
     <string name="delete_button_text">Sil</string>
     <string name="cancel">İptal Et</string>
-    <string name="widget_title">Feeder</string>
     <string name="translation_language_placeholder">Bir dil seçin</string>
     <string name="translate_feed_cards_by_default">Makale önizlemelerini çevir</string>
     <string name="translate_articles_by_default">Varsayılan olarak makaleleri çevir</string>
@@ -379,9 +375,7 @@
     <string name="delete_all_models">Tüm indirilmiş modelleri sil</string>
     <string name="deleted_model_pair">%1$s -&gt; %2$s modeli silindi</string>
     <string name="set_translation_language_first">YZ ayarlarında tercih edilen çeviri dilini belirleyin</string>
-    <string name="downloaded_translation_models_desc">Çevrimdışı çeviri için cihazda depolanan Mozilla/Bergamot modelleri. Depolama alanında yer açmak için kullanılmayan dil çiftlerini silin.</string>
     <string name="delete_all_models_desc">İndirilen tüm %1$d çeviri modellerini silmek istiyor musunuz (%2$s)?</string>
     <string name="force_single_column">Tek sütunlu görünümü zorunlu kıl</string>
     <string name="show_only_bergamot_languages">Herhangi bir Mozilla/Bergamot modeline sahip hedef dilleri göster</string>
-    <string name="local_translation_setup_bergamot">İşletim sisteminde cihaz üzerinde çalışan bir çevirici yoksa, Feeder desteklenen %1$s dil çiftleri için Mozilla/Bergamot modellerini indirir.</string>
 </resources>

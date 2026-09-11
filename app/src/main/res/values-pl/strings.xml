@@ -149,7 +149,6 @@
     <string name="or_open_device_sync_link">Alternatywnie otwórz link na swoim urządzeniu.</string>
     <string name="qr_code">Kod QR</string>
     <string name="leave_sync_chain">Opuść łańcuch synchronizacji</string>
-    <string name="feeder_device_sync_code">Kod synchronizacji urządzenia z Feederem</string>
     <string name="scan_or_enter_code">Zeskanuj lub wprowadź kod synchronizacji</string>
     <string name="sync_code">Kod synchronizacji</string>
     <string name="secret_key">Klucz tajny</string>
@@ -290,8 +289,6 @@
     <string name="open_article_in_custom_tab">Otwórz w niestandardowej karcie</string>
     <string name="no_article_link_browser">Nie udało się otworzyć artykułu w przeglądarce</string>
     <string name="no_article_link_custom_tab">Nie udało się otworzyć artykułu w niestandardowej karcie</string>
-    <string name="widget_title">Feeder</string>
-    <string name="widget_refreshing">Odświeżanie</string>
     <string name="pref_paging_mode_title">Tryb przewracania stron</string>
     <string name="pref_paging_mode_description">Przeglądaj artykuły przez „przewracanie stron” zamiast ciągłego przewijania. Przystosowane do urządzeń z e-papierem</string>
     <string name="pref_animated_paging_title">Animowane przewracanie stron</string>
@@ -330,7 +327,6 @@
     <string name="show_original_language">Pokaż oryginalny (%1$s)</string>
     <string name="original_article">oryginalny</string>
     <string name="preferred_translation_language">Preferowany język tłumaczenia</string>
-    <string name="preferred_translation_language_description">Wybierz język, na który Feeder ma tłumaczyć</string>
     <string name="translation_language_placeholder">Wybierz język</string>
     <string name="set_translation_language_first">Ustaw preferowany język tłumaczenia w ustawieniach AI</string>
     <string name="translate_feed_cards_by_default">Tłumacz podglądy artykułów</string>
@@ -366,10 +362,8 @@
     <string name="bergamot_webview_not_initialized">Bergamot WebView nie został zainicjowany</string>
     <string name="bergamot_response_parse_failed">Nie udało się przeanalizować odpowiedzi Bergamot</string>
     <string name="local_translation_setup_system">Najpierw korzysta z wbudowanego tłumaczenia systemowego Androida, które należy pobrać w ustawieniach systemowych</string>
-    <string name="local_translation_setup_bergamot">Jeśli system nie ma wbudowanego translatora, Feeder pobiera modele Mozilla/Bergamot dla obsługiwanych par języków %1$s</string>
     <string name="show_only_bergamot_languages">Pokazuj tylko języki docelowe z dowolnym modelem Mozilla/Bergamot</string>
     <string name="downloaded_translation_models">Pobrane modele tłumaczeń</string>
-    <string name="downloaded_translation_models_desc">Modele Mozilla/Bergamot przechowywane na urządzeniu do tłumaczenia offline. Usuń nieużywane pary języków, aby zwolnić miejsce.</string>
     <string name="delete_model_pair">Usuń model</string>
     <string name="delete_model_pair_desc">Czy usunąć model tłumaczenia %1$s na %2$s (%3$s)?</string>
     <string name="delete_all_models">Usuń wszystkie pobrane modele</string>

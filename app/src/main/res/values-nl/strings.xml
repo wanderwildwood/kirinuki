@@ -144,7 +144,6 @@
     <string name="press_scan_sync">Ga naar \'Toestellen-synchroniseren\' en klik op \'Sync-code scannen of invoeren\'.</string>
     <string name="devices_on_sync_chain">Toestellen in de sync-keten</string>
     <string name="device_sync">Toestellen synchroniseren</string>
-    <string name="feeder_device_sync_code">Feeder sync-code</string>
     <string name="device_sync_description_2">Scan de sync-code voor de keten van een ander toestel, of start een nieuwe sync-keten.</string>
     <string name="add_new_device">Nieuw toestel toevoegen</string>
     <string name="this_device">%1$s (dit toestel)</string>
@@ -323,5 +322,4 @@
     <string name="enter_azure_endpoint_before_saving">Voer je Azure eindpunt in voor opslaan.</string>
     <string name="enter_azure_deployment_id_before_saving">Voer je Azure deployment id in voor opslaan.</string>
     <string name="enter_azure_api_version_before_saving">Voer je Azure API versie in voor opslaan.</string>
-    <string name="widget_refreshing">Vernieuwen</string>
 </resources>

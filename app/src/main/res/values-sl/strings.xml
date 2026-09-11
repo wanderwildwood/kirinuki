@@ -60,7 +60,6 @@
     <string name="failed_to_import_OPML">Ni bilo mogoče uvoziti OPML datoteke</string>
     <string name="open_menu">Odpri meni</string>
     <string name="remove_device">Odstrani napravo</string>
-    <string name="feeder_device_sync_code">Feeder sinhronizacijska koda za napravo</string>
     <string name="or_open_device_sync_link">Ali pa odprite povezavo na svoji napravi.</string>
     <string name="from_anywhere">Od kjerkoli</string>
     <string name="swipe_to_mark_as_read">Podrsaj, da označiš kot prebrano</string>
