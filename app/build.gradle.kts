@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -71,33 +72,29 @@ android {
         }
     }
 
-    signingConfigs {
-        create("shareddebug") {
-            storeFile = rootProject.file("shareddebug.keystore")
-            storePassword = "android"
-            keyAlias = "AndroidDebugKey"
-            keyPassword = "android"
-        }
-        if (project.hasProperty("STORE_FILE")) {
-            create("release") {
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val STORE_FILE: String by project.properties
-
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val STORE_PASSWORD: String by project.properties
-
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val KEY_ALIAS: String by project.properties
-
-                @Suppress("LocalVariableName", "ktlint:standard:property-naming")
-                val KEY_PASSWORD: String by project.properties
-                storeFile = file(STORE_FILE)
-                storePassword = STORE_PASSWORD
-                keyAlias = KEY_ALIAS
-                keyPassword = KEY_PASSWORD
+    // A real keystore in signing/ signs every build type when it is present, so the
+    // very first install is already release-signed and a later update can never hit
+    // INSTALL_FAILED_UPDATE_INCOMPATIBLE. It is gitignored, and there is no fallback:
+    // a fresh clone builds an unsigned release APK, which will not install anywhere.
+    // A keystore committed to a public repo is not a signing key, it is a formality,
+    // and a missing one should stop you rather than produce something installable.
+    // (Debug builds still get the ordinary Android debug key from AGP.)
+    val signingPropertiesFile = rootProject.file("signing/signing.properties")
+    val realSigningConfig =
+        if (signingPropertiesFile.isFile) {
+            val signingProperties =
+                Properties().apply {
+                    signingPropertiesFile.inputStream().use(::load)
+                }
+            signingConfigs.create("real") {
+                storeFile = rootProject.file("signing/signing.keystore")
+                storePassword = signingProperties.getProperty("STORE_PASSWORD")
+                keyAlias = signingProperties.getProperty("KEY_ALIAS")
+                keyPassword = signingProperties.getProperty("KEY_PASSWORD")
             }
+        } else {
+            null
         }
-    }
 
     buildTypes {
         val debug by getting {
@@ -108,7 +105,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            signingConfig = signingConfigs.getByName("shareddebug")
+            realSigningConfig?.let { signingConfig = it }
         }
         val release by getting {
             isMinifyEnabled = true
@@ -117,9 +114,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            if (project.hasProperty("STORE_FILE")) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            realSigningConfig?.let { signingConfig = it }
         }
     }
     testOptions {

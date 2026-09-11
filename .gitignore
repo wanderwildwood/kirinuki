@@ -15,3 +15,6 @@ app/creds.b64
 keystore.b64
 devenv.local
 keystore
+
+# The whole signing directory: keystore and its passwords both.
+/signing
