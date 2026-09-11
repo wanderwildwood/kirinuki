@@ -76,6 +76,18 @@ fun ArticleListScreen(
             )
         },
     ) { padding ->
+        if (items.itemCount == 0) {
+            TextMMD(
+                text = stringResource(R.string.nothing_here),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .padding(24.dp),
+            )
+            return@Scaffold
+        }
+
         LazyColumnMMD(
             state = listState,
             modifier =

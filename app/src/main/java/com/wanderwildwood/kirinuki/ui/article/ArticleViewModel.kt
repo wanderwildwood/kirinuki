@@ -35,7 +35,6 @@ class ArticleViewModel(
     private val repository: Repository by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val fullTextParser: FullTextParser by instance()
-    private val application: Application by instance()
 
     private val displayFullTextOverride = MutableStateFlow<Boolean?>(null)
     private val textToDisplay = MutableStateFlow(TextToDisplay.CONTENT)
@@ -85,10 +84,11 @@ class ArticleViewModel(
         fullText: Boolean,
     ): LinearArticle =
         withContext(Dispatchers.IO) {
+            val app = getApplication<Application>()
             val linearizer =
                 HtmlLinearizer(
-                    tooLargeText = application.getString(R.string.failed_to_fetch_full_article_too_large),
-                    openInBrowserText = application.getString(R.string.open_in_web_view),
+                    tooLargeText = app.getString(R.string.failed_to_fetch_full_article_too_large),
+                    openInBrowserText = app.getString(R.string.open_in_web_view),
                     articleLink = article.link ?: "",
                 )
 

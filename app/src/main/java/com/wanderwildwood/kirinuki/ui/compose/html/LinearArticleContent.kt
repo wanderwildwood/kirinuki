@@ -97,13 +97,13 @@ import com.wanderwildwood.kirinuki.ui.compose.text.asFontFamily
 import com.wanderwildwood.kirinuki.ui.compose.text.rememberMaxImageWidth
 import com.wanderwildwood.kirinuki.ui.compose.theme.CodeBlockBackground
 import com.wanderwildwood.kirinuki.ui.compose.theme.CodeInlineStyle
+import com.wanderwildwood.kirinuki.ui.compose.theme.KirinukiTheme
 import com.wanderwildwood.kirinuki.ui.compose.theme.LinkTextStyle
 import com.wanderwildwood.kirinuki.ui.compose.theme.LocalDimens
 import com.wanderwildwood.kirinuki.ui.compose.theme.LocalTypographySettings
 import com.wanderwildwood.kirinuki.ui.compose.theme.OnCodeBlockBackground
 import com.wanderwildwood.kirinuki.ui.compose.theme.hasImageAspectRatioInReader
 import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
-import com.wanderwildwood.kirinuki.ui.compose.utils.WithAllPreviewProviders
 import com.wanderwildwood.kirinuki.ui.compose.utils.focusableInNonTouchMode
 import com.wanderwildwood.kirinuki.util.logDebug
 import kotlin.math.abs
@@ -873,7 +873,7 @@ fun LinearText.toAnnotatedString(
 
 @Composable
 private fun PreviewContent(element: LinearElement) {
-    WithAllPreviewProviders {
+    KirinukiTheme {
         Surface {
             Box(
                 contentAlignment = Alignment.Center,

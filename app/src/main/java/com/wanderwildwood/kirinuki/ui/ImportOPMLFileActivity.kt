@@ -1,24 +1,34 @@
 package com.wanderwildwood.kirinuki.ui
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.core.net.toUri
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
+import com.mudita.mmd.components.buttons.ButtonMMD
+import com.mudita.mmd.components.text.TextMMD
+import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
-import com.wanderwildwood.kirinuki.db.room.ID_ALL_FEEDS
-import com.wanderwildwood.kirinuki.ui.compose.ompl.OpmlImportScreen
+import com.wanderwildwood.kirinuki.model.opml.importOpml
 import com.wanderwildwood.kirinuki.ui.compose.utils.withAllProviders
-import com.wanderwildwood.kirinuki.util.DEEP_LINK_BASE_URI
 import com.wanderwildwood.kirinuki.util.logDebug
+import kotlinx.coroutines.launch
 
 /**
- * This activity should only be started via a Open File Intent.
+ * Started by opening an OPML file from somewhere else on the phone. It imports and
+ * says so; there is nothing to decide, so there is nothing to ask.
  */
 class ImportOPMLFileActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,41 +41,41 @@ class ImportOPMLFileActivity : DIAwareComponentActivity() {
 
         setContent {
             withAllProviders {
-                val navController = rememberNavController()
-                NavHost(navController, startDestination = "import") {
-                    composable(
-                        "import",
-                        enterTransition = { fadeIn() },
-                        exitTransition = { fadeOut() },
-                        popEnterTransition = { fadeIn() },
-                        popExitTransition = { fadeOut() },
-                    ) {
-                        OpmlImportScreen(
-                            onNavigateUp = {
-                                onNavigateUpFromIntentActivities()
-                            },
-                            uri = uri,
-                            onDismiss = {
-                                finish()
-                            },
-                            {
-                                val deepLinkUri =
-                                    "$DEEP_LINK_BASE_URI/feed?id=$ID_ALL_FEEDS"
+                var done by remember { mutableStateOf(false) }
 
-                                val intent =
-                                    Intent(
-                                        Intent.ACTION_VIEW,
-                                        deepLinkUri.toUri(),
-                                        this@ImportOPMLFileActivity,
-                                        MainActivity::class.java,
-                                    ).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
+                LaunchedEffect(uri) {
+                    if (uri == null) {
+                        done = true
+                        return@LaunchedEffect
+                    }
+                    lifecycleScope
+                        .launch {
+                            importOpml(di, uri)
+                        }.join()
+                    done = true
+                }
 
-                                startActivity(intent)
-                                finish()
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(24.dp),
+                ) {
+                    TextMMD(
+                        text =
+                            when {
+                                done -> stringResource(R.string.imported_feeds_from_opml)
+                                else -> stringResource(R.string.import_feeds_from_opml)
                             },
-                        )
+                    )
+                    if (done) {
+                        ButtonMMD(
+                            onClick = { onNavigateUpFromIntentActivities() },
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            TextMMD(text = stringResource(R.string.open_feed))
+                        }
                     }
                 }
             }
@@ -73,6 +83,6 @@ class ImportOPMLFileActivity : DIAwareComponentActivity() {
     }
 
     companion object {
-        private const val LOG_TAG = "FEEDER_OPMLIMPORT"
+        private const val LOG_TAG = "KIRINUKI_OPMLIMPORT"
     }
 }

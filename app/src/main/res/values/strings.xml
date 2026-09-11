@@ -415,4 +415,5 @@
   <string name="summary_only_notice">Only the summary the feed carried. Fetching the whole article does not always work.</string>
   <string name="add_feed_url">Feed address</string>
   <string name="add_feed_url_invalid">That does not look like an address.</string>
+  <string name="imported_feeds_from_opml">Feeds imported.</string>
 </resources>

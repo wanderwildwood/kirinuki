@@ -1,4 +1,0 @@
-# 2.6.6
-bowornsin (1):
-  * [cac00ff3] Updated Thai translation using Weblate
-

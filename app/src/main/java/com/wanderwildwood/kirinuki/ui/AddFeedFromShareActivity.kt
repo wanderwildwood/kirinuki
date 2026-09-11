@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -33,4 +34,18 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
             }
         }
     }
+}
+
+/**
+ * Backing out of an activity that was opened by a share or a file leaves you in the
+ * app itself rather than wherever the intent came from.
+ */
+fun Activity.onNavigateUpFromIntentActivities() {
+    startActivity(
+        Intent(
+            this,
+            MainActivity::class.java,
+        ),
+    )
+    finish()
 }

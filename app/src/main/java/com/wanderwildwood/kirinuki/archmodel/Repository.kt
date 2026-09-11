@@ -25,8 +25,6 @@ import com.wanderwildwood.kirinuki.db.room.SyncDevice
 import com.wanderwildwood.kirinuki.db.room.SyncRemote
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
 import com.wanderwildwood.kirinuki.model.ThumbnailImage
-import com.wanderwildwood.kirinuki.sync.DeviceListResponse
-import com.wanderwildwood.kirinuki.sync.ErrorResponse
 import com.wanderwildwood.kirinuki.model.FeedListItem
 import com.wanderwildwood.kirinuki.model.FeedListFilter
 import com.wanderwildwood.kirinuki.model.emptyFeedListFilter
@@ -64,29 +62,9 @@ class Repository(
     private val application: Application by instance()
     private val syncRemoteStore: SyncRemoteStore by instance()
 
-    init {
-        addFeederNewsIfInitialStart()
-    }
-
-    private fun addFeederNewsIfInitialStart() {
-        if (!settingsStore.addedFeederNews.value) {
-            applicationCoroutineScope.launch {
-                val feedId =
-                    feedStore.upsertFeed(
-                        Feed(
-                            title = "Feeder News",
-                            url = URL("https://news.nononsenseapps.com/index.atom"),
-                        ),
-                    )
-                settingsStore.setAddedFeederNews(true)
-                runOnceRssSync(
-                    di = di,
-                    feedId = feedId,
-                    triggeredByUser = false,
-                )
-            }
-        }
-    }
+    // Upstream subscribed every new install to its own news feed on first start.
+    // That is inherited process rather than inherited code: a reader should open empty
+    // and wait to be told what to read.
 
     val minReadTime: StateFlow<Instant> = settingsStore.minReadTime
 
