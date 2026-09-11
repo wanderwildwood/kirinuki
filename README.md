@@ -14,8 +14,8 @@ Mudita's MMD design system.
 
 | | |
 |---|---|
-| ![The feeds](screenshots/1-feeds.png) | ![What is in one feed](screenshots/2-articles.png) |
-| ![A cutting](screenshots/3-article.png) | ![Settings](screenshots/4-settings.png) |
+| ![The feeds, a gemlog among them](screenshots/1-feeds.png) | ![Everything, whichever protocol it came over](screenshots/2-articles.png) |
+| ![A cutting](screenshots/3-article.png) | ![A capsule, over Gemini](screenshots/4-capsule.png) |
 
 ## What it is
 
