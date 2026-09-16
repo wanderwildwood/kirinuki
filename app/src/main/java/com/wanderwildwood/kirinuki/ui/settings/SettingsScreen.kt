@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -19,6 +17,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
+import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -62,43 +61,69 @@ fun SettingsScreen(
             )
         },
     ) { padding ->
-        Column(
+        // MMD's list, not a scrolling Column: it steps four rows to a swipe and stops, and it
+        // brings the chevron rail at both ends. A screen that coasts was the one screen in
+        // the app that did not behave like the phone it is on.
+        LazyColumnMMD(
             modifier =
                 Modifier
                     .fillMaxSize()
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState()),
+                    .padding(padding),
         ) {
-            SwitchRow(
-                title = stringResource(R.string.only_on_wifi),
-                checked = syncOnlyOnWifi,
-                onCheckedChange = viewModel::setSyncOnlyOnWifi,
-            )
-            HorizontalDividerMMD()
-            SwitchRow(
-                title = stringResource(R.string.only_when_charging),
-                checked = syncOnlyWhenCharging,
-                onCheckedChange = viewModel::setSyncOnlyWhenCharging,
-            )
-            HorizontalDividerMMD()
-            StepperRow(
-                title = stringResource(R.string.check_for_updates),
-                value = stringResource(syncFrequency.stringId),
-                onLess = { viewModel.setSyncFrequency(syncFrequency.previous()) },
-                onMore = { viewModel.setSyncFrequency(syncFrequency.next()) },
-            )
-            HorizontalDividerMMD()
-            StepperRow(
-                title = stringResource(R.string.text_scale),
-                value = "${(textScale * 100).toInt()}%",
-                onLess = { viewModel.setTextScale((textScale - 0.1f).coerceAtLeast(0.5f)) },
-                onMore = { viewModel.setTextScale((textScale + 0.1f).coerceAtMost(3.0f)) },
-            )
-            HorizontalDividerMMD()
-            ActionRow(title = stringResource(R.string.import_feeds_from_opml), onClick = onImportOpml)
-            HorizontalDividerMMD()
-            ActionRow(title = stringResource(R.string.export_feeds_to_opml), onClick = onExportOpml)
-            HorizontalDividerMMD()
+            item {
+                SwitchRow(
+                    title = stringResource(R.string.only_on_wifi),
+                    checked = syncOnlyOnWifi,
+                    onCheckedChange = viewModel::setSyncOnlyOnWifi,
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                SwitchRow(
+                    title = stringResource(R.string.only_when_charging),
+                    checked = syncOnlyWhenCharging,
+                    onCheckedChange = viewModel::setSyncOnlyWhenCharging,
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                StepperRow(
+                    title = stringResource(R.string.check_for_updates),
+                    value = stringResource(syncFrequency.stringId),
+                    onLess = { viewModel.setSyncFrequency(syncFrequency.previous()) },
+                    onMore = { viewModel.setSyncFrequency(syncFrequency.next()) },
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                StepperRow(
+                    title = stringResource(R.string.text_scale),
+                    value = "${(textScale * 100).toInt()}%",
+                    onLess = { viewModel.setTextScale((textScale - 0.1f).coerceAtLeast(0.5f)) },
+                    onMore = { viewModel.setTextScale((textScale + 0.1f).coerceAtMost(3.0f)) },
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                ActionRow(title = stringResource(R.string.import_feeds_from_opml), onClick = onImportOpml)
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                ActionRow(title = stringResource(R.string.export_feeds_to_opml), onClick = onExportOpml)
+            }
+            item {
+                HorizontalDividerMMD()
+            }
         }
     }
 }
