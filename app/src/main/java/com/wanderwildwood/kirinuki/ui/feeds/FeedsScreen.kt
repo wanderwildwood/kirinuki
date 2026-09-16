@@ -11,7 +11,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -21,6 +25,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Settings
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
@@ -32,6 +37,7 @@ import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import kotlinx.coroutines.delay
 
 /**
  * The feeds, and above them the two rows that are not feeds: everything, and what was kept.
@@ -140,6 +146,15 @@ fun FeedsScreen(
                         }
                     },
                     onToggleTag = { viewModel.toggleTagExpansion(item.tag) },
+                    // "All feeds", "Saved articles" and a tag are not subscriptions, so
+                    // there is nothing to unsubscribe from and no icon on those rows.
+                    onRemove =
+                        when {
+                            item.id == ID_ALL_FEEDS -> null
+                            item.id == ID_SAVED_ARTICLES -> null
+                            item.id == ID_UNSET -> null
+                            else -> ({ viewModel.remove(item.id) })
+                        },
                 )
                 HorizontalDividerMMD()
             }
@@ -153,8 +168,18 @@ private fun FeedRow(
     expanded: Boolean,
     onClick: () -> Unit,
     onToggleTag: () -> Unit,
+    onRemove: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
+    // Removing a feed cannot be undone, so it asks in the row rather than in a dialog --
+    // see STYLE.md. It disarms itself, because a row left armed under a thumb is a trap.
+    var armed by remember { mutableStateOf(false) }
+    LaunchedEffect(armed) {
+        if (armed) {
+            delay(ARMED_MILLIS)
+            armed = false
+        }
+    }
     val isTag = item.id == ID_UNSET && item.tag.isNotEmpty()
     val title =
         when (item.id) {
@@ -169,7 +194,7 @@ private fun FeedRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
+                .clickable { if (armed) armed = false else onClick() }
                 .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
         if (isTag) {
@@ -180,13 +205,26 @@ private fun FeedRow(
             }
         }
         TextMMD(
-            text = title,
+            text = if (armed) stringResource(R.string.remove_feed_armed) else title,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
-        if (item.unreadCount > 0) {
+        if (item.unreadCount > 0 && !armed) {
             TextMMD(text = item.unreadCount.toString())
+        }
+        if (onRemove != null) {
+            BarIcon(
+                icon = Icons.Outlined.Delete,
+                contentDescription =
+                    stringResource(
+                        if (armed) R.string.remove_feed_armed else R.string.remove_feed,
+                    ),
+                onClick = { if (armed) onRemove() else armed = true },
+            )
         }
     }
 }
+
+/** Long enough to mean it, short enough not to leave a live delete under a thumb. */
+private const val ARMED_MILLIS = 4000L

@@ -64,6 +64,8 @@
   <string name="no_such_feed">No such feed could be found. Try using HTTPS maybe?</string>
   <string name="nothing_to_display">Nothing to display!</string>
   <string name="title_activity_settings">Settings</string>
+  <string name="remove_feed">Remove this feed</string>
+  <string name="remove_feed_armed">Remove this feed — tap again</string>
   <string name="all_feeds">All feeds</string>
 
   <string name="sync_option_manually">Manually</string>
