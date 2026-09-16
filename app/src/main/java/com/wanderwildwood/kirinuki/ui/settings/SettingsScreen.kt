@@ -7,10 +7,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,6 +31,7 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -46,6 +51,9 @@ fun SettingsScreen(
     val syncFrequency by viewModel.syncFrequency.collectAsStateWithLifecycle()
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
 
+    var aboutOpen by remember { mutableStateOf(false) }
+
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -56,6 +64,15 @@ fun SettingsScreen(
                         icon = Icons.AutoMirrored.Outlined.ArrowBack,
                         contentDescription = stringResource(R.string.go_back),
                         onClick = onBack,
+                    )
+                },
+                // About is not a setting, and it is the one thing a stranger looks for
+                // before trusting an app. An i in the top right, as everywhere else here.
+                actions = {
+                    BarIcon(
+                        icon = Icons.Outlined.Info,
+                        contentDescription = stringResource(R.string.about),
+                        onClick = { aboutOpen = true },
                     )
                 },
             )
@@ -126,6 +143,8 @@ fun SettingsScreen(
             }
         }
     }
+
+    if (aboutOpen) AboutDialog(onDismiss = { aboutOpen = false })
 }
 
 private fun SyncFrequency.next(): SyncFrequency {
@@ -182,6 +201,7 @@ private fun StepperRow(
         BarAction("−", onLess)
         BarAction("+", onMore)
     }
+
 }
 
 @Composable

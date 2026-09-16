@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
@@ -22,6 +21,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import com.mudita.mmd.components.text.TextMMD
 
 @Composable
 fun Table(
@@ -139,7 +139,7 @@ private fun TableDifferentColumnsPreview() {
         ) {
             Row {
                 for (i in 0..row) {
-                    Text(text = "Row $row Column $column")
+                    TextMMD(text = "Row $row Column $column")
                 }
             }
         }
@@ -184,7 +184,7 @@ private fun TableCaptionPreview() {
 @Composable
 private fun EmptyTableShouldNotCrashPreview() {
     Surface {
-        Text("No table to show")
+        TextMMD("No table to show")
         Table(tableData = TableData(0, 0)) { _, _ ->
             Box(
                 modifier =

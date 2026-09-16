@@ -26,7 +26,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -55,6 +54,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.model.html.Coordinate
@@ -286,7 +286,7 @@ fun LinearAudioContent(modifier: Modifier = Modifier) {
     ) {
         DisableSelection {
             ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
-                Text(text = stringResource(R.string.article_has_audio))
+                TextMMD(text = stringResource(R.string.article_has_audio))
             }
         }
     }
@@ -301,7 +301,7 @@ fun LinearVideoContent(modifier: Modifier = Modifier) {
     ) {
         DisableSelection {
             ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
-                Text(text = stringResource(R.string.article_has_video))
+                TextMMD(text = stringResource(R.string.article_has_video))
             }
         }
     }
@@ -346,9 +346,9 @@ fun LinearListItemContent(
     ) {
         // List item indicator here
         if (listItem.orderedIndex != null) {
-            Text("${listItem.orderedIndex}.")
+            TextMMD("${listItem.orderedIndex}.")
         } else {
-            Text("•")
+            TextMMD("•")
         }
 
         // Then the item content
@@ -417,7 +417,7 @@ fun LinearTextContent(
             val interactionSource = remember { MutableInteractionSource() }
             val annotatedString = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
 
-            Text(
+            TextMMD(
                 text = annotatedString,
                 softWrap = softWrap,
                 modifier =
@@ -477,9 +477,11 @@ fun LinearBlockQuoteContent(
                                     TextLinkStyles(
                                         style =
                                             MaterialTheme.typography.bodySmall.toSpanStyle().merge(
+                                                // Was tertiary and italic. tertiary is white
+                                                // in this palette, so the cite link was white
+                                                // on white; a link is underlined here instead.
                                                 SpanStyle(
-                                                    color = MaterialTheme.colorScheme.tertiary,
-                                                    fontStyle = FontStyle.Italic,
+                                                    textDecoration = TextDecoration.Underline,
                                                 ),
                                             ),
                                     ),
@@ -498,7 +500,7 @@ fun LinearBlockQuoteContent(
                         }
                     }
 
-                Text(
+                TextMMD(
                     text = annotatedText,
                     modifier = Modifier.align(Alignment.End),
                 )

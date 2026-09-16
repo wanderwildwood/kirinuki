@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.outlined.Subject
@@ -87,7 +87,7 @@ fun ArticleScreen(
                     BarIcon(
                         icon =
                             if (article?.bookmarked == true) {
-                                Icons.Filled.Star
+                                Icons.Outlined.Star
                             } else {
                                 Icons.Outlined.StarBorder
                             },

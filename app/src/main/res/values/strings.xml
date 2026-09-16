@@ -428,4 +428,5 @@
   <string name="tour_empty">Nothing on the tour. Anything you cannot reach can be put here, and fetched next time you sync.</string>
   <string name="tour_waiting">waiting for a sync</string>
   <string name="tour_remove">Take off the tour</string>
+    <string name="about">About</string>
 </resources>
