@@ -125,4 +125,27 @@ class GemsubParserTest {
 
         assertEquals("A post", feed?.items?.single()?.title)
     }
+
+    @Test
+    fun `link lines separated by a tab are still entries`() {
+        // geminiprotocol.net's own news capsule separates the target from the label with a
+        // TAB rather than a space. It is the most canonical gemsub there is, and subscribing
+        // to it on the phone produced no entries at all.
+        val feed =
+            parser.parse(
+                "gemini://geminiprotocol.net/news/",
+                "# Official Project Gemini news feed\n" +
+                    "=> atom.xml\tAtom feed\n" +
+                    "=> 2026_06_20.gmi\t2026-06-20 - Seven years of Gemini!\n" +
+                    "=> 2026_01_14.gmi\t2026-01-14 - Yet more downtime\n",
+            )
+
+        assertNotNull(feed)
+        assertEquals(2, feed.items?.size)
+        assertEquals("Seven years of Gemini!", feed.items?.first()?.title)
+        assertEquals(
+            "gemini://geminiprotocol.net/news/2026_06_20.gmi",
+            feed.items?.first()?.url,
+        )
+    }
 }
