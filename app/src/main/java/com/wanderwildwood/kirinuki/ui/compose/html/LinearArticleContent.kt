@@ -18,10 +18,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.DisableSelection
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ErrorOutline
-import androidx.compose.material.icons.outlined.PlayCircleOutline
-import androidx.compose.material.icons.outlined.Terrain
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -98,6 +94,7 @@ import com.wanderwildwood.kirinuki.ui.compose.text.asFontFamily
 import com.wanderwildwood.kirinuki.ui.compose.text.rememberMaxImageWidth
 import com.wanderwildwood.kirinuki.ui.compose.theme.CodeBlockBackground
 import com.wanderwildwood.kirinuki.ui.compose.theme.CodeInlineStyle
+import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.compose.theme.KirinukiTheme
 import com.wanderwildwood.kirinuki.ui.compose.theme.LinkTextStyle
 import com.wanderwildwood.kirinuki.ui.compose.theme.LocalDimens

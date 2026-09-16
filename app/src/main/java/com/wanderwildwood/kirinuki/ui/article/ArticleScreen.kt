@@ -17,12 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Star
-import androidx.compose.material.icons.outlined.Article
-import androidx.compose.material.icons.outlined.StarBorder
-import androidx.compose.material.icons.outlined.Subject
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -31,6 +25,7 @@ import com.wanderwildwood.kirinuki.archmodel.TextToDisplay
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
 /**
  * The cutting itself. Title, where it came from, and the text -- the summary the feed
@@ -63,7 +58,7 @@ fun ArticleScreen(
                 },
                 navigationIcon = {
                     BarIcon(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        icon = Icons.Back,
                         contentDescription = stringResource(R.string.go_back),
                         onClick = onBack,
                     )
@@ -72,9 +67,9 @@ fun ArticleScreen(
                     BarIcon(
                         icon =
                             if (showingFullText) {
-                                Icons.Outlined.Subject
+                                Icons.Subject
                             } else {
-                                Icons.Outlined.Article
+                                Icons.Article
                             },
                         contentDescription =
                             if (showingFullText) {
@@ -87,9 +82,9 @@ fun ArticleScreen(
                     BarIcon(
                         icon =
                             if (article?.bookmarked == true) {
-                                Icons.Outlined.Star
+                                Icons.Star
                             } else {
-                                Icons.Outlined.StarBorder
+                                Icons.StarBorder
                             },
                         contentDescription =
                             if (article?.bookmarked == true) {

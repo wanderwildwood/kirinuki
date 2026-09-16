@@ -9,10 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -31,6 +27,7 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
+import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import java.net.URI
 
 /**
@@ -65,7 +62,7 @@ fun GeminiPageScreen(
                 },
                 navigationIcon = {
                     BarIcon(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        icon = Icons.Back,
                         contentDescription = stringResource(R.string.go_back),
                         onClick = onBack,
                     )
@@ -73,12 +70,12 @@ fun GeminiPageScreen(
                 actions = {
                     // Following a capsule usually occurs to you while reading it.
                     BarIcon(
-                        icon = Icons.Outlined.Add,
+                        icon = Icons.Plus,
                         contentDescription = stringResource(R.string.subscribe_to_this),
                         onClick = { onSubscribe(url) },
                     )
                     BarIcon(
-                        icon = Icons.Outlined.Refresh,
+                        icon = Icons.Refresh,
                         contentDescription = stringResource(R.string.sync),
                         onClick = { viewModel.reload() },
                     )

@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -23,8 +22,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
@@ -32,6 +29,7 @@ import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
+import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -61,7 +59,7 @@ fun SettingsScreen(
                 title = { TextMMD(text = stringResource(R.string.action_settings)) },
                 navigationIcon = {
                     BarIcon(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        icon = Icons.Back,
                         contentDescription = stringResource(R.string.go_back),
                         onClick = onBack,
                     )
@@ -70,7 +68,7 @@ fun SettingsScreen(
                 // before trusting an app. An i in the top right, as everywhere else here.
                 actions = {
                     BarIcon(
-                        icon = Icons.Outlined.Info,
+                        icon = Icons.Info,
                         contentDescription = stringResource(R.string.about),
                         onClick = { aboutOpen = true },
                     )

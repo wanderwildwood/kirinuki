@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -29,6 +26,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.model.tour.TourEntry
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
 /**
  * What you meant to read. Things put here while you could not reach them are fetched by
@@ -55,7 +53,7 @@ fun TourScreen(
                 title = { TextMMD(text = stringResource(R.string.tour)) },
                 navigationIcon = {
                     BarIcon(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        icon = Icons.Back,
                         contentDescription = stringResource(R.string.go_back),
                         onClick = onBack,
                     )
@@ -118,7 +116,7 @@ private fun TourRow(
             }
         }
         BarIcon(
-            icon = Icons.Outlined.Close,
+            icon = Icons.Close,
             contentDescription = stringResource(R.string.tour_remove),
             onClick = onRemove,
         )

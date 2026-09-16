@@ -19,10 +19,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.DoneAll
-import androidx.compose.material.icons.outlined.Refresh
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
@@ -31,6 +27,7 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.FeedType
 import com.wanderwildwood.kirinuki.model.FeedListItem
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
 /**
  * The cuttings in one feed. Title, where it came from, when -- and nothing else:
@@ -66,19 +63,19 @@ fun ArticleListScreen(
                 },
                 navigationIcon = {
                     BarIcon(
-                        icon = Icons.AutoMirrored.Outlined.ArrowBack,
+                        icon = Icons.Back,
                         contentDescription = stringResource(R.string.go_back),
                         onClick = onBack,
                     )
                 },
                 actions = {
                     BarIcon(
-                        icon = Icons.Outlined.DoneAll,
+                        icon = Icons.DoneAll,
                         contentDescription = stringResource(R.string.mark_all_as_read),
                         onClick = { viewModel.markAllAsRead() },
                     )
                     BarIcon(
-                        icon = Icons.Outlined.Refresh,
+                        icon = Icons.Refresh,
                         contentDescription = stringResource(R.string.sync),
                         onClick = { viewModel.refresh() },
                     )

@@ -19,14 +19,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Settings
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
 import com.mudita.mmd.components.text.TextMMD
@@ -37,6 +34,7 @@ import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import kotlinx.coroutines.delay
 
 /**
@@ -75,12 +73,12 @@ fun FeedsScreen(
                 },
                 actions = {
                     BarIcon(
-                        icon = Icons.Outlined.Add,
+                        icon = Icons.Plus,
                         contentDescription = stringResource(R.string.add_feed),
                         onClick = onAddFeed,
                     )
                     BarIcon(
-                        icon = Icons.Outlined.Settings,
+                        icon = Icons.Settings,
                         contentDescription = stringResource(R.string.action_settings),
                         onClick = onSettings,
                     )
@@ -119,7 +117,11 @@ fun FeedsScreen(
                             .clickable(onClick = onTour)
                             .padding(horizontal = 16.dp, vertical = 14.dp),
                 ) {
-                    TextMMD(text = stringResource(R.string.tour), modifier = Modifier.weight(1f))
+                    TextMMD(
+                        text = stringResource(R.string.tour),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f),
+                    )
                     if (tourCount > 0) TextMMD(text = tourCount.toString())
                 }
                 HorizontalDividerMMD()
@@ -206,6 +208,10 @@ private fun FeedRow(
         }
         TextMMD(
             text = if (armed) stringResource(R.string.remove_feed_armed) else title,
+            // Tour, All feeds and Saved articles are not feeds. They sat in the same
+            // column drawn the same way, so they read as subscriptions. Weight separates
+            // the kinds without a second type size or a row of its own.
+            fontWeight = if (onRemove == null && !isTag) FontWeight.Bold else FontWeight.Normal,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
@@ -215,7 +221,7 @@ private fun FeedRow(
         }
         if (onRemove != null) {
             BarIcon(
-                icon = Icons.Outlined.Delete,
+                icon = Icons.Delete,
                 contentDescription =
                     stringResource(
                         if (armed) R.string.remove_feed_armed else R.string.remove_feed,
