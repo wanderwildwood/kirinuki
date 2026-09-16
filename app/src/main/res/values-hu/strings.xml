@@ -71,7 +71,6 @@
     <string name="open_links_with">Hivatkozások megnyitása ezzel</string>
     <string name="reader_settings">Olvasó</string>
     <string name="open_link_in_web_view">Hivatkozás megnyitása webes nézetben</string>
-    <string name="open_in_web_view">Megnyitás webes nézetben</string>
     <string name="max_feed_items">Maximális elemszám hírforrásonként</string>
     <string name="could_not_load_url">Nem tölthető be a webcím</string>
     <string name="theme_system">Rendszer</string>
@@ -161,7 +160,6 @@
     <string name="all_feeds">Összes hírforrás</string>
     <string name="check_for_updates">Új cikkek lekérdezése…</string>
     <string name="sync_status">Szinkronizálás állapota</string>
-    <string name="touch_to_play_video">Érintse meg a videó indításhoz</string>
     <string name="open_feed">Hírforrás megnyitása</string>
     <string name="mark_items_below_as_read">Lentebbiek megjelölése olvasottként</string>
     <string name="battery_optimization_disabled">Kikapcsolva</string>
@@ -247,7 +245,6 @@
     <string name="skip_duplicate_articles">Duplikált cikkek kihagyása</string>
     <string name="skip_duplicate_articles_desc">Azok a cikkek, amelyeknek a hivatkozásai vagy címei megegyeznek a már meglévő cikkekkel legyenek figyelmen kívül hagyva</string>
     <string name="feed_item_style_compact_card">Kompakt kártya</string>
-    <string name="touch_to_play_audio">Érintse meg a hang lejátszásához</string>
     <string name="show_title_unread_count">Olvasatlan cikkek számának megjelenítése a címben</string>
     <string name="api_key">API-kulcs</string>
     <string name="model_id">Modellazonosító</string>

@@ -94,8 +94,6 @@ class ArticleViewModel(
             val linearizer =
                 HtmlLinearizer(
                     tooLargeText = app.getString(R.string.failed_to_fetch_full_article_too_large),
-                    openInBrowserText = app.getString(R.string.open_in_web_view),
-                    articleLink = article.link ?: "",
                 )
 
             // A gemlog entry is a link rather than a document: the feed carried only its

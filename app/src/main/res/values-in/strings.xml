@@ -73,7 +73,6 @@
     <string name="open_links_with">Buka tautan dengan</string>
     <string name="reader_settings">Pembaca</string>
     <string name="open_link_in_web_view">Buka tautan di web view</string>
-    <string name="open_in_web_view">Buka di Web view</string>
     <string name="max_feed_items">Maksimum item per umpan</string>
     <string name="could_not_load_url">Tidak bisa memuat URL</string>
     <string name="theme_system">Sistem</string>
@@ -86,7 +85,6 @@
     <string name="sort">Urutkan</string>
     <string name="send_bug_report">Kirim laporan bug</string>
     <string name="no_email_client">Tidak bisa membuka aplikasi surel</string>
-    <string name="touch_to_play_video">Sentuh untuk memutar video</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Buka umpan</string>
     <string name="mark_items_above_as_read">Tandai item di atas sudah dibaca</string>
@@ -247,7 +245,6 @@
     <string name="feed_item_style_compact_card">Kartu Ringkas</string>
     <string name="export_saved_articles">Ekspor artikel yang disimpan</string>
     <string name="failed_to_export_saved_articles">Gagal mengekspor artikel yang disimpan</string>
-    <string name="touch_to_play_audio">Sentuh untuk memainkan audio</string>
     <string name="show_title_unread_count">Tampilkan artikel belum dibaca pada judul</string>
     <string name="show_message">Tampilkan pesan</string>
     <string name="open_drawer_on_fab">Tampilkan umpan setelah menandai semua telah dibaca</string>

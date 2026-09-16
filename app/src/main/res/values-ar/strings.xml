@@ -8,7 +8,6 @@
     <string name="add_new_device">أضف جهازًا جديدًا</string>
     <string name="disabled">معطّل</string>
     <string name="block_list_description">يخفي المقالات ذات العناوين التي تحتوي على أي من هذه المرشحات. مثال مرشحات:</string>
-    <string name="touch_to_play_video">المس لتشغيل الفيديو</string>
     <string name="javascript">جافاسكربت</string>
     <string name="open_feed">افتح خلاصة</string>
     <string name="mark_items_above_as_read">علّم الذي بالأعلى أنه مقروء</string>
@@ -108,7 +107,6 @@
     <string name="open_links_with">افتح الروابط بـ</string>
     <string name="reader_settings">القارئ</string>
     <string name="open_link_in_web_view">افتح الرابط في عرض الويب</string>
-    <string name="open_in_web_view">افتح في عرض الويب</string>
     <string name="max_feed_items">أقصى عدد للعناصر لكل خلاصة</string>
     <string name="could_not_load_url">لا يمكن تحميل العنوان</string>
     <string name="theme_system">النظام</string>

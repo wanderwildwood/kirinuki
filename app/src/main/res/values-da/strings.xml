@@ -59,7 +59,6 @@
     <string name="open_links_with">Åbn links med</string>
     <string name="reader_settings">Læser</string>
     <string name="open_link_in_web_view">Åbn link i webvisning</string>
-    <string name="open_in_web_view">Åbn i webvisning</string>
     <string name="max_feed_items">Maks. elementer pr. feed</string>
     <string name="could_not_load_url">Kunne ikke indlæse URL</string>
     <string name="theme_system">System</string>
@@ -71,7 +70,6 @@
     <string name="dark_theme_preference_black">Sort</string>
     <string name="send_bug_report">Send fejlrapport</string>
     <string name="no_email_client">Kunne ikke åbne e-mail-klient</string>
-    <string name="touch_to_play_video">Tryk for at afspille video</string>
     <string name="toggle_tag_expansion">Udvidelse af etikette til/fra</string>
     <string name="expanded_tag">Åbn etikette</string>
     <string name="discovered_feeds_list">Liste over opdagede feeds</string>
@@ -242,7 +240,6 @@
     <string name="one_minute">%1$s minut</string>
     <string name="many_minutes">%1$s minutter</string>
     <string name="other_minutes">%1$s minutter</string>
-    <string name="touch_to_play_audio">Tryk for at afspille lyd</string>
     <string name="export_saved_articles">Eksporter gemte artikler</string>
     <string name="failed_to_export_saved_articles">Kunne ikke eksportere gemte artikler</string>
     <string name="skip_duplicate_articles">Spring dubletter af artikler over</string>

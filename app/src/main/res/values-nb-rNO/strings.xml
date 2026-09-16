@@ -2,7 +2,6 @@
 <resources>
     <string name="mark_items_below_as_read">Marker elementer nedenfor som leste</string>
     <string name="mark_items_above_as_read">Marker elementer ovenfor som leste</string>
-    <string name="touch_to_play_video">Trykk for å spille video</string>
     <string name="no_email_client">Kunne ikke åpne e-postklient</string>
     <string name="sort">Sorter etter</string>
     <string name="sort_oldest_first">Eldste først</string>
@@ -25,7 +24,6 @@
     <string name="theme_day">Dag</string>
     <string name="theme_automatic">Automatisk</string>
     <string name="could_not_load_url">Kunne ikke laste inn nettadresse</string>
-    <string name="open_in_web_view">Åpne i nettvisning</string>
     <string name="open_link_in_web_view">Åpne lenke i nettvisning</string>
     <string name="open_links_with">Åpne lenker med</string>
     <string name="open_in_custom_tab">Egendefinert fane</string>
@@ -249,6 +247,5 @@
     <string name="openai_settings_info">Kompatibel med mange AI-leverandører, men ikke alle</string>
     <string name="api_key">API-nøkkel</string>
     <string name="azure_api_version">Azure API-versjon</string>
-    <string name="touch_to_play_audio">Trykk for å spille av lyd</string>
     <string name="show_title_unread_count">Vis antall uleste artikler i tittelen</string>
 </resources>

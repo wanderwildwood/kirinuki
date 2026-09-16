@@ -67,7 +67,6 @@
     <string name="open_item_by_default_with">По умолчанию открывать элементы в</string>
     <string name="open_links_with">Открывать ссылки в</string>
     <string name="open_link_in_web_view">Открыть ссылку в WebView</string>
-    <string name="open_in_web_view">Открыть в WebView</string>
     <string name="max_feed_items">Максимум элементов в ленте</string>
     <string name="could_not_load_url">Не удалось открыть URL</string>
     <string name="theme_system">Системная</string>
@@ -80,7 +79,6 @@
     <string name="sort">Упорядочить</string>
     <string name="send_bug_report">Сообщить об ошибке</string>
     <string name="no_email_client">Не удаётся открыть email-клиент</string>
-    <string name="touch_to_play_video">Нажмите для просмотра видео</string>
     <string name="open_feed">Открыть ленту</string>
     <string name="mark_items_below_as_read">Отметить ниже как прочитанное</string>
     <string name="discovered_feeds_list">Список найденных лент</string>
@@ -247,6 +245,5 @@
     <string name="skip_duplicate_articles">Пропускать повторяющиеся статьи</string>
     <string name="skip_duplicate_articles_desc">Статьи с ссылками или заголовками идентичными существующим статьям игнорируются</string>
     <string name="feed_item_style_compact_card">Компактный карточный</string>
-    <string name="touch_to_play_audio">Коснитесь для воспроизведения аудио</string>
     <string name="show_title_unread_count">Показывать число непрочитанных статей в заголовке</string>
 </resources>

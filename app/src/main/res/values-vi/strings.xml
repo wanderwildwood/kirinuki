@@ -16,7 +16,6 @@
     <string name="mark_items_above_as_read">Đánh dấu các mục ở trên đã đọc</string>
     <string name="open_feed">Mở nguồn cấp</string>
     <string name="javascript">JavaScript</string>
-    <string name="touch_to_play_video">Chạm để phát video</string>
     <string name="no_email_client">Không thể mở ứng dụng email</string>
     <string name="send_bug_report">Gửi báo cáo lỗi</string>
     <string name="sort">Sắp xếp theo</string>
@@ -29,7 +28,6 @@
     <string name="theme_system">Hệ thống</string>
     <string name="could_not_load_url">Không thể tải URL</string>
     <string name="max_feed_items">Số mục tối đa trên mỗi nguồn cấp dữ liệu</string>
-    <string name="open_in_web_view">Mở trong Web view</string>
     <string name="open_link_in_web_view">Mở liên kết trong web view</string>
     <string name="reader_settings">Trình đọc</string>
     <string name="open_links_with">Mở các liên kết bằng</string>
@@ -247,5 +245,4 @@
     <string name="close_menu">Đóng trình đơn</string>
     <string name="export_saved_articles">Xuất các bài viết đã lưu</string>
     <string name="skip_duplicate_articles">Bỏ qua bài viết trùng lặp</string>
-    <string name="touch_to_play_audio">Chạm để phát âm thanh</string>
 </resources>

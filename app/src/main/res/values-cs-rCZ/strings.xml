@@ -79,7 +79,6 @@
     <string name="sort">Seřadit</string>
     <string name="send_bug_report">Odeslat chybové hlášení</string>
     <string name="no_email_client">Nenalezen e-mailový klient</string>
-    <string name="touch_to_play_video">Klepnutím přehrajete video</string>
     <string name="open_feed">Otevřít kanál</string>
     <string name="mark_items_below_as_read">Označit níže uvedené články za přečtené</string>
     <string name="discovered_feeds_list">Seznam objevených kanálů</string>
@@ -106,7 +105,6 @@
     <string name="open_in_browser">Otevřít v prohlížeči</string>
     <string name="open_in_reader">Ve vnitřní čtečce</string>
     <string name="use_app_default">Použít výchozí</string>
-    <string name="open_in_web_view">Otevřít ve webovém prohlížeči</string>
     <string name="dark_theme_preference_black">Černý</string>
     <string name="contracted_tag">Složený štítek</string>
     <string name="go_back">Jít zpět</string>
@@ -247,7 +245,6 @@
     <string name="skip_duplicate_articles">Přeskočit duplicitní články</string>
     <string name="skip_duplicate_articles_desc">Články s odkazy nebo názvy shodnými s existujícími články jsou ignorovány</string>
     <string name="feed_item_style_compact_card">Kompaktní karty</string>
-    <string name="touch_to_play_audio">Dotykem přehrajete zvuk</string>
     <string name="show_title_unread_count">Zobrazit počet nepřečtených článků v nadpisu</string>
     <string name="openai_settings">AI a překlady</string>
     <string name="model_id">Id modelu</string>

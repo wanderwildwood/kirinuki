@@ -73,7 +73,6 @@
     <string name="open_links_with">Avaa linkit käyttäen</string>
     <string name="reader_settings">Lukija</string>
     <string name="open_link_in_web_view">Avaa linkki Web-näkymässä</string>
-    <string name="open_in_web_view">Avaa Web-näkymässä</string>
     <string name="max_feed_items">Syötteen sisällön raja</string>
     <string name="could_not_load_url">URL-osoitetta ei voitu ladata</string>
     <string name="theme_system">Järjestelmä</string>
@@ -86,7 +85,6 @@
     <string name="sort">Lajittelujärjestys</string>
     <string name="send_bug_report">Lähetä virheraportti</string>
     <string name="no_email_client">Sähköpostiohjelmaa ei voitu avata</string>
-    <string name="touch_to_play_video">Toista video koskettamalla</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Avaa syöte</string>
     <string name="mark_items_above_as_read">Merkitse yllä olevat luetuiksi</string>
@@ -244,7 +242,6 @@
     <string name="close_menu">Sulje valikko</string>
     <string name="export_saved_articles">Vie tallennetut artikkelit</string>
     <string name="failed_to_export_saved_articles">Tallennettujen artikkeleiden vienti epäonnistui</string>
-    <string name="touch_to_play_audio">Toista ääntä koskettamalla</string>
     <string name="skip_duplicate_articles">Ohita monistetut artikkelit</string>
     <string name="feed_item_style_compact_card">Kompakti kortti</string>
     <string name="skip_duplicate_articles_desc">Artikkelit, joiden linkit tai otsikot ovat identtisiä olemassa olevien artikkelien kanssa sivuutetaan</string>

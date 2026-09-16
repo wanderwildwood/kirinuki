@@ -61,7 +61,6 @@
     <string name="open_in_default_browser">預設瀏覽器</string>
     <string name="sort">以…排序</string>
     <string name="send_bug_report">回報錯誤</string>
-    <string name="touch_to_play_video">點擊播放影片</string>
     <string name="mark_items_above_as_read">以上標記為已讀</string>
     <string name="sort_newest_first">新文章優先</string>
     <string name="sort_oldest_first">舊文章優先</string>
@@ -118,7 +117,6 @@
     <string name="dark_theme_preference_black">黑色</string>
     <string name="dark_theme_preference_dark">深色</string>
     <string name="open_in_webview">WebView</string>
-    <string name="open_in_web_view">在 WebView 內打開</string>
     <string name="use_app_default">使用程式預設值</string>
     <string name="sync_status">同步狀態</string>
     <string name="feed_item_style">文章樣式</string>
@@ -250,7 +248,6 @@
     <string name="read_adjective">已讀</string>
     <string name="summarize">概述</string>
     <string name="openai_settings">OpenAI 整合</string>
-    <string name="touch_to_play_audio">點擊播放音訊</string>
     <string name="azure_deployment_id">Azure 部署 ID</string>
     <string name="azure_api_version">Azure API 版本</string>
     <string name="generate_extra_unique_ids">産生附加的唯一 ID</string>

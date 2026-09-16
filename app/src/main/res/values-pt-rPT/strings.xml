@@ -18,7 +18,6 @@
     <string name="mark_items_above_as_read">Marcar os acima como lidos</string>
     <string name="open_feed">Abrir o feed</string>
     <string name="javascript">JavaScript</string>
-    <string name="touch_to_play_video">Toque para reproduzir o vídeo</string>
     <string name="no_email_client">Não foi possível abrir o e-mail</string>
     <string name="send_bug_report">Enviar relatório de falhas</string>
     <string name="sort">Ordenar por</string>
@@ -31,7 +30,6 @@
     <string name="theme_system">Sistema</string>
     <string name="could_not_load_url">Não foi possível carregar o URL</string>
     <string name="max_feed_items">Máximo de itens por feed</string>
-    <string name="open_in_web_view">Abrir em vista Web</string>
     <string name="open_link_in_web_view">Abrir a ligação na vista web</string>
     <string name="reader_settings">Leitor</string>
     <string name="open_links_with">Abrir as ligações com</string>
@@ -254,7 +252,6 @@
     <string name="show_title_unread_count">Mostrar contagem de artigos não lidos no título</string>
     <string name="summarize">Resumir</string>
     <string name="openai_settings">IA e tradução</string>
-    <string name="touch_to_play_audio">Toque para reproduzir áudio</string>
     <string name="model_id">Id do Modelo</string>
     <string name="azure_api_version">Versão da API Azure</string>
     <string name="unable_to_load_models">Incapaz de carregar modelos.</string>

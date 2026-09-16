@@ -191,7 +191,6 @@
     <string name="permission_read_desc">Omogoča aplikaciji brati vire in članke</string>
     <string name="new_based_on_this">Novo na osnovi tega</string>
     <string name="mark_items_below_as_read">Označi spodnje kot prebrano</string>
-    <string name="open_in_web_view">Odpri v spletnem pogledu</string>
     <string name="feed_item_style_compact">Kompaktno</string>
     <string name="theme_night">Noč</string>
     <string name="open_in_default_browser">Privzeti brskalnik</string>
@@ -207,7 +206,6 @@
     <string name="device_sync_description_2">Skenirajte kodo iste sinhronizacijske verige kot na drugi napravi, ali pa ustvarite novo sinhronizacijsko verigo.</string>
     <string name="failed_to_parse_the_page">Strani ni bilo mogoče razbrati</string>
     <string name="many_words">%1$s besed</string>
-    <string name="touch_to_play_video">Tapni za predvajanje videoposnetka</string>
     <string name="show_only_title">Prikaži le naslov</string>
     <string name="http_error">Napaka HTTP</string>
     <string name="failed_to_download">Prenos neuspešen</string>
@@ -272,7 +270,6 @@
     <string name="openai_settings">AI integracija</string>
     <string name="model_id">ID modela</string>
     <string name="azure_api_version">Različica Azure API</string>
-    <string name="touch_to_play_audio">Tapni za predvajanje zvoka</string>
     <string name="unable_to_load_models">Ni bilo mogoče naložiti modelov.</string>
     <string name="no_models_were_found">Ni bilo mogoče najti modelov</string>
     <string name="azure_deployment_id">Azure deployment identifikacija</string>

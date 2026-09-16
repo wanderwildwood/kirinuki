@@ -61,7 +61,6 @@
     <string name="mark_items_above_as_read">Marquer lus les articles au dessus</string>
     <string name="open_feed">Ouvrir le flux</string>
     <string name="javascript">JavaScript</string>
-    <string name="touch_to_play_video">Toucher pour lire la vidéo</string>
     <string name="no_email_client">Impossible d’ouvrir le client de messagerie</string>
     <string name="send_bug_report">Envoyer un rapport de bug</string>
     <string name="sort">Trier par</string>
@@ -75,7 +74,6 @@
     <string name="could_not_load_url">Impossible de charger l’URL</string>
     <string name="max_feed_items">Articles maximum par flux</string>
     <string name="open_link_in_web_view">Ouvrir le lien dans WebView</string>
-    <string name="open_in_web_view">Ouvrir dans WebView</string>
     <string name="reader_settings">Lecteur</string>
     <string name="open_links_with">Ouvrir les liens avec</string>
     <string name="open_item_by_default_with">Ouvrir par défaut les articles avec</string>
@@ -247,7 +245,6 @@
     <string name="skip_duplicate_articles">Ignorer les doublons d\'article</string>
     <string name="skip_duplicate_articles_desc">Les articles avec des liens ou titres identiques à des articles déjà existants seront ignorés</string>
     <string name="feed_item_style_compact_card">Carte compact</string>
-    <string name="touch_to_play_audio">Appuyer pour écouter</string>
     <string name="show_title_unread_count">Afficher le nombre d\'articles non lus dans le titre</string>
     <string name="model_id">Id du Modèle</string>
     <string name="no_models_were_found">Aucun modèle trouvé</string>

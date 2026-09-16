@@ -32,7 +32,6 @@
     <string name="open_in_reader">Lietotnē (WebView)</string>
     <string name="use_app_default">Izmantojot lietotnes iestatīto veidu</string>
     <string name="open_link_in_web_view">Atvērt saiti WebView</string>
-    <string name="open_in_web_view">Atvērt WebView</string>
     <string name="max_feed_items">Maksimālais rakstu skaits vienā ziņu plūsmā</string>
     <string name="theme_system">Sistēmas</string>
     <string name="theme_day">Diena</string>
@@ -44,7 +43,6 @@
     <string name="dynamic_theme_use">Dinamiskas krāsas</string>
     <string name="dark_theme_preference_dark">Tumšs</string>
     <string name="dark_theme_preference_black">Melns</string>
-    <string name="touch_to_play_video">Pieskarieties, lai atskaņotu video</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Atvērt ziņu plūsmu</string>
     <string name="contracted_tag">Aizvērta birka</string>
@@ -109,7 +107,6 @@
     <string name="two_minutes">%1$s minūtes</string>
     <string name="many_minutes">%1$s minūtes</string>
     <string name="show_reading_time">Rādīt aptuveno lasīšanas ilgumu</string>
-    <string name="touch_to_play_audio">Pieskarieties, lai atskaņotu audio</string>
     <string name="show_all_items">Rādīt visus rakstus</string>
     <string name="show_unread_items">Rādīt nelasītos rakstus</string>
     <string name="delete_feed">Dzēst ziņu plūsmu</string>

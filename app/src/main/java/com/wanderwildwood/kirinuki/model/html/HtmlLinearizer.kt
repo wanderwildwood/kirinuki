@@ -18,8 +18,6 @@ typealias IdHolder = (String) -> Unit
 
 class HtmlLinearizer(
     private val tooLargeText: String,
-    private val openInBrowserText: String,
-    private val articleLink: String,
 ) {
     private var linearTextBuilder: LinearTextBuilder = LinearTextBuilder()
     private var idHolder: IdHolder = {
@@ -51,6 +49,8 @@ class HtmlLinearizer(
                 emptyList()
             }
 
+        // A truncated article says so and stops there. It used to offer the page in a
+        // browser; the Kompakt has none, so the offer was to the AOSP WebView test shell.
         val finalElements =
             if (truncated) {
                 elements +
@@ -59,19 +59,6 @@ class HtmlLinearizer(
                         text = tooLargeText,
                         blockStyle = LinearTextBlockStyle.TEXT,
                         annotations = emptyList(),
-                    ) +
-                    LinearText(
-                        ids = emptySet(),
-                        text = openInBrowserText,
-                        blockStyle = LinearTextBlockStyle.TEXT,
-                        annotations =
-                            listOf(
-                                LinearTextAnnotation(
-                                    data = LinearTextAnnotationLink(articleLink),
-                                    start = 0,
-                                    end = openInBrowserText.lastIndex,
-                                ),
-                            ),
                     )
             } else {
                 elements

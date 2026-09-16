@@ -16,7 +16,6 @@
     <string name="mark_items_above_as_read">Marcați cele de mai sus ca fiind citite</string>
     <string name="open_feed">Deschideți flux</string>
     <string name="javascript">JavaScript</string>
-    <string name="touch_to_play_video">Atingeți pentru a reda video</string>
     <string name="no_email_client">Nu s-a putut deschide clientul de e-mail</string>
     <string name="send_bug_report">Trimiteți un raport de eroare</string>
     <string name="sort">Sortează după</string>
@@ -29,7 +28,6 @@
     <string name="theme_system">Sistem</string>
     <string name="could_not_load_url">Nu s-a putut încărca URL-ul</string>
     <string name="max_feed_items">Numărul maxim de articole pe feed</string>
-    <string name="open_in_web_view">Deschidere în vizualizare Web</string>
     <string name="open_link_in_web_view">Deschidere link în vizualizare web</string>
     <string name="reader_settings">Cititor</string>
     <string name="open_links_with">Deschideți legături cu</string>
@@ -245,7 +243,6 @@
     <string name="failed_to_export_saved_articles">Nu a reușit să exporte articolele salvate</string>
     <string name="many_words">%1$s cuvinte</string>
     <string name="skip_duplicate_articles">Treceți peste articolele duplicate</string>
-    <string name="touch_to_play_audio">Atingeți pentru a reda audio</string>
     <string name="skip_duplicate_articles_desc">Articolele cu linkuri sau titluri identice cu articole existente sunt ignorate</string>
     <string name="feed_item_style_compact_card">Card compact</string>
     <string name="nostr_feed_description">Articole Nostr de %1$s</string>

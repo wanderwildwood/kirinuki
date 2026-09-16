@@ -73,7 +73,6 @@
     <string name="open_links_with">Otvori veze koristeći</string>
     <string name="reader_settings">Čitač</string>
     <string name="open_link_in_web_view">Otvori vezu u web prikazu</string>
-    <string name="open_in_web_view">Otvori u web prikazu</string>
     <string name="max_feed_items">Maksimalan broj članaka po izvoru</string>
     <string name="could_not_load_url">Nemoguće učitati adresu (URL)</string>
     <string name="theme_system">Sistemska</string>
@@ -86,7 +85,6 @@
     <string name="sort">Poredaj po</string>
     <string name="send_bug_report">Pošalji izvještaj o greškama</string>
     <string name="no_email_client">Nemoguće otvoriti e-mail program</string>
-    <string name="touch_to_play_video">Dodirnite za video reprodukciju</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Otvori izvor (feed)</string>
     <string name="mark_items_above_as_read">Označi gornje članke kao pročitane</string>
@@ -247,7 +245,6 @@
     <string name="many_minutes">%1$s minuta</string>
     <string name="other_minutes">%1$s minuta</string>
     <string name="show_reading_time">Prikaži procijenjeno vrijeme čitanja</string>
-    <string name="touch_to_play_audio">Dodirni za slušanje zvuka</string>
     <string name="show_title_unread_count">Prikaži u naslovu broj nepročitanih članaka</string>
     <string name="unable_to_load_models">Nemoguće učitati modele.</string>
     <string name="no_models_were_found">Nema pronađenih modela</string>

@@ -15,7 +15,6 @@
     <string name="mark_items_above_as_read">Означи ставке изнад као прочитане</string>
     <string name="open_feed">Отвори извор</string>
     <string name="javascript">JavaScript</string>
-    <string name="touch_to_play_video">Додирни за покретање видео записа</string>
     <string name="no_email_client">Не може да се отвори клијент е-поште</string>
     <string name="send_bug_report">Пошаљи извештај о грешкама</string>
     <string name="sort">Поредак</string>
@@ -28,7 +27,6 @@
     <string name="theme_system">Систем</string>
     <string name="could_not_load_url">Мрежна адреса није могла да се учита</string>
     <string name="max_feed_items">Ограничење броја ставки по извору</string>
-    <string name="open_in_web_view">Отвори у веб приказу</string>
     <string name="open_link_in_web_view">Отвори линк у веб приказу</string>
     <string name="reader_settings">Читач</string>
     <string name="open_links_with">Отвори линкове помоћу</string>
@@ -247,7 +245,6 @@
     <string name="two_words">%1$s речи</string>
     <string name="skip_duplicate_articles">Прескочи дуплиране чланке</string>
     <string name="show_reading_time">Прикажи процењено време читања</string>
-    <string name="touch_to_play_audio">Додирните да се пусти звук</string>
     <string name="show_title_unread_count">Прикажи број непрочитаних чланака у наслову</string>
     <string name="openai_settings">AI и превод</string>
     <string name="api_key">API кључ</string>

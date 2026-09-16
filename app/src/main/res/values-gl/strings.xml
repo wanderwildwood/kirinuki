@@ -106,7 +106,6 @@
     <string name="reader_settings">Lector</string>
     <string name="article_list_settings">Lista de artigos</string>
     <string name="open_link_in_web_view">Abrir ligazón na vista web</string>
-    <string name="open_in_web_view">Abrir en vista Web</string>
     <string name="max_feed_items">Máx. elementos por canle</string>
     <string name="could_not_load_url">Non cargou o URL</string>
     <string name="theme_system">Sistema</string>
@@ -124,7 +123,6 @@
     <string name="sort">Orde por</string>
     <string name="send_bug_report">Informar sobre problemas</string>
     <string name="no_email_client">Non se puido abrir cliente de correo</string>
-    <string name="touch_to_play_video">Toca para reproducir vídeo</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Abrir canle</string>
     <string name="mark_items_above_as_read">Marcar o superior como lido</string>
@@ -247,6 +245,5 @@
     <string name="skip_duplicate_articles">Omitir artigos duplicados</string>
     <string name="skip_duplicate_articles_desc">Vanse ignorar os artigos con ligazóns ou titulares idénticos aos existentes</string>
     <string name="feed_item_style_compact_card">Tarxeta compacta</string>
-    <string name="touch_to_play_audio">Toca para reproducir o audio</string>
     <string name="show_title_unread_count">Mostrar número de artigos non lidos no título</string>
 </resources>

@@ -132,7 +132,6 @@
     <string name="sort">Järjestus</string>
     <string name="send_bug_report">Koosta veateade</string>
     <string name="no_email_client">E-postikliendi avamine ei õnnestunud</string>
-    <string name="touch_to_play_video">Klõpsa video esitamiseks</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Ava uudisvoog</string>
     <string name="mark_items_above_as_read">Märgi ülalasuvad loetuks</string>
@@ -152,7 +151,6 @@
     <string name="api_key">API võti</string>
     <string name="model_id">Mudeli tunnus</string>
     <string name="azure_api_version">Azure\'i API versioon</string>
-    <string name="touch_to_play_audio">Heli esitamiseks puuduta</string>
     <string name="no_models_were_found">Ühtegi mudelit ei leidu</string>
     <string name="open_browser_in_split_screen">Ava veebibrauser jagatud vaates</string>
     <string name="show_reading_time">Näita hinnangulist lugemisaega</string>
@@ -205,7 +203,6 @@
     <string name="reader_settings">Lugeja</string>
     <string name="article_list_settings">Artiklite loend</string>
     <string name="open_link_in_web_view">Ava link sisseehitatud brauseris</string>
-    <string name="open_in_web_view">Ava sisseehitatud „Web view“ brauseris</string>
     <string name="max_feed_items">Maksimaalne kirjete arv uudisvoo kohta</string>
     <string name="could_not_load_url">Võrguaadressi laadimine ei õnnestunud</string>
     <string name="discovered_feeds_list">Tuvastatud uudisvoogude loend</string>

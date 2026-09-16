@@ -92,7 +92,6 @@
     <string name="reader_settings">Čítačka</string>
     <string name="article_list_settings">Zoznam článkov</string>
     <string name="open_link_in_web_view">Otvoriť link vo webovom pohľade</string>
-    <string name="open_in_web_view">Otvoriť vo webovom pohľade</string>
     <string name="max_feed_items">Maximum položiek na kanál</string>
     <string name="could_not_load_url">Nepodarilo sa načítať URL</string>
     <string name="theme_system">Systém</string>
@@ -109,7 +108,6 @@
     <string name="sort">Triediť podľa</string>
     <string name="send_bug_report">Poslať správu o chybe</string>
     <string name="no_email_client">Nepodarilo sa otvoriť e-mailového klienta</string>
-    <string name="touch_to_play_video">Dotknúť sa pre prehratie videa</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Otvoriť kanál</string>
     <string name="mark_items_above_as_read">Označiť vyššie uvedené články ako prečíťané</string>
@@ -257,7 +255,6 @@
     <string name="api_key">API kľúč</string>
     <string name="model_id">Id modelu</string>
     <string name="azure_api_version">Verzia API Azure</string>
-    <string name="touch_to_play_audio">Dotykom prehráte zvuk</string>
     <string name="show_title_unread_count">Zobraziť počet neprečítaných článkov v nadpise</string>
     <string name="unable_to_load_models">Nemožno nahrať modely.</string>
     <string name="no_models_were_found">Neboli nájdené žiadne modely</string>

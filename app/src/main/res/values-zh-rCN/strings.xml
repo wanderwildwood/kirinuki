@@ -73,7 +73,6 @@
     <string name="open_links_with">链接打开方式</string>
     <string name="reader_settings">阅读器</string>
     <string name="open_link_in_web_view">以网页视图打开链接</string>
-    <string name="open_in_web_view">在网页视图中打开</string>
     <string name="max_feed_items">每个订阅源的最大内容数</string>
     <string name="could_not_load_url">无法加载 URL</string>
     <string name="theme_system">系统</string>
@@ -86,7 +85,6 @@
     <string name="sort">排序方式</string>
     <string name="send_bug_report">发送错误报告</string>
     <string name="no_email_client">无法打开电子邮件客户端</string>
-    <string name="touch_to_play_video">轻触播放视频</string>
     <string name="javascript">Javascript</string>
     <string name="open_feed">打开订阅源</string>
     <string name="mark_items_above_as_read">标记以上内容为已读</string>
@@ -247,7 +245,6 @@
     <string name="skip_duplicate_articles">跳过重复的文章</string>
     <string name="skip_duplicate_articles_desc">忽略链接或标题和现存文章相同的新文章</string>
     <string name="feed_item_style_compact_card">紧凑卡片</string>
-    <string name="touch_to_play_audio">轻触播放音频</string>
     <string name="show_title_unread_count">在标题中显示未读文章数</string>
     <string name="no_models_were_found">未找到模型</string>
     <string name="openai_settings">AI 和翻译</string>

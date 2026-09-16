@@ -120,7 +120,6 @@
     <string name="sync_status">สถานะการซิงค์</string>
     <string name="reader_settings">เครื่องมืออ่าน</string>
     <string name="open_link_in_web_view">เปิดลิงก์ใน Webview</string>
-    <string name="open_in_web_view">เปิดใน Webview</string>
     <string name="max_feed_items">รายการสูงสุดในแต่ละฟีด</string>
     <string name="could_not_load_url">ไม่สามารถโหลดที่อยู่เว็บ</string>
     <string name="theme_system">ระบบ</string>
@@ -133,7 +132,6 @@
     <string name="sort">เรียงตาม</string>
     <string name="send_bug_report">ส่งรายงานปัญหาบั้ก</string>
     <string name="no_email_client">เปิดอีเมล์ไคลแอนท์ไม่ได้</string>
-    <string name="touch_to_play_video">แตะเพื่อเล่นวีดิโอ</string>
     <string name="javascript">จาวาสคริปต์</string>
     <string name="open_feed">เปิดฟีด</string>
     <string name="mark_items_above_as_read">ทำเครื่องหมายรายการด้านบนว่าอ่านแล้ว</string>
@@ -244,7 +242,6 @@
     <string name="skip_duplicate_articles">ข้ามบทความที่ซ้ำ</string>
     <string name="skip_duplicate_articles_desc">บทความที่มีลิงก์หรือหัวข้อที่มีอยู่แล้วจะถูกเพิกเฉย</string>
     <string name="feed_item_style_compact_card">การ์ดแบบกระทัดรัด</string>
-    <string name="touch_to_play_audio">แตะเพื่อเล่นเสียง</string>
     <string name="no_body_in_response">ไม่มี body ในข้อมูลที่ตอบกลับมาจากเว็บ</string>
     <string name="show_title_unread_count">แสดงจำนวนบทความที่ไม่ได้อ่านในหัวเรื่อง</string>
     <string name="show_message">แสดงข้อความ</string>

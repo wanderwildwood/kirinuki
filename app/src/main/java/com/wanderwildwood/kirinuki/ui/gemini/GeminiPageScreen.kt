@@ -1,6 +1,5 @@
 package com.wanderwildwood.kirinuki.ui.gemini
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,11 +19,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.lazy.LazyColumnMMD
@@ -53,7 +49,6 @@ fun GeminiPageScreen(
     listState: LazyListState = rememberLazyListState(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     LaunchedEffect(url) { viewModel.load(url) }
 
@@ -137,10 +132,10 @@ fun GeminiPageScreen(
                             // A smolnet link stays in the app. Anything else is somebody
                             // else's protocol and goes to whatever handles it -- a gopher
                             // menu can point at the web, and often does.
+                            // A capsule may link out to the web. Clippings cannot follow
+                            // that anywhere sane on this phone, so it is text, not a link.
                             if (isSmolnetUrl(target)) {
                                 onFollow(target)
-                            } else {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, target.toUri()))
                             }
                         },
                     )

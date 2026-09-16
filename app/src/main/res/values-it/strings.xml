@@ -71,7 +71,6 @@
     <string name="open_links_with">Apri i link con</string>
     <string name="reader_settings">Lettore</string>
     <string name="open_link_in_web_view">Apri il link in una web view</string>
-    <string name="open_in_web_view">Apri in una web view</string>
     <string name="max_feed_items">Numero massimo di articoli per feed</string>
     <string name="could_not_load_url">Impossibile caricare l\'URL</string>
     <string name="theme_system">Sistema</string>
@@ -84,7 +83,6 @@
     <string name="sort">Ordinamento</string>
     <string name="send_bug_report">Invia segnalazione di errore</string>
     <string name="no_email_client">Impossibile aprire il client e-mail</string>
-    <string name="touch_to_play_video">Tocca per riprodurre il video</string>
     <string name="open_feed">Apri feed</string>
     <string name="mark_items_below_as_read">Segna gli elementi in basso come letti</string>
     <string name="discovered_feeds_list">Lista dei feed trovati</string>
@@ -247,7 +245,6 @@
     <string name="skip_duplicate_articles">Salta gli articoli duplicati</string>
     <string name="skip_duplicate_articles_desc">Gli articoli con link o titoli identici ad articoli esistenti vengono ignorati</string>
     <string name="feed_item_style_compact_card">Scheda compatta</string>
-    <string name="touch_to_play_audio">Tocca per riprodurre l\'audio</string>
     <string name="show_title_unread_count">Mostra nel titolo il numero di articoli non letti</string>
     <string name="show_message">Mostra messaggio</string>
     <string name="api_key">Chiave API</string>

@@ -39,10 +39,8 @@
     <string name="article_list_settings">Lîsteya gotara</string>
     <string name="saved_article">Gotara tomarkirî</string>
     <string name="on_startup">Dema ku Bername dest pê kir</string>
-    <string name="touch_to_play_video">Ji bo lîstina vîdyoyê bikirtînin</string>
     <string name="press_scan_sync">Li ser cîhaza xwe, herin senkronîzekirina cîhazê û koda hevdengkirina şopandinê bikirtînin.</string>
     <string name="disconnect_device_from_sync">Pergalê ji zincîra hevdemkirinê qut bike</string>
-    <string name="open_in_web_view">Di dîmena Web-ê de veke</string>
     <string name="saved_articles">Gotarên hatine tomar kirin</string>
     <string name="on_date" comment="1 is the date. Used in the feed view.">%1$s</string>
     <string name="theme_system">Pergal</string>

@@ -56,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import com.wanderwildwood.kirinuki.R
+import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.model.html.Coordinate
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
 import com.wanderwildwood.kirinuki.model.html.LinearAudio
@@ -266,75 +267,41 @@ fun LinearElementContent(
 
         is LinearAudio ->
             LinearAudioContent(
-                linearAudio = linearElement,
-                onLinkClick = onLinkClick,
                 modifier = modifier,
             )
 
         is LinearVideo ->
             LinearVideoContent(
-                linearVideo = linearElement,
-                onLinkClick = onLinkClick,
                 modifier = modifier,
             )
     }
 }
 
 @Composable
-fun LinearAudioContent(
-    linearAudio: LinearAudio,
-    onLinkClick: (url: String, index: Int?) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun LinearAudioContent(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         DisableSelection {
-            ProvideScaledText(
-                style =
-                    MaterialTheme.typography.bodyLarge.merge(
-                        LinkTextStyle(),
-                    ),
-            ) {
-                Text(
-                    text = stringResource(R.string.touch_to_play_audio),
-                    modifier =
-                        Modifier.clickable {
-                            onLinkClick(linearAudio.firstSource.uri, null)
-                        },
-                )
+            ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
+                Text(text = stringResource(R.string.article_has_audio))
             }
         }
     }
 }
 
 @Composable
-fun LinearVideoContent(
-    linearVideo: LinearVideo,
-    onLinkClick: (url: String, index: Int?) -> Unit,
-    modifier: Modifier = Modifier,
-) {
+fun LinearVideoContent(modifier: Modifier = Modifier) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         DisableSelection {
-            ProvideScaledText(
-                style =
-                    MaterialTheme.typography.bodyLarge.merge(
-                        LinkTextStyle(),
-                    ),
-            ) {
-                Text(
-                    text = stringResource(R.string.touch_to_play_video),
-                    modifier =
-                        Modifier.clickable {
-                            onLinkClick(linearVideo.firstSource.link, null)
-                        },
-                )
+            ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
+                Text(text = stringResource(R.string.article_has_video))
             }
         }
     }
@@ -791,6 +758,13 @@ fun LinearText.toAnnotatedString(
             }
 
             is LinearTextAnnotationLink -> {
+                // Only a link Clippings can follow itself is drawn as one. A web address
+                // has nowhere to go on this phone -- the only handler registered for http
+                // is the AOSP WebView test shell -- so it stays as the words it was, rather
+                // than as something that looks tappable and then is not.
+                if (!isSmolnetUrl(data.href)) {
+                    return@forEach
+                }
                 builder.addLink(
                     clickable =
                         LinkAnnotation.Clickable(
@@ -800,7 +774,7 @@ fun LinearText.toAnnotatedString(
                                     style = LinkTextStyle().toSpanStyle(),
                                 ),
                             linkInteractionListener = {
-                                // Looks like data.href=http://www.example.com/feed#footnote-1
+                                // Looks like data.href=gemini://example.com/page#footnote-1
                                 val hashSplit = data.href.split("#")
                                 val index =
                                     when {

@@ -22,7 +22,6 @@
     <string name="mark_items_above_as_read">மேலே படித்ததாகக் குறிக்கவும்</string>
     <string name="open_feed">திறந்த ஊட்டம்</string>
     <string name="javascript">ஜாவாஸ்கிரிப்ட்</string>
-    <string name="touch_to_play_video">வீடியோவை இயக்கத் தொடவும்</string>
     <string name="no_email_client">மின்னஞ்சல் கிளையண்டை திறக்க முடியவில்லை</string>
     <string name="send_bug_report">பிழை அறிக்கையை அனுப்பு</string>
     <string name="sort">வரிசைப்படுத்து</string>
@@ -33,7 +32,6 @@
     <string name="theme_system">அமைப்பு</string>
     <string name="could_not_load_url">யுஆர்எல்-ஐ ஏற்ற முடியவில்லை</string>
     <string name="max_feed_items">ஒரு ஊட்டத்திற்கு அதிகபட்ச பொருட்கள்</string>
-    <string name="open_in_web_view">வலை பார்வையில் திறக்கவும்</string>
     <string name="open_link_in_web_view">இணையக் காட்சியில் இணைப்பைத் திறக்கவும்</string>
     <string name="reader_settings">வாசிப்பவர்</string>
     <string name="open_links_with">உடன் இணைப்புகளைத் திறக்கவும்</string>
@@ -142,7 +140,6 @@
     <string name="theme_e_ink">மின் தாள்</string>
     <string name="new_indicator">புதிய</string>
     <string name="no_feeds">ஊட்டங்கள் இல்லை</string>
-    <string name="touch_to_play_audio">ஆடியோவை இயக்கத் தொடவும்</string>
     <string name="export_saved_articles">ஏற்றுமதி சேமிக்கப்பட்ட கட்டுரைகள்</string>
     <string name="use_detect_language">மொழியைக் கண்டறியவும்</string>
     <string name="only_available_on_android_n">ஆண்ட்ராய்டு %1$s மற்றும் அதற்கு மேற்பட்டவற்றில் மட்டுமே கிடைக்கும்</string>

@@ -1,6 +1,5 @@
 package com.wanderwildwood.kirinuki.ui.article
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,16 +12,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Article
 import androidx.compose.material.icons.outlined.StarBorder
@@ -53,7 +49,6 @@ fun ArticleScreen(
     val content by viewModel.content.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val showingFullText by viewModel.showingFullText.collectAsStateWithLifecycle()
-    val context = LocalContext.current
 
     Scaffold(
         modifier = modifier,
@@ -104,15 +99,6 @@ fun ArticleScreen(
                             },
                         onClick = { viewModel.toggleBookmarked() },
                     )
-                    article?.link?.let { link ->
-                        BarIcon(
-                            icon = Icons.AutoMirrored.Outlined.OpenInNew,
-                            contentDescription = stringResource(R.string.open_in_web_view),
-                            onClick = {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, link.toUri()))
-                            },
-                        )
-                    }
                 },
             )
         },
@@ -138,13 +124,14 @@ fun ArticleScreen(
                 TextToDisplay.CONTENT ->
                     linearArticleContent(
                         articleContent = content,
+                        // Clippings hands nothing to the system. A stock Kompakt has no
+                        // browser -- only the AOSP WebView test shell is registered for http --
+                        // so an external open is a crash waiting to happen rather than a way
+                        // out. The renderer only makes followable links tappable; this is the
+                        // guard that keeps that true if it ever stops being.
                         onLinkClick = { url, _ ->
-                            // Nothing else on the phone handles gemini:// or gopher://,
-                            // so such a link would simply do nothing. Keep it here.
                             if (isSmolnetUrl(url)) {
                                 onFollowGemini(url)
-                            } else {
-                                context.startActivity(Intent(Intent.ACTION_VIEW, url.toUri()))
                             }
                         },
                     )

@@ -61,7 +61,6 @@
     <string name="add_new_device">Προσθήκη νέας συσκευής</string>
     <string name="this_device">%1$s (αυτή η συσκευή)</string>
     <string name="syncing">Συγχρονίζεται</string>
-    <string name="open_in_web_view">Άνοιγμα σε προβολή ιστού</string>
     <string name="open_links_with">Άνοιγμα συνδέσμων με</string>
     <string name="expanded_tag">Ανοιχτή ετικέτα</string>
     <string name="battery_optimization">Βελτιστοποίηση μπαταρίας</string>
@@ -109,7 +108,6 @@
     <string name="max_feed_items">Μέγιστα αντικείμενα ανά ροή</string>
     <string name="contracted_tag">Κλειστή ετικέτα</string>
     <string name="preload_custom_tab">Προφόρτωση προσαρμοσμένης καρτέλας</string>
-    <string name="touch_to_play_video">Αγγίξτε για αναπαραγωγή βίντεο</string>
     <string name="failed_to_parse">Αποτυχία ανάλυσης του %1$s</string>
     <string name="fetch_full_article">Ανάκτηση πλήρους άρθρου</string>
     <string name="failed_to_fetch_full_article">Αποτυχία ανάκτησης πλήρους άρθρου</string>
@@ -247,7 +245,6 @@
     <string name="skip_duplicate_articles_desc">Άρθρα με συνδέσμους ή τίτλους πανομοιότυπους με τα υπάρχοντα άρθρα αγνοούνται</string>
     <string name="feed_item_style_compact_card">Συμπαγής Κάρτα</string>
     <string name="export_saved_articles">Εξαγωγή αποθηκευμένων άρθρων</string>
-    <string name="touch_to_play_audio">Άγγιγμα για αναπαραγωγή ήχου</string>
     <string name="show_title_unread_count">Εμφάνιση αριθμού μη αναγνωσμενων άρθρων στον τίτλο</string>
     <string name="api_key">Κλειδί API</string>
     <string name="model_id">Id μοντέλου</string>

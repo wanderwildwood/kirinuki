@@ -73,7 +73,6 @@
     <string name="open_links_with">Otwieraj linki za pomocą</string>
     <string name="reader_settings">Czytnik</string>
     <string name="open_link_in_web_view">Otwórz link w WebView</string>
-    <string name="open_in_web_view">Otwórz w WebView</string>
     <string name="max_feed_items">Maks. liczba artykułów na kanał</string>
     <string name="could_not_load_url">Nie udało się załadować adresu URL</string>
     <string name="theme_system">Systemowy</string>
@@ -86,7 +85,6 @@
     <string name="sort">Sortuj według</string>
     <string name="send_bug_report">Wyślij raport o błędach</string>
     <string name="no_email_client">Nie udało się otworzyć klienta poczty e-mail</string>
-    <string name="touch_to_play_video">Dotknij, aby odtworzyć wideo</string>
     <string name="javascript">JavaScript</string>
     <string name="open_feed">Otwórz kanał</string>
     <string name="mark_items_above_as_read">Oznacz powyższe jako przeczytane</string>
@@ -247,7 +245,6 @@
     <string name="skip_duplicate_articles_desc">Artykuły z linkami lub tytułami identycznymi z istniejącymi artykułami są ignorowane</string>
     <string name="skip_duplicate_articles">Pomijaj zduplikowane artykuły</string>
     <string name="feed_item_style_compact_card">Karta kompaktowa</string>
-    <string name="touch_to_play_audio">Naciśnij, aby odtworzyć dźwięk</string>
     <string name="show_title_unread_count">Pokazuj liczbę nieprzeczytanych artykułów w tytule</string>
     <string name="model_id">Identyfikator modelu</string>
     <string name="azure_api_version">Wersja Azure API</string>
