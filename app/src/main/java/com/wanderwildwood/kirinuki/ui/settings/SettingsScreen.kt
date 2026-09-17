@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,6 +32,7 @@ import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import com.wanderwildwood.kirinuki.util.hasWebBrowser
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -49,7 +52,10 @@ fun SettingsScreen(
     val syncFrequency by viewModel.syncFrequency.collectAsStateWithLifecycle()
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
     val showReadArticles by viewModel.showReadArticles.collectAsStateWithLifecycle()
+    val openTitleInBrowser by viewModel.openTitleInBrowser.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
+    val hasBrowser = remember(context) { context.hasWebBrowser() }
     var aboutOpen by remember { mutableStateOf(false) }
 
 
@@ -138,6 +144,28 @@ fun SettingsScreen(
             item {
                 HorizontalDividerMMD()
             }
+            // Always here, even where it cannot do anything. A row that hides itself on
+            // the phone this app was built for is a feature nobody can find; a row that
+            // says why it is off can be read.
+            item {
+                SwitchRow(
+                    title = stringResource(R.string.open_title_in_browser),
+                    subtitle =
+                        stringResource(
+                            if (hasBrowser) {
+                                R.string.open_title_in_browser_detail
+                            } else {
+                                R.string.open_title_in_browser_no_browser
+                            },
+                        ),
+                    checked = hasBrowser && openTitleInBrowser,
+                    enabled = hasBrowser,
+                    onCheckedChange = viewModel::setOpenTitleInBrowser,
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
             item {
                 ActionRow(title = stringResource(R.string.import_feeds_from_opml), onClick = onImportOpml)
             }
@@ -172,6 +200,8 @@ private fun SwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    enabled: Boolean = true,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -179,11 +209,21 @@ private fun SwitchRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable { onCheckedChange(!checked) }
+                .clickable(enabled = enabled) { onCheckedChange(!checked) }
                 .padding(horizontal = 16.dp, vertical = 12.dp),
     ) {
-        TextMMD(text = title, modifier = Modifier.weight(1f))
-        SwitchMMD(checked = checked, onCheckedChange = onCheckedChange)
+        Column(modifier = Modifier.weight(1f)) {
+            TextMMD(text = title)
+            // Only where the row cannot say what it does in its own name. This one has to
+            // explain that it is off for a reason.
+            subtitle?.let {
+                TextMMD(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        }
+        SwitchMMD(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
     }
 }
 

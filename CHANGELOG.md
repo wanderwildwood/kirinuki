@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- **The tour is gone.** The queue, the reading-list row on the feeds screen, the screen
+  itself and the fetch a sync did for it are all removed. Nothing migrates: a page that was
+  on the list is simply not there any more.
+- **Open the title in a browser**, off by default, in settings. On it makes the reader's
+  title the link to the page the cutting came from, for when a feed carries only part of an
+  article and the full-text fetch cannot get the rest. The row only appears on a phone that
+  has a browser, and the WebView test shell a stock Kompakt registers for http does not
+  count as one — which is why the default is off and why the app still opens nothing by
+  itself.
+
 ## 0.2.0
 
 Gemini, gopher and Spartan, and a tour.

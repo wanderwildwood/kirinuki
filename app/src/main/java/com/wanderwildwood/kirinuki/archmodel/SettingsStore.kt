@@ -314,6 +314,21 @@ class SettingsStore(
         sp.edit().putFloat(PREF_TEXT_SCALE, value).apply()
     }
 
+    /**
+     * Off, and off is the answer this app is built around: it renders the article itself,
+     * and a stock Kompakt registers nothing for http but the AOSP WebView test shell, which
+     * is where an external open went the one time it was tried. Turned on by someone who
+     * has put a browser on the phone, the reader's title opens the page it came from.
+     */
+    private val _openTitleInBrowser =
+        MutableStateFlow(sp.getBoolean(PREF_OPEN_TITLE_IN_BROWSER, false))
+    val openTitleInBrowser = _openTitleInBrowser.asStateFlow()
+
+    fun setOpenTitleInBrowser(value: Boolean) {
+        _openTitleInBrowser.value = value
+        sp.edit().putBoolean(PREF_OPEN_TITLE_IN_BROWSER, value).apply()
+    }
+
     private val _maximumCountPerFeed =
         MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
@@ -701,6 +716,7 @@ const val PREF_VAL_OPEN_WITH_BROWSER = "2"
 const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
+const val PREF_OPEN_TITLE_IN_BROWSER = "pref_open_title_in_browser"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
@@ -777,6 +793,7 @@ enum class UserSettings(
     SETTING_PAGING_MODE(key = PREF_PAGING_MODE),
     SETTING_ANIMATED_PAGING(key = PREF_ANIMATED_PAGING),
     SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),
+    SETTING_OPEN_TITLE_IN_BROWSER(key = PREF_OPEN_TITLE_IN_BROWSER),
     SETTING_IS_MARK_AS_READ_ON_SCROLL(
         key = PREF_IS_MARK_AS_READ_ON_SCROLL,
     ),

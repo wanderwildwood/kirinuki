@@ -255,7 +255,11 @@ class Repository(
 
     val textScale = settingsStore.textScale
 
+    val openTitleInBrowser = settingsStore.openTitleInBrowser
+
     fun setTextScale(value: Float) = settingsStore.setTextScale(value)
+
+    fun setOpenTitleInBrowser(value: Boolean) = settingsStore.setOpenTitleInBrowser(value)
 
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
 

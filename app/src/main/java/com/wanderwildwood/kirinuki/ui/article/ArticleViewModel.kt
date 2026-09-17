@@ -71,6 +71,9 @@ class ArticleViewModel(
     /** Settings owns this; the reader only needs to read it and nudge it. */
     val textScale: StateFlow<Float> = repository.textScale
 
+    /** Off unless someone has turned it on in settings. See the setting itself for why. */
+    val openTitleInBrowser: StateFlow<Boolean> = repository.openTitleInBrowser
+
     fun setTextScale(value: Float) = repository.setTextScale(value)
 
     fun toggleFullText() {

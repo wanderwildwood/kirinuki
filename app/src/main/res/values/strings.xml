@@ -422,6 +422,11 @@
   <string name="subscribe_to_this">Subscribe to this</string>
   <string name="gopher_unsupported_type">This is not text or a menu, so there is nothing to read here.</string>
   <string name="show_read_articles">Show read articles</string>
+  <!-- Off by default, and the row says why: this app renders the article itself, and the
+       Kompakt as it ships has nothing that opens a web page. Shown only where one exists. -->
+  <string name="open_title_in_browser">Open the title in a browser</string>
+  <string name="open_title_in_browser_detail">The article title opens the page it came from. Off by default: Clippings renders the article itself.</string>
+  <string name="open_title_in_browser_no_browser">Nothing on this phone opens a web page, so there is nowhere for the title to go.</string>
   <string name="feed_folder">Folder</string>
     <string name="about">About</string>
 </resources>

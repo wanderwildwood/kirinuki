@@ -21,6 +21,7 @@ class SettingsViewModel(
     val syncFrequency: StateFlow<SyncFrequency> = repository.syncFrequency
     val textScale: StateFlow<Float> = repository.textScale
     val maximumCountPerFeed: StateFlow<Int> = repository.maximumCountPerFeed
+    val openTitleInBrowser: StateFlow<Boolean> = repository.openTitleInBrowser
 
     /**
      * One face of the list filter, which is the only face of it this app has ever shown.
@@ -47,4 +48,6 @@ class SettingsViewModel(
     fun setMaxCountPerFeed(value: Int) = repository.setMaxCountPerFeed(value)
 
     fun setShowReadArticles(value: Boolean) = repository.setFeedListFilterRead(value)
+
+    fun setOpenTitleInBrowser(value: Boolean) = repository.setOpenTitleInBrowser(value)
 }

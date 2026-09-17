@@ -24,6 +24,14 @@
     android:label="@string/permission_read_label" />
 
   <queries>
+    <!-- Package visibility: without this the reader cannot tell whether anything on the
+         phone opens a web page, and the "open the title in a browser" setting could only
+         fire blind. Asking is the whole point: a stock Kompakt answers with nothing but
+         the AOSP WebView test shell, and then the title stays plain text. -->
+    <intent>
+      <action android:name="android.intent.action.VIEW" />
+      <data android:scheme="https" />
+    </intent>
     <!-- So a barcode scanner can be invoked -->
     <package android:name="com.google.zxing.client.android" />
     <intent>

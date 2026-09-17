@@ -135,6 +135,7 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_paging_mode" value="true"/>
               <feeder:setting key="pref_animated_paging" value="true"/>
               <feeder:setting key="pref_body_text_scale" value="1.6"/>
+              <feeder:setting key="pref_open_title_in_browser" value="true"/>
               <feeder:setting key="pref_is_mark_as_read_on_scroll" value="true"/>
               <feeder:setting key="pref_readaloud_detect_lang" value="true"/>
               <feeder:setting key="pref_max_lines" value="6"/>
@@ -195,6 +196,7 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_PAGING_MODE -> "true"
                         UserSettings.SETTING_ANIMATED_PAGING -> "true"
                         UserSettings.SETTING_TEXT_SCALE -> "1.6"
+                        UserSettings.SETTING_OPEN_TITLE_IN_BROWSER -> "true"
                         UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
                         UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
                         UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"

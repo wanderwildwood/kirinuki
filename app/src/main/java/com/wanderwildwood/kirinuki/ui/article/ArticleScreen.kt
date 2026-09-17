@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui.article
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +17,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +35,8 @@ import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.compose.theme.TextScaleDialog
 import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
+import com.wanderwildwood.kirinuki.util.hasWebBrowser
+import com.wanderwildwood.kirinuki.util.openInBrowser
 
 /**
  * The cutting itself. Title, where it came from, and the text -- the summary the feed
@@ -51,7 +56,18 @@ fun ArticleScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val showingFullText by viewModel.showingFullText.collectAsStateWithLifecycle()
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
+    val openTitleInBrowser by viewModel.openTitleInBrowser.collectAsStateWithLifecycle()
     var scaleOpen by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+    // Three things have to be true, and the default is that the first is not: the setting
+    // is on, this phone has something that is not the WebView shell, and the cutting
+    // remembers where it came from. Anything less and the title is what it always was.
+    val articleLink = article?.link
+    val titleOpensPage =
+        openTitleInBrowser &&
+            articleLink != null &&
+            remember(context) { context.hasWebBrowser() }
 
     Scaffold(
         modifier = modifier,
@@ -132,7 +148,20 @@ fun ArticleScreen(
                     TextMMD(
                         text = article?.title.orEmpty(),
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
+                        // Underlined only when it leads somewhere. An underline on a title
+                        // that does nothing is the thing this app took out.
+                        textDecoration =
+                            if (titleOpensPage) TextDecoration.Underline else null,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .then(
+                                    if (articleLink != null && titleOpensPage) {
+                                        Modifier.clickable { context.openInBrowser(articleLink) }
+                                    } else {
+                                        Modifier
+                                    },
+                                ),
                     )
                 }
             }
