@@ -67,7 +67,11 @@ fun AddFeedScreen(
         // last visit is what is in hand until this one's read comes back.
         if (loaded == null || loaded.id != feedId || filledIn) return@LaunchedEffect
         url = loaded.url.toString()
-        title = loaded.customTitle
+        // The name it goes by, which is a custom one only if it has been given one. An
+        // empty box would be a feed that looks nameless, and there is nowhere else on this
+        // screen to read the name off. Saving it back unchanged stores nothing: the view
+        // model drops a custom title that only repeats what the feed calls itself.
+        title = loaded.displayTitle
         folder = loaded.tag
         filledIn = true
     }

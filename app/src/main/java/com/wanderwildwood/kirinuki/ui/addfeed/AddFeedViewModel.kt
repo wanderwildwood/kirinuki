@@ -91,9 +91,13 @@ class AddFeedViewModel(
             // loaded anything into them, so a blank box there is no opinion, and it must
             // not wipe the name and folder of a feed that turns out to be already here.
             val editing = feedId > ID_UNSET
+            // A custom title that only repeats what the feed calls itself is not a custom
+            // title. The edit screen arrives with the name in the box, so this is what
+            // keeps opening it and saving it from pinning a name the feed may later change.
             val newCustomTitle =
                 when {
-                    editing || existing == null -> title.trim()
+                    editing || existing == null ->
+                        title.trim().takeUnless { it == existing?.title }.orEmpty()
                     else -> title.trim().ifBlank { existing.customTitle }
                 }
             val newTag =
