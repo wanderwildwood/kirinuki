@@ -3,10 +3,21 @@
   切抜 — a column cut out of a page with scissors.
 
   Drawn to the five rules measured off the chanterelle in kinokocho/tools/make-art.py:
-  one weight throughout at 0.015 of the drawing's width (the chanterelle is 0.0143),
-  seven strokes to its eight, sitting four degrees off square, and nothing filled.
-  Every edge is a run of nearly straight segments that change angle where the scissors
-  bit again, at uneven intervals so the outline does not fall into a rhythm.
+  one weight throughout, seven strokes to its eight, sitting four degrees off square,
+  and nothing filled. Every edge is a run of nearly straight segments that change angle
+  where the scissors bit again, at uneven intervals so the outline does not fall into a
+  rhythm.
+
+  The weight is no longer the chanterelle's 0.0143 of the drawing's width. The shop
+  settled its launcher weights on 2026-09-17 against a measurement instead: mean ink at
+  48px, the band 0.61 to 0.89. This mark came in at 0.24, the lightest of the nineteen.
+  At strokeWidth 20 it measures 0.62, beside onsa and seizu at 0.64 and sokudokei at
+  0.60. The number looks unlike theirs only because this drawing is on a 512 viewport
+  where theirs are on 108: as a fraction of the canvas it is 3.1% against their 2.8%.
+
+  ⚠ Measure this one WITH the group below applied. Desktop/icons/icontool.py renders
+  paths only and drops the transform, and this is the one icon in the shop that has one,
+  so ignoring the 0.84 makes it read about 16% heavier than the launcher draws it.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -25,44 +36,44 @@
       android:scaleY="0.84">
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.5"
+        android:strokeWidth="20"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
         android:fillColor="#00000000"
         android:pathData="M132,104 L262,98 L374,108 L366,166 L376,232 L368,286 L378,366 L370,408 L244,416 L134,404 L141,330 L131,268 L139,186 Z" />
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.5"
+        android:strokeWidth="20"
         android:strokeLineCap="round"
         android:fillColor="#00000000"
         android:pathData="M166,156 L320,151" />
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.5"
+        android:strokeWidth="20"
         android:strokeLineCap="round"
         android:fillColor="#00000000"
         android:pathData="M167,212 L354,206" />
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.5"
+        android:strokeWidth="20"
         android:strokeLineCap="round"
         android:fillColor="#00000000"
         android:pathData="M167,248 L298,244" />
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.5"
+        android:strokeWidth="20"
         android:strokeLineCap="round"
         android:fillColor="#00000000"
         android:pathData="M168,284 L350,278" />
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.5"
+        android:strokeWidth="20"
         android:strokeLineCap="round"
         android:fillColor="#00000000"
         android:pathData="M168,320 L312,315" />
     <path
         android:strokeColor="#000000"
-        android:strokeWidth="3.5"
+        android:strokeWidth="20"
         android:strokeLineCap="round"
         android:fillColor="#00000000"
         android:pathData="M169,356 L276,352" />
