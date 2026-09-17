@@ -72,6 +72,13 @@ fun FeedsScreen(
                     )
                 },
                 actions = {
+                    // Ahead of the two that were already here, so nothing moved out from
+                    // under a thumb that had learnt where it was.
+                    BarIcon(
+                        icon = Icons.Refresh,
+                        contentDescription = stringResource(R.string.sync),
+                        onClick = { viewModel.refresh() },
+                    )
                     BarIcon(
                         icon = Icons.Plus,
                         contentDescription = stringResource(R.string.add_feed),
