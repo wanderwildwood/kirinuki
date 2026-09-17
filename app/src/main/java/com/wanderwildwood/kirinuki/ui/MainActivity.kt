@@ -23,6 +23,7 @@ import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.background.schedulePeriodicOrphanedFilesCleanup
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
 import com.wanderwildwood.kirinuki.base.diAwareViewModel
+import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.opml.exportOpml
 import com.wanderwildwood.kirinuki.model.opml.importOpml
 import com.wanderwildwood.kirinuki.notifications.NotificationsWorker
@@ -172,6 +173,7 @@ class MainActivity : DIAwareComponentActivity() {
                 FeedsScreen(
                     onOpenFeed = { navController.navigate(Route.ARTICLES) },
                     onAddFeed = { navController.navigate(Route.addFeed("")) },
+                    onEditFeed = { navController.navigate(Route.editFeed(it)) },
                     onSettings = { navController.navigate(Route.SETTINGS) },
                     onTour = { navController.navigate(Route.TOUR) },
                     viewModel = viewModel,
@@ -232,6 +234,10 @@ class MainActivity : DIAwareComponentActivity() {
                             type = NavType.StringType
                             defaultValue = ""
                         },
+                        navArgument(Route.ADD_FEED_FEED_ARG) {
+                            type = NavType.LongType
+                            defaultValue = ID_UNSET
+                        },
                     ),
             ) { entry ->
                 val viewModel: AddFeedViewModel = entry.diAwareViewModel()
@@ -241,6 +247,7 @@ class MainActivity : DIAwareComponentActivity() {
                     onRead = { navController.navigate(Route.gemini(it)) },
                     viewModel = viewModel,
                     initialUrl = entry.arguments?.getString(Route.ADD_FEED_ARG).orEmpty(),
+                    feedId = entry.arguments?.getLong(Route.ADD_FEED_FEED_ARG) ?: ID_UNSET,
                 )
             }
         }

@@ -1,6 +1,8 @@
 package com.wanderwildwood.kirinuki.ui.feeds
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -41,12 +43,14 @@ import kotlinx.coroutines.delay
  * The feeds, and above them the two rows that are not feeds: everything, and what was kept.
  *
  * A tag holding feeds is a row that opens; tapping the tag itself reads the whole tag.
+ * A long press on a feed opens it for editing -- its name, and the folder it sits in.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeedsScreen(
     onOpenFeed: () -> Unit,
     onAddFeed: () -> Unit,
+    onEditFeed: (Long) -> Unit,
     onSettings: () -> Unit,
     onTour: () -> Unit,
     viewModel: FeedsViewModel,
@@ -155,6 +159,13 @@ fun FeedsScreen(
                         }
                     },
                     onToggleTag = { viewModel.toggleTagExpansion(item.tag) },
+                    // A tag, All feeds and Saved articles are not feeds, so there is
+                    // nothing to edit on those rows either.
+                    onEdit =
+                        when {
+                            item.id > ID_UNSET -> ({ onEditFeed(item.id) })
+                            else -> null
+                        },
                     // "All feeds", "Saved articles" and a tag are not subscriptions, so
                     // there is nothing to unsubscribe from and no icon on those rows.
                     onRemove =
@@ -171,6 +182,7 @@ fun FeedsScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun FeedRow(
     item: FeedUnreadCount,
@@ -178,6 +190,7 @@ private fun FeedRow(
     onClick: () -> Unit,
     onToggleTag: () -> Unit,
     onRemove: (() -> Unit)?,
+    onEdit: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
     // Removing a feed cannot be undone, so it asks in the row rather than in a dialog --
@@ -203,7 +216,15 @@ private fun FeedRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                .clickable { if (armed) armed = false else onClick() }
+                // Renaming a feed and putting it in a folder are rare next to opening it,
+                // and neither is worth a second icon on every row or a mode over the whole
+                // screen. A long press on the row itself is where the app already puts
+                // what is seldom wanted: it costs the list nothing.
+                .combinedClickable(
+                    onLongClickLabel = stringResource(R.string.edit_feed),
+                    onLongClick = onEdit,
+                    onClick = { if (armed) armed = false else onClick() },
+                )
                 .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
         if (isTag) {
