@@ -28,8 +28,8 @@ android {
 
     defaultConfig {
         applicationId = "com.wanderwildwood.kirinuki"
-        versionCode = 4
-        versionName = "0.2.2"
+        versionCode = 5
+        versionName = "0.2.3"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
@@ -108,6 +108,15 @@ android {
             realSigningConfig?.let { signingConfig = it }
         }
         val release by getting {
+            // AGP stamps the git revision into META-INF of a release build. This one is
+            // built on the build box, which works from an rsync with no .git, so it writes
+            // NO_SUPPORTED_VCS_FOUND instead -- but the same tag built here would carry the
+            // commit, and two APKs of one version would differ. Off, so where it was built
+            // makes no difference to what is in it.
+            vcsInfo {
+                include = false
+            }
+
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
