@@ -25,6 +25,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.FeedType
+import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.FeedListItem
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
@@ -44,7 +45,13 @@ fun ArticleListScreen(
     val items = viewModel.items.collectAsLazyPagingItems()
     val syncing by viewModel.syncing.collectAsStateWithLifecycle(initialValue = false)
     val screenTitle by viewModel.screenTitle.collectAsStateWithLifecycle(initialValue = null)
+    val (openFeedId, _) = viewModel.currentFeedAndTag.collectAsStateWithLifecycle().value
     val listState = rememberLazyListState()
+
+    // One feed open: the bar above the list already says whose these are, and the name
+    // under every title is that same word again, once per row. A tag and the two lists
+    // that are not a feed keep it, because there it is the thing that tells them apart.
+    val showFeedName = openFeedId <= ID_UNSET
 
     val title =
         when {
@@ -109,6 +116,7 @@ fun ArticleListScreen(
                 val item = items[index] ?: return@items
                 ArticleRow(
                     item = item,
+                    showFeedName = showFeedName,
                     onClick = {
                         viewModel.open(item.id)
                         viewModel.markAsRead(item.id)
@@ -124,6 +132,7 @@ fun ArticleListScreen(
 @Composable
 private fun ArticleRow(
     item: FeedListItem,
+    showFeedName: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -142,12 +151,14 @@ private fun ArticleRow(
             overflow = TextOverflow.Ellipsis,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            TextMMD(
-                text = item.feedTitle,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false),
-            )
+            if (showFeedName) {
+                TextMMD(
+                    text = item.feedTitle,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false),
+                )
+            }
             TextMMD(text = item.pubDate, maxLines = 1)
         }
     }
