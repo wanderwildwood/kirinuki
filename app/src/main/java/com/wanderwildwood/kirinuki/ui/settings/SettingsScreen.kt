@@ -48,6 +48,7 @@ fun SettingsScreen(
     val syncOnlyWhenCharging by viewModel.syncOnlyWhenCharging.collectAsStateWithLifecycle()
     val syncFrequency by viewModel.syncFrequency.collectAsStateWithLifecycle()
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
+    val showReadArticles by viewModel.showReadArticles.collectAsStateWithLifecycle()
 
     var aboutOpen by remember { mutableStateOf(false) }
 
@@ -122,6 +123,16 @@ fun SettingsScreen(
                     value = "${(textScale * 100).toInt()}%",
                     onLess = { viewModel.setTextScale((textScale - 0.1f).coerceAtLeast(0.5f)) },
                     onMore = { viewModel.setTextScale((textScale + 0.1f).coerceAtMost(3.0f)) },
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                SwitchRow(
+                    title = stringResource(R.string.show_read_articles),
+                    checked = showReadArticles,
+                    onCheckedChange = viewModel::setShowReadArticles,
                 )
             }
             item {

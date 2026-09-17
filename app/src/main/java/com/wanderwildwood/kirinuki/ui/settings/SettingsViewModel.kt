@@ -1,9 +1,13 @@
 package com.wanderwildwood.kirinuki.ui.settings
 
+import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -18,6 +22,20 @@ class SettingsViewModel(
     val textScale: StateFlow<Float> = repository.textScale
     val maximumCountPerFeed: StateFlow<Int> = repository.maximumCountPerFeed
 
+    /**
+     * One face of the list filter, which is the only face of it this app has ever shown.
+     * Off leaves what you have read in the database and out of the list; it comes back
+     * the moment this is on again.
+     */
+    val showReadArticles: StateFlow<Boolean> =
+        repository.feedListFilter
+            .map { it.read }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Eagerly,
+                initialValue = repository.feedListFilter.value.read,
+            )
+
     fun setSyncOnlyOnWifi(value: Boolean) = repository.setSyncOnlyOnWifi(value)
 
     fun setSyncOnlyWhenCharging(value: Boolean) = repository.setSyncOnlyWhenCharging(value)
@@ -27,4 +45,6 @@ class SettingsViewModel(
     fun setTextScale(value: Float) = repository.setTextScale(value)
 
     fun setMaxCountPerFeed(value: Int) = repository.setMaxCountPerFeed(value)
+
+    fun setShowReadArticles(value: Boolean) = repository.setFeedListFilterRead(value)
 }
