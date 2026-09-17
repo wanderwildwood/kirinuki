@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
 
 /**
  * The cutting itself. Title, where it came from, and the text -- the summary the feed
@@ -108,11 +110,17 @@ fun ArticleScreen(
                     .padding(padding),
         ) {
             item {
-                TextMMD(
-                    text = article?.title.orEmpty(),
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                // The body is bodyLarge through ProvideScaledText, and the title was the
+                // ambient style at no scale at all: a step smaller than the text under it
+                // at 100%, and further adrift at every step of the text scale. Same style,
+                // same scale, bold -- which is the only emphasis there is here.
+                ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
+                    TextMMD(
+                        text = article?.title.orEmpty(),
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
 
             when (state) {
