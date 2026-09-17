@@ -43,17 +43,6 @@ class FeedsViewModel(
         _tourCount.value = tourStore.count()
     }
 
-    /**
-     * Unsubscribe. The articles go with it -- a feed you have removed keeping its unread
-     * count in "All feeds" would be the app disagreeing with the reader about what they
-     * are subscribed to.
-     */
-    fun remove(feedId: Long) {
-        viewModelScope.launch {
-            repository.deleteFeeds(listOf(feedId))
-        }
-    }
-
     fun refresh() {
         viewModelScope.launch {
             runOnceRssSync(di = di, forceNetwork = true, triggeredByUser = true)

@@ -33,6 +33,21 @@ class AddFeedViewModel(
     /** The folders that exist, so that putting a feed in one is a tap and not a spelling test. */
     val folders: Flow<List<String>> = repository.allTags
 
+    /**
+     * Unsubscribes, and takes the articles that came with the feed with it.
+     *
+     * This lived on the feeds screen as a bin on every row. It is here because it belongs
+     * with the other two things you can do to a feed, and because a list of names and
+     * counts is a better list than one carrying a live delete on every line.
+     */
+    fun delete(feedId: Long) {
+        if (feedId <= ID_UNSET) return
+        viewModelScope.launch {
+            repository.deleteFeeds(listOf(feedId))
+            _saved.value = true
+        }
+    }
+
     fun load(feedId: Long) {
         _feed.value = null
         if (feedId <= ID_UNSET) return

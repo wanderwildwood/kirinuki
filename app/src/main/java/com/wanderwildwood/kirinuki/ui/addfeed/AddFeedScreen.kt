@@ -30,6 +30,7 @@ import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import kotlinx.coroutines.delay
 
 /**
  * One screen for subscribing and for changing a feed afterwards, because the two hold the
@@ -58,6 +59,15 @@ fun AddFeedScreen(
     val feed by viewModel.feed.collectAsStateWithLifecycle()
     val folders by viewModel.folders.collectAsStateWithLifecycle(initialValue = emptyList())
     val editing = feedId > ID_UNSET
+
+    // Disarms itself after a few seconds, the same as the row it replaces used to.
+    var armed by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(armed) {
+        if (armed) {
+            delay(ARMED_MILLIS)
+            armed = false
+        }
+    }
 
     LaunchedEffect(feedId) { viewModel.load(feedId) }
 
@@ -187,6 +197,27 @@ fun AddFeedScreen(
                     TextMMD(text = stringResource(R.string.read_it))
                 }
             }
+
+            // Last, after everything that only adjusts -- see STYLE.md. Unsubscribing cannot
+            // be undone, so the button asks in its own face rather than stacking a dialog on
+            // a screen, and it disarms itself, because a live delete left under a thumb is a
+            // trap for whoever picks the phone up next.
+            if (editing) {
+                OutlinedButtonMMD(
+                    onClick = { if (armed) viewModel.delete(feedId) else armed = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextMMD(
+                        text =
+                            stringResource(
+                                if (armed) R.string.remove_feed_armed else R.string.remove_feed,
+                            ),
+                    )
+                }
+            }
         }
     }
 }
+
+/** Long enough to mean it, short enough not to leave a live delete under a thumb. */
+private const val ARMED_MILLIS = 4000L

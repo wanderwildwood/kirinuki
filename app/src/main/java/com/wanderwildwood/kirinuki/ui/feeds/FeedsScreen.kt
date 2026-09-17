@@ -13,11 +13,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,7 +33,6 @@ import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
-import kotlinx.coroutines.delay
 
 /**
  * The feeds, and above them the two rows that are not feeds: everything, and what was kept.
@@ -166,15 +161,6 @@ fun FeedsScreen(
                             item.id > ID_UNSET -> ({ onEditFeed(item.id) })
                             else -> null
                         },
-                    // "All feeds", "Saved articles" and a tag are not subscriptions, so
-                    // there is nothing to unsubscribe from and no icon on those rows.
-                    onRemove =
-                        when {
-                            item.id == ID_ALL_FEEDS -> null
-                            item.id == ID_SAVED_ARTICLES -> null
-                            item.id == ID_UNSET -> null
-                            else -> ({ viewModel.remove(item.id) })
-                        },
                 )
                 HorizontalDividerMMD()
             }
@@ -189,19 +175,9 @@ private fun FeedRow(
     expanded: Boolean,
     onClick: () -> Unit,
     onToggleTag: () -> Unit,
-    onRemove: (() -> Unit)?,
     onEdit: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
-    // Removing a feed cannot be undone, so it asks in the row rather than in a dialog --
-    // see STYLE.md. It disarms itself, because a row left armed under a thumb is a trap.
-    var armed by remember { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(ARMED_MILLIS)
-            armed = false
-        }
-    }
     val isTag = item.id == ID_UNSET && item.tag.isNotEmpty()
     val title =
         when (item.id) {
@@ -216,14 +192,14 @@ private fun FeedRow(
         modifier =
             modifier
                 .fillMaxWidth()
-                // Renaming a feed and putting it in a folder are rare next to opening it,
-                // and neither is worth a second icon on every row or a mode over the whole
-                // screen. A long press on the row itself is where the app already puts
-                // what is seldom wanted: it costs the list nothing.
+                // Renaming a feed, moving it and removing it are all rare next to opening
+                // it, and none is worth an icon on every row or a mode over the whole
+                // screen. A long press opens the one screen that holds all three, which
+                // leaves the list as names and counts and nothing else.
                 .combinedClickable(
                     onLongClickLabel = stringResource(R.string.edit_feed),
                     onLongClick = onEdit,
-                    onClick = { if (armed) armed = false else onClick() },
+                    onClick = onClick,
                 )
                 .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
@@ -235,30 +211,17 @@ private fun FeedRow(
             }
         }
         TextMMD(
-            text = if (armed) stringResource(R.string.remove_feed_armed) else title,
-            // Tour, All feeds and Saved articles are not feeds. They sat in the same
-            // column drawn the same way, so they read as subscriptions. Weight separates
+            text = title,
+            // The reading list, All feeds and Saved articles are not feeds. They sat in the
+            // same column drawn the same way, so they read as subscriptions. Weight separates
             // the kinds without a second type size or a row of its own.
-            fontWeight = if (onRemove == null && !isTag) FontWeight.Bold else FontWeight.Normal,
+            fontWeight = if (onEdit == null && !isTag) FontWeight.Bold else FontWeight.Normal,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),
         )
-        if (item.unreadCount > 0 && !armed) {
+        if (item.unreadCount > 0) {
             TextMMD(text = item.unreadCount.toString())
-        }
-        if (onRemove != null) {
-            BarIcon(
-                icon = Icons.Delete,
-                contentDescription =
-                    stringResource(
-                        if (armed) R.string.remove_feed_armed else R.string.remove_feed,
-                    ),
-                onClick = { if (armed) onRemove() else armed = true },
-            )
         }
     }
 }
-
-/** Long enough to mean it, short enough not to leave a live delete under a thumb. */
-private const val ARMED_MILLIS = 4000L
