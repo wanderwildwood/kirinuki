@@ -12,6 +12,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +30,7 @@ import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import com.wanderwildwood.kirinuki.ui.compose.theme.TextScaleDialog
 import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
 
 /**
@@ -46,6 +50,8 @@ fun ArticleScreen(
     val content by viewModel.content.collectAsStateWithLifecycle()
     val state by viewModel.state.collectAsStateWithLifecycle()
     val showingFullText by viewModel.showingFullText.collectAsStateWithLifecycle()
+    val textScale by viewModel.textScale.collectAsStateWithLifecycle()
+    var scaleOpen by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier,
@@ -66,6 +72,14 @@ fun ArticleScreen(
                     )
                 },
                 actions = {
+                    // The setting is in settings, where it is set once. This is the same
+                    // setting reached from the one screen where the size is a question you
+                    // can actually answer, because the page you are judging is behind it.
+                    BarIcon(
+                        icon = Icons.TextScale,
+                        contentDescription = stringResource(R.string.text_scale),
+                        onClick = { scaleOpen = true },
+                    )
                     BarIcon(
                         icon =
                             if (showingFullText) {
@@ -148,6 +162,14 @@ fun ArticleScreen(
                     }
             }
         }
+    }
+
+    if (scaleOpen) {
+        TextScaleDialog(
+            scale = textScale,
+            onScale = viewModel::setTextScale,
+            onDismiss = { scaleOpen = false },
+        )
     }
 }
 
