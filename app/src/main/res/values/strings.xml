@@ -421,16 +421,6 @@
   <string name="read_it">Read it</string>
   <string name="subscribe_to_this">Subscribe to this</string>
   <string name="gopher_unsupported_type">This is not text or a menu, so there is nothing to read here.</string>
-  <!-- The reader-facing name for what the code calls the tour. The idea is Offpunk's and so
-       was the word, but a reviewer who liked the app could not tell what the row was for, which
-       is the only test a name has to pass. The keys and the package stay "tour". -->
-  <string name="tour">Reading list</string>
-  <string name="tour_add">Add to the reading list</string>
-  <string name="tour_queued">Put on the reading list.</string>
-  <string name="tour_queued_detail">It will be here to read after the next sync.</string>
-  <string name="tour_empty">Nothing on the reading list. A page you cannot reach can be put here, and it is fetched the next time you sync.</string>
-  <string name="tour_waiting">waiting for a sync</string>
-  <string name="tour_remove">Take off the reading list</string>
   <string name="show_read_articles">Show read articles</string>
   <string name="feed_folder">Folder</string>
     <string name="about">About</string>

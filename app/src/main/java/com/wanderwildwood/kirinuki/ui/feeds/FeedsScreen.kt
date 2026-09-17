@@ -47,7 +47,6 @@ fun FeedsScreen(
     onAddFeed: () -> Unit,
     onEditFeed: (Long) -> Unit,
     onSettings: () -> Unit,
-    onTour: () -> Unit,
     viewModel: FeedsViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -55,7 +54,6 @@ fun FeedsScreen(
     val syncing by viewModel.syncing.collectAsStateWithLifecycle(initialValue = false)
     val expandedTags by viewModel.expandedTags.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
-    val tourCount by viewModel.tourCount.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = modifier,
@@ -111,28 +109,6 @@ fun FeedsScreen(
                     .fillMaxSize()
                     .padding(padding),
         ) {
-            // First, because it is what you came back for: the tour is the only row here
-            // holding things you asked for by hand rather than subscribed to.
-            item {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = onTour)
-                            .padding(horizontal = 16.dp, vertical = 14.dp),
-                ) {
-                    TextMMD(
-                        text = stringResource(R.string.tour),
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (tourCount > 0) TextMMD(text = tourCount.toString())
-                }
-                HorizontalDividerMMD()
-            }
-
             items(
                 count = items.itemCount,
                 key = { index -> items.peek(index)?.let { "${it.id}/${it.tag}" } ?: index },

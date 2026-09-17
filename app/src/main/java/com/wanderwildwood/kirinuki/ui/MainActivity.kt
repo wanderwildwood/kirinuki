@@ -39,8 +39,6 @@ import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageScreen
 import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageViewModel
 import com.wanderwildwood.kirinuki.ui.feeds.FeedsViewModel
 import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
-import com.wanderwildwood.kirinuki.ui.tour.TourScreen
-import com.wanderwildwood.kirinuki.ui.tour.TourViewModel
 import com.wanderwildwood.kirinuki.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
@@ -175,7 +173,6 @@ class MainActivity : DIAwareComponentActivity() {
                     onAddFeed = { navController.navigate(Route.addFeed("")) },
                     onEditFeed = { navController.navigate(Route.editFeed(it)) },
                     onSettings = { navController.navigate(Route.SETTINGS) },
-                    onTour = { navController.navigate(Route.TOUR) },
                     viewModel = viewModel,
                 )
             }
@@ -194,14 +191,6 @@ class MainActivity : DIAwareComponentActivity() {
                     onFollowGemini = { navController.navigate(Route.gemini(it)) },
                     viewModel = viewModel,
                     listState = articleListState,
-                )
-            }
-            composable(Route.TOUR) { entry ->
-                val viewModel: TourViewModel = entry.diAwareViewModel()
-                TourScreen(
-                    onBack = { navController.popBackStack() },
-                    onOpen = { navController.navigate(Route.gemini(it)) },
-                    viewModel = viewModel,
                 )
             }
             composable(Route.SETTINGS) { entry ->

@@ -41,9 +41,6 @@ shared anywhere arrives here.
 - **Subscribe to a gemlog.** Gemini has no feed format; the convention is that a page *is*
   a feed when its links carry dates. Subscribe to one and its entries arrive like any
   other feed's, with the text fetched at sync time, so a gemlog reads with the radio off.
-- **The tour.** A page you cannot reach is the page worth keeping. That screen offers to
-  put it on the tour; the next sync fetches it; it is there to read whenever. A capsule
-  that was down when you queued something is not a reason to lose it.
 - **Certificates.** Gemini has no authorities, so a capsule is trusted the first time it
   is seen and checked against that afterwards. A host presenting a different certificate
   before the known one has expired is refused, and the screen says why rather than
@@ -96,9 +93,6 @@ database — is Feeder's and is the reason this exists at all.
 ## Credits
 
 - Built on [Feeder](https://github.com/spacecowboy/Feeder) by Jonas Kalderstam (GPL-3.0).
-- The tour is [Offpunk](https://sr.ht/~lioploum/offpunk/)'s idea, by Ploum. No code is
-  taken from it: Offpunk is AGPL-3.0 and this is GPL-3.0, so the protocols here are
-  written against their specifications.
 - Full-text extraction via [Readability4J](https://github.com/dankito/Readability4J).
 - UI built with Mudita's [MMD](https://github.com/mudita/MMD) component library for Kompakt.
 

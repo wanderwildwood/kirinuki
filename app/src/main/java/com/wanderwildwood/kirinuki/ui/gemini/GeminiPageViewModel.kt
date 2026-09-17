@@ -14,7 +14,6 @@ import com.wanderwildwood.kirinuki.net.spartan.SpartanClient
 import com.wanderwildwood.kirinuki.net.gopher.GopherResponse
 import com.wanderwildwood.kirinuki.net.gopher.GopherClient
 import com.wanderwildwood.kirinuki.model.gopher.GopherMenuParser
-import com.wanderwildwood.kirinuki.model.tour.TourStore
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import kotlinx.coroutines.Dispatchers
@@ -42,14 +41,10 @@ sealed interface GeminiPageState {
         val text: String,
     ) : GeminiPageState
 
-    /**
-     * Said in words, because an empty screen is not an answer. [canQueue] is set when the
-     * page could not be reached but could be waiting after the next sync.
-     */
+    /** Said in words, because an empty screen is not an answer. */
     data class Problem(
         val message: String,
         val detail: String?,
-        val canQueue: Boolean = false,
     ) : GeminiPageState
 }
 
@@ -59,7 +54,6 @@ class GeminiPageViewModel(
     private val client: GeminiClient by instance()
     private val gopherClient: GopherClient by instance()
     private val spartanClient: SpartanClient by instance()
-    private val tourStore: TourStore by instance()
 
     private val _state = MutableStateFlow<GeminiPageState>(GeminiPageState.Loading)
     val state: StateFlow<GeminiPageState> = _state
@@ -88,12 +82,6 @@ class GeminiPageViewModel(
     private suspend fun fetch(url: String): GeminiPageState =
         withContext(Dispatchers.IO) {
             val app = getApplication<Application>()
-
-            // A page on the tour was fetched by a sync so it could be read now, whatever
-            // the radio is doing. Reload goes to the network; opening it does not.
-            tourStore.cachedText(url)?.let { cached ->
-                return@withContext render(url, cached)
-            }
 
             try {
                 if (isGopherUrl(url)) {
@@ -144,7 +132,6 @@ class GeminiPageViewModel(
                 GeminiPageState.Problem(
                     app.getString(R.string.gemini_unreachable),
                     e.message,
-                    canQueue = !tourStore.contains(url),
                 )
             }
         }
@@ -195,35 +182,6 @@ class GeminiPageViewModel(
                     response.message.ifBlank { null },
                 )
         }
-
-    /**
-     * Cached text, rendered the way its protocol would have been. Gopher menus and
-     * gemtext are told apart by the address, which is the only thing a cache keeps.
-     */
-    private fun render(
-        url: String,
-        text: String,
-    ): GeminiPageState =
-        when {
-            isGopherUrl(url) && url.gopherType() == '0' -> GeminiPageState.Preformatted(text)
-            isGopherUrl(url) -> GeminiPageState.Page(GopherMenuParser().parse(text))
-            else -> GeminiPageState.Page(GemtextParser(url).parse(text))
-        }
-
-    private fun String.gopherType(): Char =
-        runCatching { java.net.URI(this).path.orEmpty().getOrNull(1) }.getOrNull() ?: '1'
-
-    fun queueOnTour(
-        url: String,
-        title: String,
-    ) {
-        tourStore.add(url, title)
-        _state.value =
-            GeminiPageState.Problem(
-                getApplication<Application>().getString(R.string.tour_queued),
-                getApplication<Application>().getString(R.string.tour_queued_detail),
-            )
-    }
 
     companion object {
         private const val LOG_TAG = "KIRINUKI_GEMINI"

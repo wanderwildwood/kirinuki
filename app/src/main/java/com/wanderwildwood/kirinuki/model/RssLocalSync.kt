@@ -4,8 +4,6 @@ import android.app.Application
 import android.util.Log
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.model.gemtext.GemsubParser
-import com.wanderwildwood.kirinuki.model.tour.TourStore
-import com.wanderwildwood.kirinuki.net.SmolnetFetcher
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
@@ -61,8 +59,6 @@ class RssLocalSync(
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
     private val geminiClient: GeminiClient by instance()
-    private val tourStore: TourStore by instance()
-    private val smolnetFetcher: SmolnetFetcher by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val application: Application by instance()
 
@@ -87,11 +83,7 @@ class RssLocalSync(
                         forceNetwork = forceNetwork,
                         minFeedAgeMinutes = minFeedAgeMinutes,
                         debugReallyForceNetwork = debugReallyForceNetwork,
-                    ).also {
-                        // The whole point of a tour: what was queued while disconnected
-                        // is here to read by the time you are disconnected again.
-                        fetchTour()
-                    }
+                    )
                 } finally {
                     repository.setSyncWorkerRunning(false)
                 }
@@ -232,27 +224,6 @@ class RssLocalSync(
                 feedId = feed.id,
                 syncing = false,
             )
-        }
-    }
-
-    /**
-     * Fetch anything queued on the tour that a sync has not been for yet.
-     *
-     * Failures are left pending rather than marked done, so the next sync tries again —
-     * a capsule that was down when you queued a page is not a reason to lose the page.
-     */
-    private suspend fun fetchTour() {
-        val pending = tourStore.pending()
-        if (pending.isEmpty()) return
-
-        logDebug(LOG_TAG, "Fetching ${pending.size} queued on the tour")
-        for (entry in pending) {
-            try {
-                withContext(Dispatchers.IO) { smolnetFetcher.fetchText(entry.url) }
-                    ?.let { text -> tourStore.markFetched(entry.url, text) }
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "Could not fetch ${entry.url} for the tour", e)
-            }
         }
     }
 

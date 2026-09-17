@@ -7,7 +7,6 @@ import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
-import com.wanderwildwood.kirinuki.model.tour.TourStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +18,6 @@ class FeedsViewModel(
     di: DI,
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
-    private val tourStore: TourStore by instance()
-
-    private val _tourCount = MutableStateFlow(tourStore.count())
-    val tourCount: StateFlow<Int> = _tourCount
-
     val items: Flow<PagingData<FeedUnreadCount>> =
         repository.getPagedNavDrawerItems().cachedIn(viewModelScope)
 
@@ -37,11 +31,6 @@ class FeedsViewModel(
         feedId: Long,
         tag: String,
     ) = repository.setCurrentFeedAndTag(feedId = feedId, tag = tag)
-
-    /** The count changes behind this screen's back, when a sync fills the tour in. */
-    fun refreshTourCount() {
-        _tourCount.value = tourStore.count()
-    }
 
     fun refresh() {
         viewModelScope.launch {
