@@ -3,6 +3,7 @@ package com.wanderwildwood.kirinuki.ui.addfeed
 import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
+import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
@@ -74,6 +75,7 @@ class AddFeedViewModel(
         title: String,
         folder: String,
         feedId: Long = ID_UNSET,
+        fullTextByDefault: Boolean = false,
     ) {
         _error.value = null
         val parsed =
@@ -120,18 +122,29 @@ class AddFeedViewModel(
                     editing || existing == null -> folder.trim()
                     else -> folder.trim().ifBlank { existing.tag }
                 }
+            // A switch off means two things, as a blank box does. Editing shows the feed's
+            // own setting, so off is a decision. Adding never loaded it, so off there is no
+            // opinion at all, and it must not quietly undo a feed that already wants the
+            // whole article.
+            val newFullText =
+                when {
+                    editing || existing == null -> fullTextByDefault
+                    else -> fullTextByDefault || existing.fullTextByDefault
+                }
             val savedId =
                 repository.saveFeed(
                     existing?.copy(
                         url = parsed,
                         customTitle = newCustomTitle,
                         tag = newTag,
+                        fullTextByDefault = newFullText,
                     )
                         ?: Feed(
                             url = parsed,
                             title = placeholder,
                             customTitle = newCustomTitle,
                             tag = newTag,
+                            fullTextByDefault = newFullText,
                         ),
                 )
             // A rename or a move is not a reason to go to the network. A new feed is, and
@@ -139,7 +152,14 @@ class AddFeedViewModel(
             // ⚠ Compared as text: java.net.URL.equals resolves both hosts, and this runs
             // on the main dispatcher.
             if (existing == null || existing.url.toString() != parsed.toString()) {
+                // A sync of a feed that wants the whole article chains the full text pass
+                // itself, so this covers the new feed too.
                 runOnceRssSync(di = di, feedId = savedId, forceNetwork = true, triggeredByUser = true)
+            } else if (newFullText && !existing.fullTextByDefault) {
+                // The feed has nothing new to give, but every article it already gave has
+                // a page behind it that has not been fetched. Turning this on and seeing
+                // nothing change would read as the switch not working.
+                runOnceFullTextSync(di = di, triggeredByUser = true)
             }
             _saved.value = true
         }

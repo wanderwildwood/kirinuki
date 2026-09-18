@@ -428,5 +428,7 @@
   <string name="open_title_in_browser_detail">The article title opens the page it came from. Off by default: Clippings renders the article itself.</string>
   <string name="open_title_in_browser_no_browser">Nothing on this phone opens a web page, so there is nowhere for the title to go.</string>
   <string name="feed_folder">Folder</string>
+  <string name="full_text_by_default">Always fetch the whole article</string>
+  <string name="full_text_by_default_detail">Fetch each article from its own page when this feed syncs, rather than reading only what the feed carries. Slower, and more to download.</string>
     <string name="about">About</string>
 </resources>

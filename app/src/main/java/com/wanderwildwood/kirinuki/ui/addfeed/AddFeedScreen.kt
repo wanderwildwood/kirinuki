@@ -3,12 +3,14 @@ package com.wanderwildwood.kirinuki.ui.addfeed
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,12 +18,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.buttons.ButtonMMD
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
+import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -51,6 +55,7 @@ fun AddFeedScreen(
     var url by rememberSaveable { mutableStateOf(initialUrl) }
     var title by rememberSaveable { mutableStateOf("") }
     var folder by rememberSaveable { mutableStateOf("") }
+    var fullText by rememberSaveable { mutableStateOf(false) }
     // The feed arrives after the first composition, and it must fill the boxes once and
     // then leave them alone: without this, a second emission would undo what was typed.
     var filledIn by rememberSaveable { mutableStateOf(false) }
@@ -83,6 +88,7 @@ fun AddFeedScreen(
         // model drops a custom title that only repeats what the feed calls itself.
         title = loaded.displayTitle
         folder = loaded.tag
+        fullText = loaded.fullTextByDefault
         filledIn = true
     }
 
@@ -162,6 +168,26 @@ fun AddFeedScreen(
                     }
                 }
             }
+            // The answer to a feed that carries only a paragraph. Before this it existed
+            // and was reachable only by hand-editing an OPML file and importing it, which
+            // is not a setting anybody can find.
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .clickable { fullText = !fullText },
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    TextMMD(text = stringResource(R.string.full_text_by_default))
+                    TextMMD(
+                        text = stringResource(R.string.full_text_by_default_detail),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+                SwitchMMD(checked = fullText, onCheckedChange = { fullText = it })
+            }
             if (error != null) {
                 TextMMD(text = stringResource(R.string.add_feed_url_invalid))
             }
@@ -173,6 +199,7 @@ fun AddFeedScreen(
                             title = title,
                             folder = folder,
                             feedId = feedId,
+                            fullTextByDefault = fullText,
                         )
                     },
                 enabled = url.isNotBlank(),
