@@ -1,16 +1,24 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
+
+The tour is gone, and a feed that carries only a paragraph can be told to fetch the rest.
 
 - **The tour is gone.** The queue, the reading-list row on the feeds screen, the screen
   itself and the fetch a sync did for it are all removed. Nothing migrates: a page that was
   on the list is simply not there any more.
+- **"Always fetch the whole article", per feed**, on the add and edit feed screen. A feed
+  that carries only a summary can be told to fetch each article from its own page at sync
+  time, so the whole thing is there to read with the radio off. This existed and sync has
+  always honoured it — it had no switch anywhere, and could only be set by hand-editing an
+  OPML file and importing it. Turning it on also fetches the pages behind the articles that
+  are already here, rather than only applying to the next ones.
 - **Open the title in a browser**, off by default, in settings. On it makes the reader's
   title the link to the page the cutting came from, for when a feed carries only part of an
-  article and the full-text fetch cannot get the rest. The row only appears on a phone that
-  has a browser, and the WebView test shell a stock Kompakt registers for http does not
-  count as one — which is why the default is off and why the app still opens nothing by
-  itself.
+  article and the full-text fetch cannot get the rest. The row greys out and says why on a
+  phone with no browser — and the WebView test shell a stock Kompakt registers for http
+  does not count as one, which is why the default is off and why the app still opens
+  nothing by itself.
 
 ## 0.2.0
 
