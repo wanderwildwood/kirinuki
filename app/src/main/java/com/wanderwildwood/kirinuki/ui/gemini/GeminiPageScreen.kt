@@ -1,6 +1,7 @@
 package com.wanderwildwood.kirinuki.ui.gemini
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,6 +24,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.components.ReaderEdges
 import com.wanderwildwood.kirinuki.ui.compose.components.rememberReaderScrollStep
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
@@ -81,53 +83,61 @@ fun GeminiPageScreen(
             )
         },
     ) { padding ->
-        LazyColumnMMD(
-            state = listState,
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            // As in the reader: a capsule's lines are its own lengths, so the step is
-            // measured off the screen rather than counted in items.
-            scrollStep = rememberReaderScrollStep(listState),
+        Box(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(padding),
         ) {
-            when (val current = state) {
-                is GeminiPageState.Loading ->
-                    item {
-                        TextMMD(
-                            text = stringResource(R.string.fetching_full_article),
-                            modifier = Modifier.fillMaxWidth(),
+            LazyColumnMMD(
+                state = listState,
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                // As in the reader: a capsule's lines are its own lengths, so the step is
+                // measured off the screen rather than counted in items.
+                scrollStep = rememberReaderScrollStep(listState),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                when (val current = state) {
+                    is GeminiPageState.Loading ->
+                        item {
+                            TextMMD(
+                                text = stringResource(R.string.fetching_full_article),
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+
+                    is GeminiPageState.Preformatted ->
+                        item {
+                            FittedPreformattedText(text = current.text)
+                        }
+
+                    is GeminiPageState.Problem ->
+                        item {
+                            TextMMD(text = current.message, modifier = Modifier.fillMaxWidth())
+                            current.detail?.let { TextMMD(text = it, modifier = Modifier.fillMaxWidth()) }
+                        }
+
+                    is GeminiPageState.Page ->
+                        linearArticleContent(
+                            articleContent = current.article,
+                            onLinkClick = { target, _ ->
+                                // A smolnet link stays in the app. Anything else is somebody
+                                // else's protocol and goes to whatever handles it -- a gopher
+                                // menu can point at the web, and often does.
+                                // A capsule may link out to the web. Clippings cannot follow
+                                // that anywhere sane on this phone, so it is text, not a link.
+                                if (isSmolnetUrl(target)) {
+                                    onFollow(target)
+                                }
+                            },
                         )
-                    }
-
-                is GeminiPageState.Preformatted ->
-                    item {
-                        FittedPreformattedText(text = current.text)
-                    }
-
-                is GeminiPageState.Problem ->
-                    item {
-                        TextMMD(text = current.message, modifier = Modifier.fillMaxWidth())
-                        current.detail?.let { TextMMD(text = it, modifier = Modifier.fillMaxWidth()) }
-                    }
-
-                is GeminiPageState.Page ->
-                    linearArticleContent(
-                        articleContent = current.article,
-                        onLinkClick = { target, _ ->
-                            // A smolnet link stays in the app. Anything else is somebody
-                            // else's protocol and goes to whatever handles it -- a gopher
-                            // menu can point at the web, and often does.
-                            // A capsule may link out to the web. Clippings cannot follow
-                            // that anywhere sane on this phone, so it is text, not a link.
-                            if (isSmolnetUrl(target)) {
-                                onFollow(target)
-                            }
-                        },
-                    )
+                }
             }
+
+            // Last, so it is on top: the edges take their taps before the text
+            // under them does.
+            ReaderEdges(listState = listState)
         }
     }
 }

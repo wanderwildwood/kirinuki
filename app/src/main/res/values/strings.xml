@@ -225,6 +225,8 @@
   <string name="article_image">Article image</string>
   <string name="feed_icon">Feed Icon</string>
   <string name="text_scale">Text scale</string>
+  <string name="page_back">Back a page</string>
+  <string name="page_on">On a page</string>
 
   <string name="saved_articles">Saved articles</string>
   <string name="saved_article">Saved article</string>

@@ -26,8 +26,10 @@ import com.wanderwildwood.kirinuki.ui.ScrollDirection
  * ⚠ **A block taller than the screen is the one case this cannot serve.** Stepping by index
  * can only ever put a block's *top* under the top edge, so the rest of an over-long paragraph
  * -- a code block, a wall of gopher text -- is not reachable by swiping at all, and the step
- * falls back to one so that the swipe at least moves. The volume keys are the way through
- * those: they page by pixels and stop wherever the text does. See [turnPage].
+ * falls back to one so that the swipe at least moves. The volume keys and the edge taps are
+ * the way through those: both page by pixels and stop wherever the text does, and the taps
+ * matter because the reader who found this reads on a panel with no volume keys at all.
+ * See [turnPage] and [ReaderEdges].
  */
 @Composable
 fun rememberReaderScrollStep(state: LazyListState): Int {
