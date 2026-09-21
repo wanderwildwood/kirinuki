@@ -137,13 +137,26 @@ class OPMLTest : DIAware {
             // Verify database is correct
             val actual = settingsStore.getAllSettings()
 
-            ALL_SETTINGS_WITH_VALUES.toList().forEachIndexed { index, (key, expected) ->
-                assertEquals(
-                    "$index: Setting $key, expected $expected but was ${actual[key]}",
-                    expected,
-                    actual[key].toString(),
-                )
-            }
+            // pref_font is written so an OPML this app exports still carries what a Feeder
+            // export would, but it is deliberately dropped on the way back in: this app has
+            // no font setting to put it in. See SETTING_FONT in OPMLImporter, which maps it
+            // to Unit, and the note beside PREF_FONT.
+            ALL_SETTINGS_WITH_VALUES
+                .toList()
+                .filterNot { (key, _) -> key == UserSettings.SETTING_FONT.key }
+                .forEachIndexed { index, (key, expected) ->
+                    assertEquals(
+                        "$index: Setting $key, expected $expected but was ${actual[key]}",
+                        expected,
+                        actual[key].toString(),
+                    )
+                }
+
+            assertEquals(
+                "pref_font should not have been imported",
+                null,
+                actual[UserSettings.SETTING_FONT.key],
+            )
 
             val actualBlocked = settingsStore.blockListPreference.first()
 
@@ -788,6 +801,7 @@ class OPMLTest : DIAware {
                 userSetting.key to
                     when (userSetting) {
                         UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
+                        UserSettings.SETTING_OPEN_TITLE_IN_BROWSER -> "true"
                         UserSettings.SETTING_ADDED_FEEDER_NEWS -> "true"
                         UserSettings.SETTING_THEME -> "night"
                         UserSettings.SETTING_DARK_THEME -> "dark"
@@ -898,6 +912,7 @@ private val sampleFile: List<String> =
           <feeder:setting key="pref_paging_mode" value="true"/>
           <feeder:setting key="pref_animated_paging" value="true"/>
           <feeder:setting key="pref_body_text_scale" value="1.6"/>
+          <feeder:setting key="pref_open_title_in_browser" value="true"/>
           <feeder:setting key="pref_is_mark_as_read_on_scroll" value="true"/>
           <feeder:setting key="pref_readaloud_detect_lang" value="true"/>
           <feeder:setting key="pref_max_lines" value="6"/>

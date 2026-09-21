@@ -9,7 +9,6 @@ import com.wanderwildwood.kirinuki.ApplicationCoroutineScope
 import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.archmodel.FeedItemStore
 import com.wanderwildwood.kirinuki.archmodel.FeedStore
-import com.wanderwildwood.kirinuki.archmodel.FontStore
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.archmodel.SessionStore
 import com.wanderwildwood.kirinuki.archmodel.SettingsStore
@@ -86,7 +85,6 @@ class RssLocalSyncKtTest : DIAware {
                     it.setAddedFeederNews(true)
                 }
             }
-        bind<FontStore>() with singleton { FontStore(di) }
         bind<SessionStore>() with singleton { SessionStore() }
         bind<SyncRemoteStore>() with singleton { SyncRemoteStore(di) }
         bind<OkHttpClient>() with singleton { cachingHttpClient() }
