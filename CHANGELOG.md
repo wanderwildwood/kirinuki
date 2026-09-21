@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.3.1
+
+A page of an article no longer steps over the text it could not fit.
+
+- **Fixed: a swipe skipped whatever did not fit on the screen.** The list this reader is
+  built on pages by four of its items at a time, which is the right measure for a list of
+  rows and the wrong one here, where an item is a paragraph. Four paragraphs are however
+  tall they happen to be, so a swipe stepped past the ones that had not been drawn yet and
+  the article read with holes in it. A page now ends at the paragraph the bottom of the
+  screen cut through, and the next one opens on that paragraph, whole.
+- **The outer edge of the page turns it**, for a screen with no volume keys: the left fifth
+  goes back, the right fifth goes on, a screenful at a time. The middle is not a target, so
+  a link in the middle of a line is still a link, and the scrollbar keeps its own column so
+  its arrows still take their own taps.
+- **Fixed: the volume keys did nothing.** They have paged the article since the first
+  release and stopped when the interface was rebuilt, because the flag they asked about is
+  no longer set by anything. They page by pixels rather than by paragraphs, which is also
+  the way through a paragraph taller than the screen. The key's release is swallowed too,
+  so the system's volume panel no longer lands on top of the page just turned.
+
 ## 0.3.0
 
 The tour is gone, and a feed that carries only a paragraph can be told to fetch the rest.
