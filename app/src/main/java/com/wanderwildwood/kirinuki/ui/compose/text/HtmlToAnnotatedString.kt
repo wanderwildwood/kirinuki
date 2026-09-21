@@ -2,6 +2,7 @@ package com.wanderwildwood.kirinuki.ui.compose.text
 
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.BaselineShift
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
@@ -231,11 +232,13 @@ private fun AnnotatedStringComposer.appendTextChildren(
                     "pre" -> {
                         emitParagraph()
                         // TODO some TTS annotation?
-                        appendTextChildren(
-                            element.childNodes(),
-                            preFormatted = true,
-                            baseUrl = baseUrl,
-                        )
+                        withStyle(SpanStyle(fontFamily = FontFamily.Monospace)) {
+                            appendTextChildren(
+                                element.childNodes(),
+                                preFormatted = true,
+                                baseUrl = baseUrl,
+                            )
+                        }
                         emitParagraph()
                     }
 
