@@ -29,9 +29,10 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.TextToDisplay
-import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.components.rememberReaderScrollStep
+import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.compose.theme.TextScaleDialog
 import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
@@ -134,6 +135,10 @@ fun ArticleScreen(
             state = listState,
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
+            // A swipe moves on to the paragraph the bottom of the screen cut through,
+            // rather than MMD's four items -- four paragraphs are however tall they are,
+            // and the ones that did not fit were being stepped straight past.
+            scrollStep = rememberReaderScrollStep(listState),
             modifier =
                 Modifier
                     .fillMaxSize()

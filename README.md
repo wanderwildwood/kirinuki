@@ -30,7 +30,8 @@ Three screens. The feeds, what is in one, and the thing itself.
   unreadable on this screen.
 - **OPML in and out.** How you arrive with feeds, and how you leave with them.
 - **Volume keys page the article**, because dragging a finger down E Ink is a poor way to
-  read.
+  read. A swipe pages it too, and stops at the paragraph the bottom of the screen cut
+  through, so the next page opens on the line you did not finish.
 
 ## The smolnet
 

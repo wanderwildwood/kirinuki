@@ -23,6 +23,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.components.rememberReaderScrollStep
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import java.net.URI
@@ -84,6 +85,9 @@ fun GeminiPageScreen(
             state = listState,
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
+            // As in the reader: a capsule's lines are its own lengths, so the step is
+            // measured off the screen rather than counted in items.
+            scrollStep = rememberReaderScrollStep(listState),
             modifier =
                 Modifier
                     .fillMaxSize()
