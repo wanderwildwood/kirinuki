@@ -76,6 +76,8 @@ class AddFeedViewModel(
         folder: String,
         feedId: Long = ID_UNSET,
         fullTextByDefault: Boolean = false,
+        blockRules: String = "",
+        allowRules: String = "",
     ) {
         _error.value = null
         val parsed =
@@ -131,6 +133,19 @@ class AddFeedViewModel(
                     editing || existing == null -> fullTextByDefault
                     else -> fullTextByDefault || existing.fullTextByDefault
                 }
+            // Same reading again for the rule boxes. Editing loaded them, so emptying one
+            // is how a rule is taken back. Adding never loaded them, so a blank box there
+            // is no opinion and must not wipe the rules of a feed already subscribed to.
+            val newBlockRules =
+                when {
+                    editing || existing == null -> blockRules.trim()
+                    else -> blockRules.trim().ifBlank { existing.blockRules }
+                }
+            val newAllowRules =
+                when {
+                    editing || existing == null -> allowRules.trim()
+                    else -> allowRules.trim().ifBlank { existing.allowRules }
+                }
             val savedId =
                 repository.saveFeed(
                     existing?.copy(
@@ -138,6 +153,8 @@ class AddFeedViewModel(
                         customTitle = newCustomTitle,
                         tag = newTag,
                         fullTextByDefault = newFullText,
+                        blockRules = newBlockRules,
+                        allowRules = newAllowRules,
                     )
                         ?: Feed(
                             url = parsed,
@@ -145,6 +162,8 @@ class AddFeedViewModel(
                             customTitle = newCustomTitle,
                             tag = newTag,
                             fullTextByDefault = newFullText,
+                            blockRules = newBlockRules,
+                            allowRules = newAllowRules,
                         ),
                 )
             // A rename or a move is not a reason to go to the network. A new feed is, and

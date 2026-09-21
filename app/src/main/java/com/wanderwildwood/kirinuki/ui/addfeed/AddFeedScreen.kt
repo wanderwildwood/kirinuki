@@ -1,6 +1,8 @@
 package com.wanderwildwood.kirinuki.ui.addfeed
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -31,6 +34,8 @@ import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
+import com.wanderwildwood.kirinuki.model.ArticleRuleError
+import com.wanderwildwood.kirinuki.model.ArticleRuleSet
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
@@ -56,6 +61,8 @@ fun AddFeedScreen(
     var title by rememberSaveable { mutableStateOf("") }
     var folder by rememberSaveable { mutableStateOf("") }
     var fullText by rememberSaveable { mutableStateOf(false) }
+    var blockRules by rememberSaveable { mutableStateOf("") }
+    var allowRules by rememberSaveable { mutableStateOf("") }
     // The feed arrives after the first composition, and it must fill the boxes once and
     // then leave them alone: without this, a second emission would undo what was typed.
     var filledIn by rememberSaveable { mutableStateOf(false) }
@@ -89,6 +96,8 @@ fun AddFeedScreen(
         title = loaded.displayTitle
         folder = loaded.tag
         fullText = loaded.fullTextByDefault
+        blockRules = loaded.blockRules
+        allowRules = loaded.allowRules
         filledIn = true
     }
 
@@ -123,10 +132,14 @@ fun AddFeedScreen(
     ) { padding ->
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
+            // The rule boxes grow with what is typed into them, so the form can outgrow
+            // the panel. Without this the save button goes off the bottom and the screen
+            // becomes one you cannot finish.
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
+                    .verticalScroll(rememberScrollState())
                     .padding(16.dp),
         ) {
             TextFieldMMD(
@@ -188,6 +201,40 @@ fun AddFeedScreen(
                 }
                 SwitchMMD(checked = fullText, onCheckedChange = { fullText = it })
             }
+            // Two boxes rather than a rule editor: a rule is one line of text, and a
+            // builder for FieldName=pattern would be more screens to walk than the thing
+            // it builds. Invalid lines warn but never block saving -- a regular expression
+            // is invalid for most of the time it is being typed.
+            TextFieldMMD(
+                value = blockRules,
+                onValueChange = { blockRules = it },
+                label = { TextMMD(text = stringResource(R.string.block_rules)) },
+                placeholder = { TextMMD(text = stringResource(R.string.article_rules_placeholder)) },
+                singleLine = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TextMMD(
+                text = stringResource(R.string.block_rules_desc),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            RuleErrors(rules = blockRules)
+            TextFieldMMD(
+                value = allowRules,
+                onValueChange = { allowRules = it },
+                label = { TextMMD(text = stringResource(R.string.allow_rules)) },
+                placeholder = { TextMMD(text = stringResource(R.string.article_rules_placeholder)) },
+                singleLine = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            TextMMD(
+                text = stringResource(R.string.allow_rules_desc),
+                style = MaterialTheme.typography.bodySmall,
+            )
+            RuleErrors(rules = allowRules)
+            TextMMD(
+                text = stringResource(R.string.article_rules_effect),
+                style = MaterialTheme.typography.bodySmall,
+            )
             if (error != null) {
                 TextMMD(text = stringResource(R.string.add_feed_url_invalid))
             }
@@ -200,6 +247,8 @@ fun AddFeedScreen(
                             folder = folder,
                             feedId = feedId,
                             fullTextByDefault = fullText,
+                            blockRules = blockRules,
+                            allowRules = allowRules,
                         )
                     },
                 enabled = url.isNotBlank(),
@@ -248,3 +297,35 @@ fun AddFeedScreen(
 
 /** Long enough to mean it, short enough not to leave a live delete under a thumb. */
 private const val ARMED_MILLIS = 4000L
+
+/**
+ * The parse errors for one rule box, a line each.
+ *
+ * Parsed on every keystroke rather than on save: a rule is wrong for most of the time it
+ * is being typed, and a warning that only appears after saving would arrive once the
+ * screen has already been left. Nothing here prevents saving -- an invalid line is
+ * dropped at fetch time and the rest of the box still works.
+ */
+@Composable
+private fun RuleErrors(rules: String) {
+    val errors = remember(rules) { ArticleRuleSet.parse(rules).errors }
+    errors.forEach { error ->
+        TextMMD(
+            text =
+                when (error) {
+                    is ArticleRuleError.MissingSeparator ->
+                        stringResource(R.string.rule_error_missing_separator, error.lineNumber)
+                    is ArticleRuleError.UnknownField ->
+                        stringResource(R.string.rule_error_unknown_field, error.lineNumber, error.fieldName)
+                    is ArticleRuleError.EmptyPattern ->
+                        stringResource(R.string.rule_error_empty_pattern, error.lineNumber)
+                    is ArticleRuleError.InvalidRegex ->
+                        stringResource(R.string.rule_error_invalid_regex, error.lineNumber)
+                    is ArticleRuleError.TooManyRules ->
+                        stringResource(R.string.rule_error_too_many_rules, error.lineNumber, error.maxRules)
+                },
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
