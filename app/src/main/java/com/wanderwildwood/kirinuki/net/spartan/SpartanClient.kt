@@ -31,7 +31,7 @@ class SpartanClient(
                 is Hop.Done -> return step.response
                 is Hop.Redirect -> {
                     if (hop == maxRedirects) {
-                        return SpartanResponse.Failure(current, 4, "Too many redirects")
+                        return SpartanResponse.Failure(current, 4, "", tooManyRedirects = true)
                     }
                     current = URI(current).resolve(step.to).toString()
                 }
@@ -137,10 +137,12 @@ sealed interface SpartanResponse {
         val isGemtext: Boolean get() = mimeType == "text/gemini"
     }
 
+    /** As [com.wanderwildwood.kirinuki.net.gemini.GeminiResponse.Failure], [tooManyRedirects] included. */
     data class Failure(
         override val url: String,
         val status: Int,
         val message: String,
+        val tooManyRedirects: Boolean = false,
     ) : SpartanResponse
 }
 

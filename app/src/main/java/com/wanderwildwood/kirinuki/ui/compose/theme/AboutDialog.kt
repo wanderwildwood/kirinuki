@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.OutlinedButtonMMD
@@ -35,31 +36,28 @@ import com.wanderwildwood.kirinuki.R
 fun AboutDialog(onDismiss: () -> Unit) {
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(
-            text = "Clippings ${BuildConfig.VERSION_NAME}",
+            text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
         )
         Spacer(Modifier.height(14.dp))
         TextMMD(
-            text = "A reader for feeds and for the smolnet — Gemini, gopher and Spartan. " +
-                "Text on paper, no images, and everything kept on the phone.",
+            text = stringResource(R.string.about_what),
             style = MaterialTheme.typography.labelSmall,
         )
         Spacer(Modifier.height(14.dp))
         TextMMD(
-            text = "It fetches the feeds and the pages you point it at, from the addresses " +
-                "you gave it, and nothing else. There is no account, no tracking, and " +
-                "nothing is sent anywhere on your behalf.",
+            text = stringResource(R.string.about_privacy),
             style = MaterialTheme.typography.labelSmall,
         )
         Spacer(Modifier.height(14.dp))
         TextMMD(
-            text = "Built on Feeder by Jonas Kalderstam. Full-text extraction by Readability4J.",
+            text = stringResource(R.string.about_built_on),
             style = MaterialTheme.typography.labelSmall,
         )
         Spacer(Modifier.height(14.dp))
         TextMMD(
-            text = "GNU General Public License v3",
+            text = stringResource(R.string.about_licence),
             style = MaterialTheme.typography.labelSmall,
         )
         Spacer(Modifier.height(14.dp))
@@ -75,7 +73,7 @@ fun AboutDialog(onDismiss: () -> Unit) {
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = "Close", style = MaterialTheme.typography.bodySmall) }
+        ) { TextMMD(text = stringResource(R.string.about_close), style = MaterialTheme.typography.bodySmall) }
     }
 }
 
@@ -109,7 +107,7 @@ private fun Llama() {
                 }.onFailure {
                     Toast.makeText(
                         context,
-                        "There is no browser on this phone to open that with.",
+                        context.getString(R.string.about_no_browser),
                         Toast.LENGTH_SHORT,
                     ).show()
                 }
@@ -122,6 +120,6 @@ private fun Llama() {
             modifier = Modifier.size(22.dp),
         )
         Spacer(Modifier.width(6.dp))
-        TextMMD(text = "Feed the llamas", style = MaterialTheme.typography.labelSmall)
+        TextMMD(text = stringResource(R.string.about_feed_the_llamas), style = MaterialTheme.typography.labelSmall)
     }
 }

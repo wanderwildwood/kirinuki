@@ -126,7 +126,7 @@ fun SettingsScreen(
             item {
                 StepperRow(
                     title = stringResource(R.string.text_scale),
-                    value = "${(textScale * 100).toInt()}%",
+                    value = stringResource(R.string.text_scale_percent, (textScale * 100).toInt().toString()),
                     onLess = { viewModel.setTextScale((textScale - 0.1f).coerceAtLeast(0.5f)) },
                     onMore = { viewModel.setTextScale((textScale + 0.1f).coerceAtMost(3.0f)) },
                 )

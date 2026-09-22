@@ -43,7 +43,7 @@ fun TextScaleDialog(
             modifier = Modifier.fillMaxWidth(),
         ) {
             TextMMD(
-                text = "${(scale * 100).toInt()}%",
+                text = stringResource(R.string.text_scale_percent, (scale * 100).toInt().toString()),
                 modifier = Modifier.weight(1f),
             )
             // The same bounds as the settings row, so the two cannot disagree about what

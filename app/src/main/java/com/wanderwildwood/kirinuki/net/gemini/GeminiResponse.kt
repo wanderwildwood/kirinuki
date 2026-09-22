@@ -43,11 +43,16 @@ sealed interface GeminiResponse {
         val message: String,
     ) : GeminiResponse
 
-    /** 4x and 5x, and anything that did not parse. */
+    /**
+     * 4x and 5x, and anything that did not parse. [tooManyRedirects] marks the one failure
+     * this client makes up itself rather than hears, so the screen can word it; [message]
+     * is then empty, because only the capsule's own words go there.
+     */
     data class Failure(
         override val url: String,
         val status: Int,
         val message: String,
+        val tooManyRedirects: Boolean = false,
     ) : GeminiResponse
 }
 

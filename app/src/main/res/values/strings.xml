@@ -418,6 +418,8 @@
   <string name="gemini_refused">The capsule refused, with code %1$d.</string>
   <string name="gemini_certificate_changed">This host is showing a different certificate to the one it showed before, and the old one has not expired. Either it changed keys early, or this is not the host.</string>
   <string name="gemini_unreachable">Could not reach the capsule.</string>
+  <!-- Under "The capsule refused, with code …" when this app, not the capsule, gave up following a chain of redirects -->
+  <string name="gemini_too_many_redirects">Too many redirects</string>
   <string name="gemini_open_in_browser">Open in browser</string>
   <string name="subscribe">Subscribe</string>
   <string name="read_it">Read it</string>
@@ -444,4 +446,22 @@
   <string name="rule_error_invalid_regex">Line %1$d: not a regular expression. This line is ignored.</string>
   <string name="rule_error_too_many_rules">Line %1$d: only the first %2$d rules are used. The rest are ignored.</string>
     <string name="about">About</string>
+  <!-- The About dialog -->
+  <!-- Heading. %1$s is the version number, e.g. 0.3.2 -->
+  <string name="about_title">Clippings %1$s</string>
+  <string name="about_what">A reader for feeds and for the smolnet — Gemini, gopher and Spartan. Text on paper, no images, and everything kept on the phone.</string>
+  <string name="about_privacy">It fetches the feeds and the pages you point it at, from the addresses you gave it, and nothing else. There is no account, no tracking, and nothing is sent anywhere on your behalf.</string>
+  <string name="about_built_on">Built on Feeder by Jonas Kalderstam. Full-text extraction by Readability4J.</string>
+  <!-- The name of the app's licence -->
+  <string name="about_licence">GNU General Public License v3</string>
+  <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
+  <string name="about_feed_the_llamas">Feed the llamas</string>
+  <!-- Toast when the donation link cannot be opened -->
+  <string name="about_no_browser">There is no browser on this phone to open that with.</string>
+  <!-- Button that closes the About dialog -->
+  <string name="about_close">Close</string>
+  <!-- The text scale as a percentage, in settings and in the reader's text-size dialog. %1$s is the number, e.g. 120 -->
+  <string name="text_scale_percent">%1$s%%</string>
+  <!-- Shown by the launcher when a home-screen shortcut points at a feed that has since been deleted -->
+  <string name="shortcut_feed_deleted">Feed deleted</string>
 </resources>

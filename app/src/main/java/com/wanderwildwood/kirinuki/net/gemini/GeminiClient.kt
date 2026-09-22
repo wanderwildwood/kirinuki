@@ -38,7 +38,7 @@ class GeminiClient(
                 is Hop.Done -> return step.response
                 is Hop.Redirect -> {
                     if (hop == maxRedirects) {
-                        return GeminiResponse.Failure(current, 53, "Too many redirects")
+                        return GeminiResponse.Failure(current, 53, "", tooManyRedirects = true)
                     }
                     current = resolve(current, step.to)
                 }

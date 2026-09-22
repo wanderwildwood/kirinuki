@@ -118,7 +118,11 @@ class GeminiPageViewModel(
                     is GeminiResponse.Failure ->
                         GeminiPageState.Problem(
                             app.getString(R.string.gemini_refused, response.status),
-                            response.message.ifBlank { null },
+                            if (response.tooManyRedirects) {
+                                app.getString(R.string.gemini_too_many_redirects)
+                            } else {
+                                response.message.ifBlank { null }
+                            },
                         )
                 }
             } catch (e: CertificateException) {
@@ -179,7 +183,11 @@ class GeminiPageViewModel(
             is SpartanResponse.Failure ->
                 GeminiPageState.Problem(
                     app.getString(R.string.gemini_refused, response.status),
-                    response.message.ifBlank { null },
+                    if (response.tooManyRedirects) {
+                        app.getString(R.string.gemini_too_many_redirects)
+                    } else {
+                        response.message.ifBlank { null }
+                    },
                 )
         }
 

@@ -10,6 +10,7 @@ import androidx.annotation.StringRes
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.core.text.BidiFormatter
+import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.ui.MainActivity
 import java.util.Locale
 
@@ -65,7 +66,7 @@ fun Context.addDynamicShortcutToFeed(
                             ),
                         ),
                 ).setIntent(intent)
-                .setDisabledMessage("Feed deleted")
+                .setDisabledMessage(getString(R.string.shortcut_feed_deleted))
                 .setRank(0)
                 .build()
 
