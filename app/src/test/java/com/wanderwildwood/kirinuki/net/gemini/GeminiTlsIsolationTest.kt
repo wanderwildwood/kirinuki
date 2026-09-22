@@ -125,18 +125,25 @@ class GeminiTlsIsolationTest {
         val second = serverWith(impostor)
         second.start(InetAddress.getByName("localhost"), 0)
 
-        assertFailsWith<SSLHandshakeException> {
-            SSLContext
-                .getInstance("TLS")
-                .apply { init(null, arrayOf(TrustOnFirstUse("localhost", knownHosts)), null) }
-                .socketFactory
-                .createSocket("localhost", second.port)
-                .let { it as SSLSocket }
-                .apply {
-                    soTimeout = 5_000
-                    startHandshake()
-                }
-        }
+        val refused =
+            assertFailsWith<SSLHandshakeException> {
+                SSLContext
+                    .getInstance("TLS")
+                    .apply { init(null, arrayOf(TrustOnFirstUse("localhost", knownHosts)), null) }
+                    .socketFactory
+                    .createSocket("localhost", second.port)
+                    .let { it as SSLSocket }
+                    .apply {
+                        soTimeout = 5_000
+                        startHandshake()
+                    }
+            }
+        // What the page screen relies on to say "a different certificate" rather than
+        // "could not reach": the refusal survives, inside the handshake's exception.
+        assertNotNull(
+            changedCertificateIn(refused),
+            "the changed-certificate refusal was lost inside the handshake exception",
+        )
 
         second.shutdown()
     }

@@ -62,7 +62,7 @@ class TrustOnFirstUse(
                 knownHosts.remember(KnownHost(host, fingerprint, leaf.notAfter.toInstant()))
 
             else ->
-                throw CertificateException(
+                throw CertificateChangedException(
                     "$host presented a different certificate and the one recorded for it " +
                         "has not expired. Either the host changed keys early, or this is " +
                         "not the host. Forget it in settings if you know which.",
@@ -80,3 +80,23 @@ class TrustOnFirstUse(
                 .joinToString("") { "%02x".format(it) }
     }
 }
+
+/**
+ * The one refusal worth its own headline: a pinned host showing a different, unexpired key.
+ *
+ * Its own type because it never reaches the caller as itself. It is thrown from inside the
+ * TLS handshake, and the handshake wraps whatever its trust manager throws in an
+ * [javax.net.ssl.SSLHandshakeException] -- so a `catch (e: CertificateException)` around the
+ * connection never runs, and interception read as "could not reach the capsule". Find it
+ * with [changedCertificateIn].
+ */
+class CertificateChangedException(
+    message: String,
+) : CertificateException(message)
+
+/** The changed-certificate refusal somewhere in [failure]'s causes, if that is what this was. */
+fun changedCertificateIn(failure: Throwable): CertificateChangedException? =
+    generateSequence(failure) { it.cause }
+        .take(8)
+        .filterIsInstance<CertificateChangedException>()
+        .firstOrNull()

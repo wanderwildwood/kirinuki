@@ -16,6 +16,7 @@ import com.wanderwildwood.kirinuki.net.gopher.GopherClient
 import com.wanderwildwood.kirinuki.model.gopher.GopherMenuParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
+import com.wanderwildwood.kirinuki.net.gemini.changedCertificateIn
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +24,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.instance
-import java.security.cert.CertificateException
 
 sealed interface GeminiPageState {
     data object Loading : GeminiPageState
@@ -125,18 +125,23 @@ class GeminiPageViewModel(
                             },
                         )
                 }
-            } catch (e: CertificateException) {
-                // The interesting failure: the host is not showing what it showed before.
-                GeminiPageState.Problem(
-                    app.getString(R.string.gemini_certificate_changed),
-                    e.message,
-                )
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Could not reach $url", e)
-                GeminiPageState.Problem(
-                    app.getString(R.string.gemini_unreachable),
-                    e.message,
-                )
+                // The interesting failure: the host is not showing what it showed before.
+                // It arrives wrapped in the handshake's own exception, never as itself, so it
+                // is looked for among the causes rather than caught by type.
+                val changed = changedCertificateIn(e)
+                if (changed != null) {
+                    GeminiPageState.Problem(
+                        app.getString(R.string.gemini_certificate_changed),
+                        changed.message,
+                    )
+                } else {
+                    Log.e(LOG_TAG, "Could not reach $url", e)
+                    GeminiPageState.Problem(
+                        app.getString(R.string.gemini_unreachable),
+                        e.message,
+                    )
+                }
             }
         }
 
