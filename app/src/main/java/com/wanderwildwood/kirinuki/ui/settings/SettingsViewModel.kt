@@ -4,6 +4,9 @@ import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
+import com.wanderwildwood.kirinuki.net.gemini.KnownHost
+import com.wanderwildwood.kirinuki.net.gemini.KnownHosts
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -15,6 +18,7 @@ class SettingsViewModel(
     di: DI,
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
+    private val knownHosts: KnownHosts by instance()
 
     val syncOnlyOnWifi: StateFlow<Boolean> = repository.syncOnlyOnWifi
     val syncOnlyWhenCharging: StateFlow<Boolean> = repository.syncOnlyWhenCharging
@@ -50,4 +54,20 @@ class SettingsViewModel(
     fun setShowReadArticles(value: Boolean) = repository.setFeedListFilterRead(value)
 
     fun setOpenTitleInBrowser(value: Boolean) = repository.setOpenTitleInBrowser(value)
+
+    private val _capsuleCertificates = MutableStateFlow(knownHosts.all())
+
+    /**
+     * The certificate each Gemini capsule showed the first time, which is what a later visit
+     * is checked against. Listed so one can be let go: the refusal for a changed certificate
+     * tells the reader to forget it here, and until now there was nowhere to do it -- a
+     * capsule that renewed its key early stayed unreachable for good.
+     */
+    val capsuleCertificates: StateFlow<List<KnownHost>> = _capsuleCertificates
+
+    /** The next visit to [host] takes whatever certificate it shows, and remembers that one. */
+    fun forgetCapsuleCertificate(host: String) {
+        knownHosts.forget(host)
+        _capsuleCertificates.value = knownHosts.all()
+    }
 }

@@ -11,9 +11,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,10 @@ import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.util.hasWebBrowser
+import kotlinx.coroutines.delay
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -53,6 +59,7 @@ fun SettingsScreen(
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
     val showReadArticles by viewModel.showReadArticles.collectAsStateWithLifecycle()
     val openTitleInBrowser by viewModel.openTitleInBrowser.collectAsStateWithLifecycle()
+    val capsuleCertificates by viewModel.capsuleCertificates.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val hasBrowser = remember(context) { context.hasWebBrowser() }
@@ -178,6 +185,35 @@ fun SettingsScreen(
             item {
                 HorizontalDividerMMD()
             }
+            // Last, because forgetting is the one thing on this screen that cannot be taken
+            // back, and it is only ever wanted after a capsule has been refused.
+            item {
+                TextMMD(
+                    text = stringResource(R.string.capsule_certificates),
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+                )
+            }
+            if (capsuleCertificates.isEmpty()) {
+                item {
+                    TextMMD(
+                        text = stringResource(R.string.capsule_certificates_none),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                    )
+                }
+            }
+            capsuleCertificates.forEach { known ->
+                item(key = known.host) {
+                    CertificateRow(
+                        host = known.host,
+                        until = certificateDate.format(known.expiresAt.atZone(ZoneId.systemDefault())),
+                        onForget = { viewModel.forgetCapsuleCertificate(known.host) },
+                    )
+                }
+                item {
+                    HorizontalDividerMMD()
+                }
+            }
         }
     }
 
@@ -252,6 +288,50 @@ private fun StepperRow(
     }
 
 }
+
+private val certificateDate: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
+
+/**
+ * One capsule's remembered certificate. The first tap only says what the second will do,
+ * and it lets go on its own after a few seconds, like removing a feed: forgetting means the
+ * next visit trusts whatever it is shown, which is the one moment this whole check exists for.
+ */
+@Composable
+private fun CertificateRow(
+    host: String,
+    until: String,
+    onForget: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var armed by rememberSaveable(host) { mutableStateOf(false) }
+    LaunchedEffect(armed) {
+        if (armed) {
+            delay(ARMED_MILLIS)
+            armed = false
+        }
+    }
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { if (armed) onForget() else armed = true }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        TextMMD(text = host)
+        TextMMD(
+            text =
+                if (armed) {
+                    stringResource(R.string.capsule_certificate_forget_armed)
+                } else {
+                    stringResource(R.string.capsule_certificate_until, until)
+                },
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+/** Long enough to mean it, short enough not to leave a live forget under a thumb. */
+private const val ARMED_MILLIS = 4000L
 
 @Composable
 private fun ActionRow(
