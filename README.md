@@ -45,7 +45,9 @@ shared anywhere arrives here.
 - **Certificates.** Gemini has no authorities, so a capsule is trusted the first time it
   is seen and checked against that afterwards. A host presenting a different certificate
   before the known one has expired is refused, and the screen says why rather than
-  quietly carrying on.
+  quietly carrying on. When you know the change is genuine, the capsule's remembered
+  certificate can be forgotten under **Settings → Capsule certificates**, and the next
+  visit trusts what it is shown.
 - **Gopher text is fitted rather than reflowed** — it was written against eighty columns,
   and reflowing it destroys tables and art. It shrinks until it fits, and scrolls sideways
   rather than shrinking past the point of being readable.
