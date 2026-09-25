@@ -18,11 +18,6 @@
   <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
   <uses-permission android:name="android.permission.RUN_USER_INITIATED_JOBS" />
 
-  <permission
-    android:name="${applicationId}.permission.read"
-    android:description="@string/permission_read_desc"
-    android:label="@string/permission_read_label" />
-
   <queries>
     <!-- Package visibility: without this the reader cannot tell whether anything on the
          phone opens a web page, and the "open the title in a browser" setting could only
@@ -173,12 +168,13 @@
       android:launchMode="singleInstance"
       android:taskAffinity="${applicationId}.OpenLinkTask" />
 
-    <!-- Used by some external apps -->
+    <!-- Feeder's read-only provider for other apps. Closed here: its permission was normal-level,
+         so any app could read stored articles without asking, and nothing on this phone uses it.
+         Kept rather than deleted so merges from Feeder stay clean. -->
     <provider
       android:name=".contentprovider.RSSContentProvider"
       android:authorities="${applicationId}.rssprovider"
-      android:exported="true"
-      android:readPermission="${applicationId}.permission.read" />
+      android:exported="false" />
 
     <!-- Service for background jobs -->
     <service
