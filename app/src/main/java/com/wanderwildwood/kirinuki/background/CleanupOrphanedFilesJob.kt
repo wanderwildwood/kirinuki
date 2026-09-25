@@ -50,6 +50,18 @@ class CleanupOrphanedFilesJob(
             // Clean up full article files in fullArticleDir
             cleanupDirectory(filePathProvider.fullArticleDir, validFeedItemIds, ::blobFullFile)
 
+            // What the tour kept, before it was removed in 0.3.0: its queue and its page
+            // cache. Nothing has read either since, and nothing else would ever delete them --
+            // they are in filesDir, which Android does not clear.
+            withContext(Dispatchers.IO) {
+                listOf("tour", "tour-cache").forEach { name ->
+                    val left = filePathProvider.filesDir.resolve(name)
+                    if (left.exists() && left.deleteRecursively()) {
+                        Log.i(LOG_TAG, "Removed the tour's leftover $name")
+                    }
+                }
+            }
+
             Log.i(LOG_TAG, "Completed cleanup of orphaned article files")
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Error during cleanup of orphaned files", e)
