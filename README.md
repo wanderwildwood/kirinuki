@@ -76,6 +76,25 @@ name keeps working after the next release.
 
 Android 12 (API 31) or newer.
 
+## On a Mudita Kompakt
+
+DuraSpeed, a MediaTek service on the Kompakt, closes installed apps a few minutes after the
+screen goes dark and keeps them closed until they are opened again. For Clippings that means
+feeds are not refreshed in the background. Mudita's own apps are on its allow list; this one has
+to be added, once.
+
+Kompakt's Settings has no way in to DuraSpeed: no menu entry, and no search box to look for it
+in. Its own screen will not open for another app either, but its App info page will. Messaging
+and Whereabouts each have a button that goes there; without either, from a computer with `adb`:
+
+    adb shell am start -a android.settings.APPLICATION_DETAILS_SETTINGS -d package:com.mediatek.duraspeed
+
+Then, on the phone:
+
+1. Tap **Open** on DuraSpeed's App info page.
+2. Switch **Clippings** on in the list. **On means allowed** to run in the background, which is
+   easy to read the wrong way round. Switching DuraSpeed off at the top works too, for every app.
+
 ## Building it
 
 ```sh
