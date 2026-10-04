@@ -133,4 +133,35 @@ class LinearStuffKtTest {
         assertTrue(article.containsImageUrl("https://example.com/hero.jpg"))
         assertFalse(article.containsImageUrl("https://example.com/missing.jpg"))
     }
+
+    private fun text(value: String) = LinearText(ids = emptySet(), text = value, blockStyle = LinearTextBlockStyle.TEXT)
+
+    @Test
+    fun withoutRepeatedTitleDropsAHeadingThatRepeatsTheTitle() {
+        val article =
+            LinearArticle(
+                elements = listOf(text("Amazon Launches  Early\nPrime Day"), text("The body.")),
+            )
+
+        assertEquals(
+            listOf(text("The body.")),
+            article.withoutRepeatedTitle("amazon launches early prime day").elements,
+        )
+    }
+
+    @Test
+    fun withoutRepeatedTitleKeepsTextThatOnlyStartsLikeTheTitle() {
+        val article = LinearArticle(elements = listOf(text("Prime Day, and what it costs"), text("The body.")))
+
+        assertEquals(article.elements, article.withoutRepeatedTitle("Prime Day").elements)
+    }
+
+    @Test
+    fun withoutRepeatedTitleOnlyLooksAtTheFirstText() {
+        val article = LinearArticle(elements = listOf(text("Intro"), text("Prime Day")))
+
+        assertEquals(article.elements, article.withoutRepeatedTitle("Prime Day").elements)
+        assertEquals(article.elements, article.withoutRepeatedTitle(null).elements)
+        assertEquals(article.elements, article.withoutRepeatedTitle("  ").elements)
+    }
 }

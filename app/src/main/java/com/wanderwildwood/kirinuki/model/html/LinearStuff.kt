@@ -452,3 +452,22 @@ data class LinearAudioSource(
     val uri: String,
     val mimeType: String?,
 )
+
+/**
+ * The page's own heading, when it says what the title above it already said. A fetched
+ * page nearly always opens with its headline, so without this the reader shows the title
+ * twice, once as the title and once again in the page's own type.
+ *
+ * Only the first text is looked at: a heading further down that happens to match is the
+ * article's business, and is left alone.
+ */
+fun LinearArticle.withoutRepeatedTitle(title: String?): LinearArticle {
+    val wanted = title?.comparableTitle()?.takeIf { it.isNotEmpty() } ?: return this
+    val first = elements.indexOfFirst { it is LinearText }
+    if (first < 0) return this
+    val text = elements[first] as LinearText
+    if (text.text.comparableTitle() != wanted) return this
+    return LinearArticle(elements = elements.filterIndexed { index, _ -> index != first })
+}
+
+private fun String.comparableTitle(): String = trim().replace(Regex("\\s+"), " ").lowercase()

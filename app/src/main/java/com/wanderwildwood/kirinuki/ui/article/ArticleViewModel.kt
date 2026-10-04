@@ -21,6 +21,7 @@ import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
 import com.wanderwildwood.kirinuki.model.html.HtmlLinearizer
+import com.wanderwildwood.kirinuki.model.html.withoutRepeatedTitle
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -63,7 +64,8 @@ class ArticleViewModel(
             combine(article, showingFullText) { article, fullText -> article to fullText }
                 .collect { (article, fullText) ->
                     if (article == null || article.id <= 0L) return@collect
-                    _content.value = parseArticleContent(article, fullText)
+                    _content.value =
+                        parseArticleContent(article, fullText).withoutRepeatedTitle(article.title)
                 }
         }
     }
