@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
 import com.wanderwildwood.kirinuki.base.diAwareViewModel
+import com.wanderwildwood.kirinuki.net.addressIn
 import com.wanderwildwood.kirinuki.ui.addfeed.AddFeedScreen
 import com.wanderwildwood.kirinuki.ui.compose.utils.withAllProviders
 
@@ -22,7 +23,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
         enableEdgeToEdge()
 
         val initialFeedUrl =
-            (intent?.dataString ?: intent?.getStringExtra(Intent.EXTRA_TEXT))?.trim().orEmpty()
+            addressIn((intent?.dataString ?: intent?.getStringExtra(Intent.EXTRA_TEXT)).orEmpty())
 
         setContent {
             withAllProviders {

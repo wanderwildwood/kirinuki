@@ -34,9 +34,11 @@ import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
+import com.wanderwildwood.kirinuki.db.room.isSavedPages
 import com.wanderwildwood.kirinuki.model.ArticleRuleError
 import com.wanderwildwood.kirinuki.model.ArticleRuleSet
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
+import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import kotlinx.coroutines.delay
@@ -142,13 +144,17 @@ fun AddFeedScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(16.dp),
         ) {
-            TextFieldMMD(
-                value = url,
-                onValueChange = { url = it },
-                label = { TextMMD(text = stringResource(R.string.add_feed_url)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth(),
-            )
+            // The pages feed has an address nothing answers at, and changing it would only
+            // stop it being the pages feed. There is nothing in the box worth reading.
+            if (feed?.isSavedPages != true) {
+                TextFieldMMD(
+                    value = url,
+                    onValueChange = { url = it },
+                    label = { TextMMD(text = stringResource(R.string.add_feed_url)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+            }
             TextFieldMMD(
                 value = title,
                 onValueChange = { title = it },
@@ -271,6 +277,17 @@ fun AddFeedScreen(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     TextMMD(text = stringResource(R.string.read_it))
+                }
+            }
+
+            // An article's address is what gets shared, far more often than a feed's, and
+            // subscribing to it finds no feed. Keeping the page is what was meant.
+            if (!editing && isWebUrl(url.trim())) {
+                OutlinedButtonMMD(
+                    onClick = { viewModel.savePage(url) },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextMMD(text = stringResource(R.string.save_page))
                 }
             }
 

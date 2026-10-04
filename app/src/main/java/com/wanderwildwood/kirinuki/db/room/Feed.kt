@@ -73,3 +73,14 @@ data class Feed
         val displayTitle: String
             get() = (customTitle.ifBlank { title })
     }
+
+/**
+ * Where a page saved on its own is kept. A feed item needs a feed, so the pages get one
+ * of their own, at an address that cannot answer: `.invalid` is reserved never to
+ * resolve. Sync leaves it out rather than relying on that -- it is only the backstop.
+ */
+val SAVED_PAGES_URL = URL("https://pages.kirinuki.invalid/")
+
+/** ⚠ Compared as text: java.net.URL.equals resolves both hosts. */
+val Feed.isSavedPages: Boolean
+    get() = url.toString() == SAVED_PAGES_URL.toString()

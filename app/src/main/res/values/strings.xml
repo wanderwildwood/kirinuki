@@ -429,6 +429,10 @@
   <string name="gemini_open_in_browser">Open in browser</string>
   <string name="subscribe">Subscribe</string>
   <string name="read_it">Read it</string>
+  <!-- Under Subscribe, for a web address: keeps that one page instead of following a feed -->
+  <string name="save_page">Save the page</string>
+  <!-- The feed a saved page is kept under, on the feeds screen -->
+  <string name="saved_pages_feed">Pages</string>
   <string name="subscribe_to_this">Subscribe to this</string>
   <string name="gopher_unsupported_type">This is not text or a menu, so there is nothing to read here.</string>
   <string name="show_read_articles">Show read articles</string>

@@ -72,4 +72,20 @@ class UrlSchemesTest {
         assertEquals(one.hashCode(), two.hashCode())
         assertNotEquals(one, three)
     }
+
+    @Test
+    fun `a shared headline and address gives the address`() {
+        assertEquals(
+            "https://example.com/news/one",
+            addressIn("Amazon Launches Early Prime Day https://example.com/news/one"),
+        )
+        assertEquals("https://example.com/feed.xml", addressIn("  https://example.com/feed.xml\n"))
+        assertEquals("gemini://example.space/", addressIn("look gemini://example.space/"))
+    }
+
+    @Test
+    fun `shared text with no address is left for the box to refuse`() {
+        assertEquals("example.com", addressIn(" example.com "))
+        assertEquals("not an address", addressIn("not an address"))
+    }
 }

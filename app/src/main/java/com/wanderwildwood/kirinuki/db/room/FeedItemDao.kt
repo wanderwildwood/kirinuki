@@ -32,6 +32,23 @@ interface FeedItemDao {
     @Update
     suspend fun updateFeedItem(item: FeedItem): Int
 
+    /**
+     * A saved page goes in with its address standing in for a title, because the title
+     * is in the page and the page has not been fetched yet. Only that stand-in is
+     * replaced: a title that came from a feed is the feed's to give.
+     */
+    @Query(
+        """
+            UPDATE feed_items
+            SET title = :title, plain_title = :title
+            WHERE id = :id AND plain_title = link
+        """,
+    )
+    suspend fun replaceAddressTitle(
+        id: Long,
+        title: String,
+    )
+
     @Update
     suspend fun updateFeedItems(items: List<FeedItem>): Int
 

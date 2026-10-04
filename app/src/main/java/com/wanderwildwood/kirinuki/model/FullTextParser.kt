@@ -7,6 +7,7 @@ import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.blob.blobFullOutputStream
 import com.wanderwildwood.kirinuki.db.room.FeedItemForFetching
+import com.wanderwildwood.kirinuki.db.room.MAX_TITLE_LENGTH
 import com.wanderwildwood.kirinuki.db.room.estimateWordCount
 import com.wanderwildwood.kirinuki.ui.text.HtmlToPlainTextConverter
 import com.wanderwildwood.kirinuki.util.Either
@@ -139,7 +140,7 @@ class FullTextParser(
 
                         val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
                         logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
-                        val article = parseFullArticle(url, html)
+                        val (article, pageTitle) = parseFullArticleAndTitle(url, html)
 
                         logDebug(LOG_TAG, "Writing article ${feedItem.link}")
                         withContext(Dispatchers.IO) {
@@ -157,6 +158,10 @@ class FullTextParser(
                                 val wordCount = estimateWordCount(plainText)
 
                                 repository.updateWordCountFull(feedItem.id, wordCount)
+                            }
+                            // A saved page arrived with only its address for a title.
+                            pageTitle?.trim()?.takeIf { it.isNotEmpty() }?.let { title ->
+                                repository.replaceAddressTitle(feedItem.id, title.take(MAX_TITLE_LENGTH))
                             }
                         }
 
@@ -178,19 +183,27 @@ class FullTextParser(
 fun parseFullArticle(
     uri: String,
     html: String,
-): String? {
+): String? = parseFullArticleAndTitle(uri, html).first
+
+/** The article, and what the page calls itself -- which a saved page needs for its title. */
+fun parseFullArticleAndTitle(
+    uri: String,
+    html: String,
+): Pair<String?, String?> {
     val article = Readability4JExtended(uri, html).parse()
 
     val dir = article.dir
 
     // Ensure dir is set on the outermost element
-    return article.contentWithUtf8Encoding?.let { fullHtml ->
-        if (dir?.isNotBlank() == true) {
-            fullHtml.replaceFirst("<html".toRegex(), "<html dir=\"$dir\"")
-        } else {
-            fullHtml
+    val content =
+        article.contentWithUtf8Encoding?.let { fullHtml ->
+            if (dir?.isNotBlank() == true) {
+                fullHtml.replaceFirst("<html".toRegex(), "<html dir=\"$dir\"")
+            } else {
+                fullHtml
+            }
         }
-    }
+    return content to article.title
 }
 
 /**

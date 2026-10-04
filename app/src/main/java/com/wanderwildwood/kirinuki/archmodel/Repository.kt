@@ -12,6 +12,7 @@ import com.wanderwildwood.kirinuki.background.schedulePeriodicRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedForSettings
 import com.wanderwildwood.kirinuki.db.room.FeedItem
+import com.wanderwildwood.kirinuki.db.room.SAVED_PAGES_URL
 import com.wanderwildwood.kirinuki.db.room.FeedItemCursor
 import com.wanderwildwood.kirinuki.db.room.FeedItemForReadMark
 import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
@@ -411,6 +412,51 @@ class Repository(
     ) = feedItemStore.setBookmarked(itemId = itemId, bookmarked = bookmarked)
 
     suspend fun markAsNotified(itemIds: List<Long>) = feedItemStore.markAsNotified(itemIds)
+
+    /**
+     * Keeps one page, as if a feed had carried it. It goes in starred, so it is with the
+     * other saved articles and no cleanup takes it, and under the pages feed, which wants
+     * the whole article -- so the full text pass fetches it now, or on the next sync if
+     * there is no network now. Saving a page twice stars the one already here.
+     *
+     * The address stands in for the title until the page is fetched and says its own.
+     */
+    suspend fun savePage(
+        url: URL,
+        pagesTitle: String,
+    ): Long {
+        val feedId =
+            feedStore.getFeed(SAVED_PAGES_URL)?.id
+                ?: feedStore.saveFeed(
+                    Feed(url = SAVED_PAGES_URL, title = pagesTitle, fullTextByDefault = true),
+                )
+        val address = url.toString()
+        feedItemStore.loadFeedItem(guid = address, feedId = feedId)?.let { existing ->
+            feedItemStore.setBookmarked(itemId = existing.id, bookmarked = true)
+            return existing.id
+        }
+        val now = Instant.now()
+        return feedItemStore.insertFeedItem(
+            FeedItem(
+                guid = address,
+                plainTitle = address,
+                link = address,
+                feedId = feedId,
+                pubDate = ZonedDateTime.now(),
+                firstSyncedTime = now,
+                primarySortTime = now,
+                bookmarked = true,
+            ).apply {
+                @Suppress("DEPRECATION")
+                title = address
+            },
+        )
+    }
+
+    suspend fun replaceAddressTitle(
+        id: Long,
+        title: String,
+    ) = feedItemStore.replaceAddressTitle(id = id, title = title)
 
     suspend fun toggleNotifications(
         feedId: Long,

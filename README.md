@@ -29,6 +29,10 @@ Three screens. The feeds, what is in one, and the thing itself.
   redraw to say less than the headline did, and a page that drags in a site's own CSS is
   unreadable on this screen.
 - **OPML in and out.** How you arrive with feeds, and how you leave with them.
+- **Save a single page.** Share an article's link to Clippings, or type it into Add feed,
+  and choose **Save the page**. The whole article is fetched and kept under **Pages** and
+  in Saved articles, to read offline like anything else. With no network it is fetched on
+  the next sync.
 - **Volume keys page the article**, because dragging a finger down E Ink is a poor way to
   read. A swipe pages it too, and stops at the paragraph the bottom of the screen cut
   through, so the next page opens on the line you did not finish.

@@ -1,6 +1,8 @@
 package com.wanderwildwood.kirinuki.ui.addfeed
 
+import android.app.Application
 import androidx.lifecycle.viewModelScope
+import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
@@ -54,6 +56,26 @@ class AddFeedViewModel(
         if (feedId <= ID_UNSET) return
         viewModelScope.launch {
             _feed.value = repository.getFeed(feedId)
+        }
+    }
+
+    /**
+     * One page kept to read, rather than a feed followed. The whole of it is fetched now
+     * if there is a network, and on the next sync if there is not.
+     */
+    fun savePage(url: String) {
+        _error.value = null
+        val parsed =
+            try {
+                parseUrlLeniently(if (url.contains("://")) url.trim() else "https://${url.trim()}")
+            } catch (e: MalformedURLException) {
+                _error.value = url
+                return
+            }
+        viewModelScope.launch {
+            repository.savePage(parsed, pagesTitle = getApplication<Application>().getString(R.string.saved_pages_feed))
+            runOnceFullTextSync(di = di, triggeredByUser = true)
+            _saved.value = true
         }
     }
 

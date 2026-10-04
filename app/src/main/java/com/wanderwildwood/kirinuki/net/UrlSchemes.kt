@@ -44,6 +44,22 @@ fun isGopherUrl(spec: String): Boolean = spec.startsWith("gopher://", ignoreCase
 
 fun isSpartanUrl(spec: String): Boolean = spec.startsWith("spartan://", ignoreCase = true)
 
+fun isWebUrl(spec: String): Boolean =
+    spec.startsWith("https://", ignoreCase = true) || spec.startsWith("http://", ignoreCase = true)
+
+/**
+ * The address in what another app shared. Most share the address alone, but plenty put
+ * the headline in front of it, and the whole of that in the address box is not an address.
+ * Text with no address in it comes back as it was, for the box to say so.
+ */
+fun addressIn(shared: String): String {
+    val text = shared.trim()
+    return text
+        .split(Regex("\\s+"))
+        .firstOrNull { isWebUrl(it) || isSmolnetUrl(it) }
+        ?: text
+}
+
 /** An address this app can fetch but the JVM cannot be relied on to parse. */
 fun isSmolnetUrl(spec: String): Boolean =
     isGeminiUrl(spec) || isGopherUrl(spec) || isSpartanUrl(spec)

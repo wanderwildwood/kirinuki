@@ -23,6 +23,15 @@ class FullTextParserKtTest {
     }
 
     @Test
+    fun `the page says its own title`() {
+        val (content, title) =
+            parseFullArticleAndTitle("https://www.phoronix.com/news/Removing-SystemV-Filesystem", String(phoronix))
+
+        assertNotNull(content)
+        assertContains(assertNotNull(title), "SystemV")
+    }
+
+    @Test
     fun `detects gbk from html meta content`() {
         val charset = assertNotNull(findMetaCharset(gb2312))
 

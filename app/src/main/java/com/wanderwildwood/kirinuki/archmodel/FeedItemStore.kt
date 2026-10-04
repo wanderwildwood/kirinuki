@@ -327,6 +327,13 @@ class FeedItemStore(
         dao.deleteFeedItems(ids)
     }
 
+    suspend fun insertFeedItem(item: FeedItem): Long = dao.insertFeedItem(item)
+
+    suspend fun replaceAddressTitle(
+        id: Long,
+        title: String,
+    ) = dao.replaceAddressTitle(id = id, title = title)
+
     suspend fun updateWordCountFull(
         id: Long,
         wordCount: Int,

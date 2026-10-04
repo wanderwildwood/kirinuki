@@ -10,6 +10,7 @@ import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.blob.blobOutputStream
+import com.wanderwildwood.kirinuki.db.room.isSavedPages
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedItem
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
@@ -120,12 +121,15 @@ class RssLocalSync(
                                     .minus(minFeedAgeMinutes.toLong().coerceAtLeast(1), ChronoUnit.MINUTES)
                                     .toEpochMilli()
                             }
-                        val feedsToFetch =
+                        val candidates =
                             feedsToSync(feedId, feedTag, staleTime = staleTime)
+                        // The saved pages have no feed to fetch -- but they do want the
+                        // whole article, and a page saved with no network is fetched by
+                        // the full text pass this sync chains. So they count for that.
+                        needFullTextSync = candidates.any { it.fullTextByDefault }
+                        val feedsToFetch = candidates.filterNot { it.isSavedPages }
 
                         logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
-
-                        needFullTextSync = feedsToFetch.any { it.fullTextByDefault }
 
                         // These coroutines are concurrent but on a single thread,
                         // so they are not truly parallel by design to ensure
