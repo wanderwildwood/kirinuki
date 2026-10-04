@@ -13,6 +13,7 @@ import com.wanderwildwood.kirinuki.archmodel.syncFrequencyFromString
 import com.wanderwildwood.kirinuki.archmodel.themeOptionsFromString
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedDao
+import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.model.OPMLParserHandler
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import kotlinx.coroutines.flow.first
@@ -86,6 +87,10 @@ open class OPMLImporter(
                 )
             UserSettings.SETTING_TEXT_SCALE -> settingsStore.setTextScale(value.toFloatOrNull() ?: 1.0f)
             UserSettings.SETTING_OPEN_TITLE_IN_BROWSER -> settingsStore.setOpenTitleInBrowser(value.toBoolean())
+            UserSettings.SETTING_REMOVE_DOWNLOADED_AFTER_DAYS ->
+                value.toIntOrNull()?.takeIf { it in DownloadedArticles.REMOVE_AFTER_DAYS }?.let {
+                    settingsStore.setRemoveDownloadedAfterDays(it)
+                }
             UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> settingsStore.setIsMarkAsReadOnScroll(value.toBoolean())
             UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> settingsStore.setUseDetectLanguage(value.toBoolean())
             UserSettings.SETTING_MAX_LINES -> settingsStore.setMaxLines((value.toIntOrNull() ?: 1).coerceAtLeast(1))

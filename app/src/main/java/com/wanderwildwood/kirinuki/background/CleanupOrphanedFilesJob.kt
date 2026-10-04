@@ -8,19 +8,23 @@ import android.content.ComponentName
 import android.content.Context
 import android.util.Log
 import androidx.core.content.getSystemService
+import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.db.room.FeedItemDao
+import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.logDebug
+import java.io.File
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
 import org.kodein.di.instance
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 class CleanupOrphanedFilesJob(
     context: Context,
@@ -31,6 +35,7 @@ class CleanupOrphanedFilesJob(
 
     private val filePathProvider: FilePathProvider by instance()
     private val feedItemDao: FeedItemDao by instance()
+    private val repository: Repository by instance()
 
     override val jobId: Int = params.jobId
 
@@ -49,6 +54,21 @@ class CleanupOrphanedFilesJob(
 
             // Clean up full article files in fullArticleDir
             cleanupDirectory(filePathProvider.fullArticleDir, validFeedItemIds, ::blobFullFile)
+
+            // Whole articles older than the setting allows, other than the kept ones. They
+            // are in filesDir now, which nothing else would ever empty.
+            val days = repository.removeDownloadedAfterDays.value
+            if (days > 0) {
+                val removed =
+                    withContext(Dispatchers.IO) {
+                        DownloadedArticles.remove(
+                            dir = filePathProvider.fullArticleDir,
+                            keep = feedItemDao.getBookmarkedIds().toSet(),
+                            downloadedBefore = Instant.now().minus(days.toLong(), ChronoUnit.DAYS),
+                        )
+                    }
+                Log.i(LOG_TAG, "Removed $removed downloaded articles older than $days days")
+            }
 
             // What the tour kept, before it was removed in 0.3.0: its queue and its page
             // cache. Nothing has read either since, and nothing else would ever delete them --

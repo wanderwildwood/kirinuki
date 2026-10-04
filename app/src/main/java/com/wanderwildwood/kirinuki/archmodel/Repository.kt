@@ -264,6 +264,10 @@ class Repository(
 
     val maximumCountPerFeed = settingsStore.maximumCountPerFeed
 
+    val removeDownloadedAfterDays = settingsStore.removeDownloadedAfterDays
+
+    fun setRemoveDownloadedAfterDays(value: Int) = settingsStore.setRemoveDownloadedAfterDays(value)
+
     fun setMaxCountPerFeed(value: Int) = settingsStore.setMaxCountPerFeed(value)
 
     val itemOpener

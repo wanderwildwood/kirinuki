@@ -68,6 +68,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                         UserSettings.SETTING_TEXT_SCALE -> "1.6"
                         UserSettings.SETTING_OPEN_TITLE_IN_BROWSER -> "true"
+                        UserSettings.SETTING_REMOVE_DOWNLOADED_AFTER_DAYS -> "90"
                         UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
                         UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
                         UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"
@@ -133,6 +134,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setItemOpener(ItemOpener.CUSTOM_TAB)
                 settingsStore.setTextScale(1.6f)
                 settingsStore.setOpenTitleInBrowser(true)
+                settingsStore.setRemoveDownloadedAfterDays(90)
                 settingsStore.setIsMarkAsReadOnScroll(true)
                 settingsStore.setUseDetectLanguage(true)
                 settingsStore.setSyncOnlyWhenCharging(true)

@@ -431,6 +431,14 @@
   <string name="read_it">Read it</string>
   <!-- Under Subscribe, for a web address: keeps that one page instead of following a feed -->
   <string name="save_page">Save the page</string>
+  <!-- Settings: how long a whole article fetched from its page is kept on the phone -->
+  <string name="remove_downloaded_articles">Remove downloaded articles</string>
+  <string name="remove_downloaded_after_days">After %1$d days</string>
+  <string name="remove_downloaded_never">Never</string>
+  <string name="clear_downloaded_articles">Clear downloaded articles</string>
+  <!-- %1$s is a size, such as 4.2 MB -->
+  <string name="clear_downloaded_articles_size">%1$s on the phone. Kept articles stay.</string>
+  <string name="clear_downloaded_articles_armed">Clear them — tap again. Kept articles stay.</string>
   <!-- The feed a saved page is kept under, on the feeds screen -->
   <string name="saved_pages_feed">Pages</string>
   <string name="subscribe_to_this">Subscribe to this</string>

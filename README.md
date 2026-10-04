@@ -33,6 +33,11 @@ Three screens. The feeds, what is in one, and the thing itself.
   and choose **Save the page**. The whole article is fetched and kept under **Pages** and
   in Saved articles, to read offline like anything else. With no network it is fetched on
   the next sync.
+- **Downloaded articles stay until you say.** Whole articles are kept in the app's own
+  storage, not a cache the phone can empty when it is short of space. Settings has
+  **Remove downloaded articles** (after 7, 30 or 90 days, or never; 30 to begin with) and
+  **Clear downloaded articles**. Neither touches a kept (starred) article; anything removed
+  is fetched again when you next open it.
 - **Volume keys page the article**, because dragging a finger down E Ink is a poor way to
   read. A swipe pages it too, and stops at the paragraph the bottom of the screen cut
   through, so the next page opens on the line you did not finish.

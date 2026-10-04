@@ -38,7 +38,9 @@ private class FilePathProviderImpl(
     override val filesDir: File,
 ) : FilePathProvider {
     override val articleDir: File = filesDir.resolve("articles")
-    override val fullArticleDir: File = cacheDir.resolve("full_articles")
+    // Not the cache: Android may empty that whenever it is short of space, and a saved
+    // page is supposed to be there when the radio is off. See DownloadedArticles.
+    override val fullArticleDir: File = filesDir.resolve("full_articles")
     override val httpCacheDir: File = cacheDir.resolve("http")
 }
 

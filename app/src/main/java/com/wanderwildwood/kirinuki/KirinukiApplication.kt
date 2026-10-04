@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
+import com.nononsenseapps.jsonfeed.cachingHttpClient
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.db.room.AppDatabase
 import com.wanderwildwood.kirinuki.db.room.BlocklistDao
@@ -21,6 +22,7 @@ import com.wanderwildwood.kirinuki.di.androidModule
 import com.wanderwildwood.kirinuki.di.archModelModule
 import com.wanderwildwood.kirinuki.di.networkModule
 import com.wanderwildwood.kirinuki.model.AlwaysUseCacheIfPossibleRequestsInterceptor
+import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.model.ForceCacheOnSomeFailuresInterceptor
 import com.wanderwildwood.kirinuki.model.OneImageRequestPerHostInterceptor
 import com.wanderwildwood.kirinuki.model.RateLimitedInterceptor
@@ -32,7 +34,8 @@ import com.wanderwildwood.kirinuki.util.ToastMaker
 import com.wanderwildwood.kirinuki.util.currentlyUnmetered
 import com.wanderwildwood.kirinuki.util.filePathProvider
 import com.wanderwildwood.kirinuki.util.logDebug
-import com.nononsenseapps.jsonfeed.cachingHttpClient
+import java.io.File
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
@@ -46,8 +49,6 @@ import org.kodein.di.bind
 import org.kodein.di.direct
 import org.kodein.di.instance
 import org.kodein.di.singleton
-import java.io.File
-import java.util.concurrent.TimeUnit
 
 class KirinukiApplication :
     Application(),
@@ -136,6 +137,12 @@ class KirinukiApplication :
         super.onCreate()
         @Suppress("DEPRECATION")
         staticFilesDir = filesDir
+        // Before anything can read or write an article: they were in the cache before 0.3.12.
+        // Here rather than where the paths are made, because that is only when first asked.
+        DownloadedArticles.moveOutOfCache(
+            from = cacheDir.resolve("full_articles"),
+            to = di.direct.instance<FilePathProvider>().fullArticleDir,
+        )
     }
 
     override fun onTerminate() {

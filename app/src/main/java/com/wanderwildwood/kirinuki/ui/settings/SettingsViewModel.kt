@@ -4,13 +4,18 @@ import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
+import com.wanderwildwood.kirinuki.db.room.FeedItemDao
+import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.net.gemini.KnownHost
 import com.wanderwildwood.kirinuki.net.gemini.KnownHosts
+import com.wanderwildwood.kirinuki.util.FilePathProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -19,6 +24,8 @@ class SettingsViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val knownHosts: KnownHosts by instance()
+    private val filePathProvider: FilePathProvider by instance()
+    private val feedItemDao: FeedItemDao by instance()
 
     val syncOnlyOnWifi: StateFlow<Boolean> = repository.syncOnlyOnWifi
     val syncOnlyWhenCharging: StateFlow<Boolean> = repository.syncOnlyWhenCharging
@@ -54,6 +61,33 @@ class SettingsViewModel(
     fun setShowReadArticles(value: Boolean) = repository.setFeedListFilterRead(value)
 
     fun setOpenTitleInBrowser(value: Boolean) = repository.setOpenTitleInBrowser(value)
+
+    val removeDownloadedAfterDays: StateFlow<Int> = repository.removeDownloadedAfterDays
+
+    fun setRemoveDownloadedAfterDays(value: Int) = repository.setRemoveDownloadedAfterDays(value)
+
+    private val _downloadedBytes = MutableStateFlow<Long?>(null)
+
+    /** What the whole articles take up, kept ones included. Null until it has been counted. */
+    val downloadedBytes: StateFlow<Long?> = _downloadedBytes
+
+    /** Counted each time the screen opens: the sweep and the full text pass both change it. */
+    fun countDownloadedArticles() {
+        viewModelScope.launch(Dispatchers.IO) {
+            _downloadedBytes.value = DownloadedArticles.size(filePathProvider.fullArticleDir)
+        }
+    }
+
+    /** Every downloaded article but the kept ones. Each is fetched again if it is opened. */
+    fun clearDownloadedArticles() {
+        viewModelScope.launch(Dispatchers.IO) {
+            DownloadedArticles.remove(
+                dir = filePathProvider.fullArticleDir,
+                keep = feedItemDao.getBookmarkedIds().toSet(),
+            )
+            _downloadedBytes.value = DownloadedArticles.size(filePathProvider.fullArticleDir)
+        }
+    }
 
     private val _capsuleCertificates = MutableStateFlow(knownHosts.all())
 

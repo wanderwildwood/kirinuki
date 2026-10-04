@@ -802,6 +802,7 @@ class OPMLTest : DIAware {
                     when (userSetting) {
                         UserSettings.SETTING_OPEN_LINKS_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                         UserSettings.SETTING_OPEN_TITLE_IN_BROWSER -> "true"
+                        UserSettings.SETTING_REMOVE_DOWNLOADED_AFTER_DAYS -> "90"
                         UserSettings.SETTING_ADDED_FEEDER_NEWS -> "true"
                         UserSettings.SETTING_THEME -> "night"
                         UserSettings.SETTING_DARK_THEME -> "dark"
@@ -913,6 +914,7 @@ private val sampleFile: List<String> =
           <feeder:setting key="pref_animated_paging" value="true"/>
           <feeder:setting key="pref_body_text_scale" value="1.6"/>
           <feeder:setting key="pref_open_title_in_browser" value="true"/>
+          <feeder:setting key="pref_remove_downloaded_after_days" value="90"/>
           <feeder:setting key="pref_is_mark_as_read_on_scroll" value="true"/>
           <feeder:setting key="pref_readaloud_detect_lang" value="true"/>
           <feeder:setting key="pref_max_lines" value="6"/>

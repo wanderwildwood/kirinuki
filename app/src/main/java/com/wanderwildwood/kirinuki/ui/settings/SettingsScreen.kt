@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui.settings
 
+import android.text.format.Formatter
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,15 +31,16 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
+import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.util.hasWebBrowser
-import kotlinx.coroutines.delay
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import kotlinx.coroutines.delay
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -60,10 +62,13 @@ fun SettingsScreen(
     val showReadArticles by viewModel.showReadArticles.collectAsStateWithLifecycle()
     val openTitleInBrowser by viewModel.openTitleInBrowser.collectAsStateWithLifecycle()
     val capsuleCertificates by viewModel.capsuleCertificates.collectAsStateWithLifecycle()
+    val removeDownloadedAfterDays by viewModel.removeDownloadedAfterDays.collectAsStateWithLifecycle()
+    val downloadedBytes by viewModel.downloadedBytes.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val hasBrowser = remember(context) { context.hasWebBrowser() }
     var aboutOpen by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { viewModel.countDownloadedArticles() }
 
 
     Scaffold(
@@ -174,6 +179,31 @@ fun SettingsScreen(
                 HorizontalDividerMMD()
             }
             item {
+                StepperRow(
+                    title = stringResource(R.string.remove_downloaded_articles),
+                    value =
+                        if (removeDownloadedAfterDays > 0) {
+                            stringResource(R.string.remove_downloaded_after_days, removeDownloadedAfterDays)
+                        } else {
+                            stringResource(R.string.remove_downloaded_never)
+                        },
+                    onLess = { viewModel.setRemoveDownloadedAfterDays(removeDownloadedAfterDays.stepped(-1)) },
+                    onMore = { viewModel.setRemoveDownloadedAfterDays(removeDownloadedAfterDays.stepped(1)) },
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                ClearDownloadedRow(
+                    size = downloadedBytes?.let { Formatter.formatShortFileSize(context, it) },
+                    onClear = viewModel::clearDownloadedArticles,
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
                 ActionRow(title = stringResource(R.string.import_feeds_from_opml), onClick = onImportOpml)
             }
             item {
@@ -218,6 +248,60 @@ fun SettingsScreen(
     }
 
     if (aboutOpen) AboutDialog(onDismiss = { aboutOpen = false })
+}
+
+/** One step along the choices, which run shortest to longest and then never. */
+private fun Int.stepped(by: Int): Int {
+    val choices = DownloadedArticles.REMOVE_AFTER_DAYS
+    val at = choices.indexOf(this).takeIf { it >= 0 } ?: choices.indexOf(DownloadedArticles.DEFAULT_REMOVE_AFTER_DAYS)
+    return choices[(at + by).coerceIn(0, choices.size - 1)]
+}
+
+/**
+ * Clears every downloaded article but the kept ones, after asking in its own face -- the
+ * same two taps as forgetting a certificate, and for the same reason: it cannot be undone,
+ * and anything cleared has to be fetched again, which needs a network you may not have.
+ */
+@Composable
+private fun ClearDownloadedRow(
+    size: String?,
+    onClear: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var armed by rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(armed) {
+        if (armed) {
+            delay(ARMED_MILLIS)
+            armed = false
+        }
+    }
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable {
+                    if (armed) {
+                        onClear()
+                        armed = false
+                    } else {
+                        armed = true
+                    }
+                }.padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        TextMMD(text = stringResource(R.string.clear_downloaded_articles))
+        when {
+            armed ->
+                TextMMD(
+                    text = stringResource(R.string.clear_downloaded_articles_armed),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            size != null ->
+                TextMMD(
+                    text = stringResource(R.string.clear_downloaded_articles_size, size),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+        }
+    }
 }
 
 private fun SyncFrequency.next(): SyncFrequency {

@@ -10,10 +10,12 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.background.schedulePeriodicRssSync
 import com.wanderwildwood.kirinuki.db.room.BlocklistDao
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
+import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.model.FeedListFilter
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.wanderwildwood.kirinuki.util.getStringNonNull
+import java.time.Instant
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +26,6 @@ import kotlinx.coroutines.flow.update
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
-import java.time.Instant
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SettingsStore(
@@ -327,6 +328,16 @@ class SettingsStore(
     fun setOpenTitleInBrowser(value: Boolean) {
         _openTitleInBrowser.value = value
         sp.edit().putBoolean(PREF_OPEN_TITLE_IN_BROWSER, value).apply()
+    }
+
+    /** Days after which a downloaded article is removed; 0 is never. Kept ones never are. */
+    private val _removeDownloadedAfterDays =
+        MutableStateFlow(sp.getInt(PREF_REMOVE_DOWNLOADED_AFTER_DAYS, DownloadedArticles.DEFAULT_REMOVE_AFTER_DAYS))
+    val removeDownloadedAfterDays = _removeDownloadedAfterDays.asStateFlow()
+
+    fun setRemoveDownloadedAfterDays(value: Int) {
+        _removeDownloadedAfterDays.value = value
+        sp.edit().putInt(PREF_REMOVE_DOWNLOADED_AFTER_DAYS, value).apply()
     }
 
     private val _maximumCountPerFeed =
@@ -717,6 +728,7 @@ const val PREF_VAL_OPEN_WITH_CUSTOM_TAB = "3"
 
 const val PREF_TEXT_SCALE = "pref_body_text_scale"
 const val PREF_OPEN_TITLE_IN_BROWSER = "pref_open_title_in_browser"
+const val PREF_REMOVE_DOWNLOADED_AFTER_DAYS = "pref_remove_downloaded_after_days"
 
 const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
 
@@ -794,6 +806,7 @@ enum class UserSettings(
     SETTING_ANIMATED_PAGING(key = PREF_ANIMATED_PAGING),
     SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),
     SETTING_OPEN_TITLE_IN_BROWSER(key = PREF_OPEN_TITLE_IN_BROWSER),
+    SETTING_REMOVE_DOWNLOADED_AFTER_DAYS(key = PREF_REMOVE_DOWNLOADED_AFTER_DAYS),
     SETTING_IS_MARK_AS_READ_ON_SCROLL(
         key = PREF_IS_MARK_AS_READ_ON_SCROLL,
     ),
