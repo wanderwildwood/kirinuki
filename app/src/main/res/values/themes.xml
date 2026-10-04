@@ -1,6 +1,10 @@
 <resources>
 
-  <style name="AppThemeDayNoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
+  <!-- Split in two so values-v31 can add the splash attributes to the launcher theme
+       without restating all of this. -->
+  <style name="AppThemeDayNoActionBar" parent="Base.AppThemeDayNoActionBar" />
+
+  <style name="Base.AppThemeDayNoActionBar" parent="Theme.MaterialComponents.Light.NoActionBar">
     <item name="windowActionModeOverlay">true</item>
     <item name="windowActionBar">false</item>
     <item name="windowNoTitle">true</item>
