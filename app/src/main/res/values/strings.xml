@@ -483,6 +483,7 @@
   <!-- Shown by the launcher when a home-screen shortcut points at a feed that has since been deleted -->
   <string name="shortcut_feed_deleted">Feed deleted</string>
   <!-- Podcast episodes -->
+  <string name="podcasts">Podcasts</string>
   <string name="episode_play">Play</string>
   <string name="episode_pause">Pause</string>
   <string name="episode_back_seconds">Back %d seconds</string>

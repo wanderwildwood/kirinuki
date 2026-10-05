@@ -31,6 +31,19 @@ const val ID_UNSET: Long = 0
 const val ID_ALL_FEEDS: Long = -10
 const val ID_SAVED_ARTICLES: Long = -20
 
+/** Every episode of every podcast, which are kept out of [ID_ALL_FEEDS]. */
+const val ID_PODCASTS: Long = -30
+
+/**
+ * The feeds that are podcasts: any whose posts carry a sound file. Worked out from the items
+ * rather than stored on the feed, so a podcast subscribed to any way at all -- Add feed, OPML,
+ * a share -- is one as soon as its first sync arrives, and there is no column to migrate.
+ */
+const val PODCAST_FEED_IDS = "SELECT DISTINCT feed_id FROM feed_items WHERE enclosure_type LIKE 'audio/%'"
+
+/** Stands in [expandedTags] for the Podcasts row's own +, beside the real tags. */
+const val PODCASTS_EXPANDED_KEY = ":podcasts:"
+
 private const val LOG_TAG = "KIRINUKI_APPDB"
 
 /**

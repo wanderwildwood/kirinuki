@@ -45,8 +45,10 @@ Three screens. The feeds, what is in one, and the thing itself.
 ## Podcasts
 
 A podcast is a feed whose posts carry a sound file, so it is subscribed to like any other
-feed — paste its address into Add feed, or bring it in with OPML. An episode opens like an
-article, with its show notes as the text and the player along the bottom.
+feed — paste its address into Add feed, or bring it in with OPML. Podcasts are kept apart
+from the reading: they have their own **Podcasts** row, which lists every episode, and its
+**+** shows each podcast on its own. All feeds is the articles alone. An episode opens like
+an article, with its show notes as the text and the player along the bottom.
 
 - **Plays with the screen off**, from the lock screen and the notification as well.
 - **Remembers where you stopped** in every episode, and starts there next time.

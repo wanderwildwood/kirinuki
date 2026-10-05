@@ -19,6 +19,7 @@ import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
 import com.wanderwildwood.kirinuki.db.room.FeedItemWithFeed
 import com.wanderwildwood.kirinuki.db.room.FeedTitle
 import com.wanderwildwood.kirinuki.db.room.ID_ALL_FEEDS
+import com.wanderwildwood.kirinuki.db.room.ID_PODCASTS
 import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.RemoteFeed
@@ -541,6 +542,7 @@ class Repository(
                             tag.isNotBlank() -> FeedType.TAG
                             feedId == ID_UNSET || feedId == ID_ALL_FEEDS -> FeedType.ALL_FEEDS
                             feedId == ID_SAVED_ARTICLES -> FeedType.SAVED_ARTICLES
+                            feedId == ID_PODCASTS -> FeedType.PODCASTS
                             else -> FeedType.FEED
                         },
                     unreadCount = unreadCount,
@@ -563,6 +565,7 @@ class Repository(
         when {
             feedId > ID_UNSET -> feedItemStore.markAllAsReadInFeed(feedId)
             tag.isNotBlank() -> feedItemStore.markAllAsReadInTag(tag)
+            feedId == ID_PODCASTS -> feedItemStore.markAllPodcastsAsRead()
             else -> feedItemStore.markAllAsRead()
         }
         setMinReadTime(Instant.now())
@@ -840,6 +843,7 @@ enum class FeedType {
     TAG,
     SAVED_ARTICLES,
     ALL_FEEDS,
+    PODCASTS,
 }
 
 @Immutable

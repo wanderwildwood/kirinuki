@@ -136,26 +136,39 @@ interface FeedDao {
             -- wrap in select so we can collate in order
             select * from (
                 -- all items
-                select $ID_ALL_FEEDS as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, 0 as expanded, 0 as sort_section, 0 as sort_tag_or_feed
+                select $ID_ALL_FEEDS as id, '' as display_title, '' as tag, '' as image_url, coalesce(sum(unread), 0) as unread_count, 0 as expanded, 0 as sort_section, 0 as sort_tag_or_feed
                 from feeds_with_items_for_nav_drawer
+                where feed_id not in ($PODCAST_FEED_IDS)
                 -- starred
                 union
                 select $ID_SAVED_ARTICLES as id, '' as display_title, '' as tag, '' as image_url, sum(bookmarked) as unread_count, 0 as expanded, 1 as sort_section, 0 as sort_tag_or_feed
                 from feeds_with_items_for_nav_drawer
                 where bookmarked
+                -- podcasts, below the saved articles, and their shows under them when opened
+                union
+                select $ID_PODCASTS as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, '$PODCASTS_EXPANDED_KEY' in (:expandedTags) as expanded, 1 as sort_section, 1 as sort_tag_or_feed
+                from feeds_with_items_for_nav_drawer
+                where feed_id in ($PODCAST_FEED_IDS)
+                union
+                select feed_id as id, display_title, '' as tag, image_url, sum(unread) as unread_count, 0 as expanded, 1 as sort_section, 2 as sort_tag_or_feed
+                from feeds_with_items_for_nav_drawer
+                where feed_id in ($PODCAST_FEED_IDS) and '$PODCASTS_EXPANDED_KEY' in (:expandedTags)
+                group by feed_id
                 -- tags
                 union
                 select $ID_UNSET as id, tag as display_title, tag, '' as image_url, sum(unread) as unread_count, tag in (:expandedTags) as expanded, 2 as sort_section, 0 as sort_tag_or_feed
                 from feeds_with_items_for_nav_drawer
-                where tag is not ''
+                where tag is not '' and feed_id not in ($PODCAST_FEED_IDS)
                 group by tag
                 -- feeds
                 union
                 select feed_id as id, display_title, tag, image_url, sum(unread) as unread_count, 0 as expanded, case when tag is '' then 3 else 2 end as sort_section, 1 as sort_tag_or_feed
                 from feeds_with_items_for_nav_drawer
-                where tag is '' or tag in (:expandedTags)
+                where (tag is '' or tag in (:expandedTags)) and feed_id not in ($PODCAST_FEED_IDS)
                 group by feed_id
             )
+            -- no podcasts, no Podcasts row: its sum over nothing is null
+            where id is not $ID_PODCASTS or unread_count is not null
             -- sort them
             order by sort_section, tag, sort_tag_or_feed, display_title collate nocase
         """,

@@ -17,7 +17,9 @@ import com.wanderwildwood.kirinuki.db.room.FeedItemDao.Companion.FEED_ITEM_LIST_
 import com.wanderwildwood.kirinuki.db.room.FeedItemDao.Companion.FEED_ITEM_LIST_SORT_ORDER_DESC
 import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
 import com.wanderwildwood.kirinuki.db.room.FeedItemWithFeed
+import com.wanderwildwood.kirinuki.db.room.ID_PODCASTS
 import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
+import com.wanderwildwood.kirinuki.db.room.PODCAST_FEED_IDS
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.upsertFeedItems
 import com.wanderwildwood.kirinuki.model.PREVIEW_COLUMNS
@@ -165,6 +167,9 @@ class FeedItemStore(
             onlySavedArticles -> append("AND bookmarked = 1\n")
             feedId > ID_UNSET -> append("AND feed_id IS ?\n").also { args.add(feedId) }
             tag.isNotEmpty() -> append("AND tag IS ?\n").also { args.add(tag) }
+            // Podcasts have their own row, and All feeds is the reading.
+            feedId == ID_PODCASTS -> append("AND feed_id IN ($PODCAST_FEED_IDS)\n")
+            else -> append("AND feed_id NOT IN ($PODCAST_FEED_IDS)\n")
         }
     }
 
@@ -297,7 +302,11 @@ class FeedItemStore(
     }
 
     suspend fun markAllAsRead() {
-        dao.markAllAsRead()
+        dao.markAllAsReadExceptPodcasts()
+    }
+
+    suspend fun markAllPodcastsAsRead() {
+        dao.markAllPodcastsAsRead()
     }
 
     fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> = dao.getFeedsItemsWithDefaultFullTextNeedingDownload()
