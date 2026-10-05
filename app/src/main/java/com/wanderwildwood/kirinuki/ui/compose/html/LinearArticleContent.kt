@@ -85,6 +85,7 @@ import com.wanderwildwood.kirinuki.model.html.LinearTextAnnotationSuperscript
 import com.wanderwildwood.kirinuki.model.html.LinearTextAnnotationUnderline
 import com.wanderwildwood.kirinuki.model.html.LinearTextBlockStyle
 import com.wanderwildwood.kirinuki.model.html.LinearVideo
+import com.wanderwildwood.kirinuki.ui.compose.components.rememberFencedText
 import com.wanderwildwood.kirinuki.ui.compose.layouts.Table
 import com.wanderwildwood.kirinuki.ui.compose.layouts.TableCell
 import com.wanderwildwood.kirinuki.ui.compose.layouts.TableData
@@ -413,12 +414,17 @@ fun LinearTextContent(
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
             val annotatedString = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
+            // Tells the reader where this paragraph's lines are, so the bottom edge can stop
+            // on a whole one. See LineFence.
+            val fenced = rememberFencedText()
 
             TextMMD(
                 text = annotatedString,
                 softWrap = softWrap,
+                onTextLayout = fenced.onTextLayout,
                 modifier =
                     modifier
+                        .then(fenced.modifier)
                         .indication(interactionSource, LocalIndication.current)
                         .focusableInNonTouchMode(interactionSource = interactionSource),
             )

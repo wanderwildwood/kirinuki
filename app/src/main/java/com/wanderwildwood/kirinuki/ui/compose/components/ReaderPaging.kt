@@ -80,9 +80,15 @@ suspend fun LazyListState.turnPage(direction: ScrollDirection) {
     val viewport = info.viewportEndOffset - info.viewportStartOffset
     if (viewport <= 0) return
     val page = viewport * PAGE
+    // Going on, a reader that covered a cut line opens the next page on exactly that line --
+    // flush with the top, since lines touch and any gap above shows a sliver of the one
+    // before. Never less than half a page, so one very tall cut block cannot make it crawl.
+    val toCovered =
+        LineFence.of(this)?.coveredFrom
+            ?.takeIf { it >= viewport / 2f }
     scrollBy(
         when (direction) {
-            ScrollDirection.DOWN -> page
+            ScrollDirection.DOWN -> toCovered ?: page
             ScrollDirection.UP -> -page
         },
     )

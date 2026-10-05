@@ -14,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,6 +35,9 @@ import com.wanderwildwood.kirinuki.archmodel.TextToDisplay
 import com.wanderwildwood.kirinuki.archmodel.isAudio
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.components.rememberLineFence
+import com.wanderwildwood.kirinuki.ui.compose.components.LineFenceCover
+import com.wanderwildwood.kirinuki.ui.compose.components.LocalLineFence
 import com.wanderwildwood.kirinuki.ui.compose.components.ReaderEdges
 import com.wanderwildwood.kirinuki.ui.compose.components.rememberReaderScrollStep
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
@@ -64,6 +68,7 @@ fun ArticleScreen(
     val openTitleInBrowser by viewModel.openTitleInBrowser.collectAsStateWithLifecycle()
     val onlyOnWifi by viewModel.onlyOnWifi.collectAsStateWithLifecycle()
     var scaleOpen by remember { mutableStateOf(false) }
+    val lineFence = rememberLineFence(listState)
 
     val context = LocalContext.current
     // Three things have to be true, and the default is that the first is not: the setting
@@ -143,68 +148,73 @@ fun ArticleScreen(
                     .padding(padding),
         ) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                LazyColumnMMD(
-                    state = listState,
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    // A swipe moves on to the paragraph the bottom of the screen cut through,
-                    // rather than MMD's four items -- four paragraphs are however tall they are,
-                    // and the ones that did not fit were being stepped straight past.
-                    scrollStep = rememberReaderScrollStep(listState),
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    item {
-                        // The body is bodyLarge through ProvideScaledText, and the title was the
-                        // ambient style at no scale at all: a step smaller than the text under it
-                        // at 100%, and further adrift at every step of the text scale. Same style,
-                        // same scale, bold -- which is the only emphasis there is here.
-                        ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
-                            TextMMD(
-                                text = article?.title.orEmpty(),
-                                fontWeight = FontWeight.Bold,
-                                // Underlined only when it leads somewhere. An underline on a title
-                                // that does nothing is the thing this app took out.
-                                textDecoration =
-                                    if (titleOpensPage) TextDecoration.Underline else null,
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .then(
-                                            if (articleLink != null && titleOpensPage) {
-                                                Modifier.clickable { context.openInBrowser(articleLink) }
-                                            } else {
-                                                Modifier
-                                            },
-                                        ),
-                            )
-                        }
-                    }
-
-                    when (state) {
-                        TextToDisplay.CONTENT ->
-                            linearArticleContent(
-                                articleContent = content,
-                                // Clippings hands nothing to the system. A stock Kompakt has no
-                                // browser -- only the AOSP WebView test shell is registered for http --
-                                // so an external open is a crash waiting to happen rather than a way
-                                // out. The renderer only makes followable links tappable; this is the
-                                // guard that keeps that true if it ever stops being.
-                                onLinkClick = { url, _ ->
-                                    if (isSmolnetUrl(url)) {
-                                        onFollowGemini(url)
-                                    }
-                                },
-                            )
-
-                        else ->
-                            item {
+                CompositionLocalProvider(LocalLineFence provides lineFence) {
+                    LazyColumnMMD(
+                        state = listState,
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        // A swipe moves on to the paragraph the bottom of the screen cut through,
+                        // rather than MMD's four items -- four paragraphs are however tall they are,
+                        // and the ones that did not fit were being stepped straight past.
+                        scrollStep = rememberReaderScrollStep(listState),
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        item {
+                            // The body is bodyLarge through ProvideScaledText, and the title was the
+                            // ambient style at no scale at all: a step smaller than the text under it
+                            // at 100%, and further adrift at every step of the text scale. Same style,
+                            // same scale, bold -- which is the only emphasis there is here.
+                            ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
                                 TextMMD(
-                                    text = stringResource(state.messageRes()),
-                                    modifier = Modifier.fillMaxWidth(),
+                                    text = article?.title.orEmpty(),
+                                    fontWeight = FontWeight.Bold,
+                                    // Underlined only when it leads somewhere. An underline on a title
+                                    // that does nothing is the thing this app took out.
+                                    textDecoration =
+                                        if (titleOpensPage) TextDecoration.Underline else null,
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .then(
+                                                if (articleLink != null && titleOpensPage) {
+                                                    Modifier.clickable { context.openInBrowser(articleLink) }
+                                                } else {
+                                                    Modifier
+                                                },
+                                            ),
                                 )
                             }
+                        }
+
+                        when (state) {
+                            TextToDisplay.CONTENT ->
+                                linearArticleContent(
+                                    articleContent = content,
+                                    // Clippings hands nothing to the system. A stock Kompakt has no
+                                    // browser -- only the AOSP WebView test shell is registered for http --
+                                    // so an external open is a crash waiting to happen rather than a way
+                                    // out. The renderer only makes followable links tappable; this is the
+                                    // guard that keeps that true if it ever stops being.
+                                    onLinkClick = { url, _ ->
+                                        if (isSmolnetUrl(url)) {
+                                            onFollowGemini(url)
+                                        }
+                                    },
+                                )
+
+                            else ->
+                                item {
+                                    TextMMD(
+                                        text = stringResource(state.messageRes()),
+                                        modifier = Modifier.fillMaxWidth(),
+                                    )
+                                }
+                        }
                     }
                 }
+
+                // The line the bottom edge cuts is covered, so the page stops on a whole one.
+                LineFenceCover(fence = lineFence)
 
                 // Last, so it is on top: the edges take their taps before the text
                 // under them does.
