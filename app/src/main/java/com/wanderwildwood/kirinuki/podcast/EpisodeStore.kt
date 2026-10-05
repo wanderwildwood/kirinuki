@@ -2,6 +2,8 @@ package com.wanderwildwood.kirinuki.podcast
 
 import android.app.DownloadManager
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import androidx.core.content.edit
 import java.io.File
@@ -81,18 +83,41 @@ class EpisodeStore(
                         val state = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
                         val done = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
                         val total = cursor.getLong(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
-                        Triple(state, done, total)
+                        val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
+                        // ⚠ The download service runs on JobScheduler now, and one held back for
+                        // wifi simply stays PENDING -- the PAUSED reasons are what older phones
+                        // said. So a wifi-only download with nothing fetched, on a phone with no
+                        // wifi, is asked about directly.
+                        val waiting =
+                            (
+                                state == DownloadManager.STATUS_PAUSED &&
+                                    (
+                                        reason == DownloadManager.PAUSED_QUEUED_FOR_WIFI ||
+                                            reason == DownloadManager.PAUSED_WAITING_FOR_NETWORK
+                                    )
+                            ) ||
+                                (
+                                    state == DownloadManager.STATUS_PENDING &&
+                                        done == 0L &&
+                                        prefs.getBoolean(WIFI_ONLY + itemId, false) &&
+                                        !onUnmeteredNetwork()
+                                )
+                        Status(state, done, total, waiting)
                     }
                 }
-            when (status?.first) {
+            when (status?.state) {
                 DownloadManager.STATUS_PENDING,
                 DownloadManager.STATUS_RUNNING,
                 DownloadManager.STATUS_PAUSED,
                 -> {
-                    val (_, done, total) = status
-                    return DownloadState.Downloading(
-                        percent = if (total > 0) (done * 100 / total).toInt() else null,
-                    )
+                    val (_, done, total, waiting) = status
+                    return if (waiting) {
+                        DownloadState.WaitingForWifi
+                    } else {
+                        DownloadState.Downloading(
+                            percent = if (total > 0) (done * 100 / total).toInt() else null,
+                        )
+                    }
                 }
 
                 DownloadManager.STATUS_SUCCESSFUL -> prefs.edit { remove(DOWNLOAD + itemId) }
@@ -109,7 +134,13 @@ class EpisodeStore(
         return if (file(itemId)?.isFile == true) DownloadState.Kept else DownloadState.None
     }
 
-    /** Hands the fetch to the system, which carries on with the app closed and the screen off. */
+    /**
+     * Hands the fetch to the system, which carries on with the app closed and the screen off.
+     *
+     * Wifi only unless the reader has said otherwise, under a switch of its own: an episode is
+     * tens of megabytes, and the feeds a few kilobytes. Asked for away from wifi, it waits and
+     * starts on the next network that is not metered.
+     */
     fun download(
         itemId: Long,
         url: String,
@@ -126,7 +157,16 @@ class EpisodeStore(
                 .setAllowedOverMetered(!onlyOnWifi)
                 .setAllowedOverRoaming(false)
                 .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
-        prefs.edit { putLong(DOWNLOAD + itemId, manager.enqueue(request)) }
+        prefs.edit {
+            putLong(DOWNLOAD + itemId, manager.enqueue(request))
+            putBoolean(WIFI_ONLY + itemId, onlyOnWifi)
+        }
+    }
+
+    private fun onUnmeteredNetwork(): Boolean {
+        val connectivity = appContext.getSystemService(ConnectivityManager::class.java) ?: return false
+        val capabilities = connectivity.getNetworkCapabilities(connectivity.activeNetwork) ?: return false
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
     }
 
     fun removeDownload(itemId: Long) {
@@ -168,10 +208,18 @@ class EpisodeStore(
         private const val DURATION = "duration_"
         private const val FINISHED = "finished_"
         private const val DOWNLOAD = "download_"
+        private const val WIFI_ONLY = "wifionly_"
         private const val SPEED = "speed"
-        private val KEYED = listOf(POSITION, DURATION, FINISHED, DOWNLOAD)
+        private val KEYED = listOf(POSITION, DURATION, FINISHED, DOWNLOAD, WIFI_ONLY)
     }
 }
+
+private data class Status(
+    val state: Int,
+    val done: Long,
+    val total: Long,
+    val waiting: Boolean,
+)
 
 sealed interface DownloadState {
     data object None : DownloadState
@@ -179,6 +227,8 @@ sealed interface DownloadState {
     data class Downloading(
         val percent: Int?,
     ) : DownloadState
+
+    data object WaitingForWifi : DownloadState
 
     data object Kept : DownloadState
 

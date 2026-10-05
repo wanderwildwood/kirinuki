@@ -173,6 +173,7 @@ fun EpisodePanel(
                         is DownloadState.Downloading ->
                             d.percent?.let { stringResource(R.string.episode_downloading_percent, it) }
                                 ?: stringResource(R.string.episode_downloading)
+                        DownloadState.WaitingForWifi -> stringResource(R.string.episode_waiting_for_wifi)
                         DownloadState.Kept ->
                             if (removeArmed) {
                                 stringResource(R.string.episode_remove_armed)
@@ -191,7 +192,7 @@ fun EpisodePanel(
                                 store.download(episode.itemId, episode.url, episode.title, onlyOnWifi)
                                 download = store.downloadState(episode.itemId)
                             }
-                            is DownloadState.Downloading -> {
+                            is DownloadState.Downloading, DownloadState.WaitingForWifi -> {
                                 store.removeDownload(episode.itemId)
                                 download = DownloadState.None
                             }

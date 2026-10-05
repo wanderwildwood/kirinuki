@@ -149,7 +149,7 @@ class FeedItemStoreTest : DIAware {
         }
 
         coVerify {
-            dao.markAllAsRead(readTime = any())
+            dao.markAllAsReadExceptPodcasts(readTime = any())
         }
     }
 

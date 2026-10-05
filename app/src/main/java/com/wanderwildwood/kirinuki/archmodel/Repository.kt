@@ -245,6 +245,10 @@ class Repository(
 
     val syncOnlyOnWifi: StateFlow<Boolean> = settingsStore.syncOnlyOnWifi
 
+    val episodesOnlyOnWifi: StateFlow<Boolean> = settingsStore.episodesOnlyOnWifi
+
+    fun setEpisodesOnlyOnWifi(value: Boolean) = settingsStore.setEpisodesOnlyOnWifi(value)
+
     fun setSyncOnlyOnWifi(value: Boolean) = settingsStore.setSyncOnlyOnWifi(value)
 
     val syncOnlyWhenCharging: StateFlow<Boolean> = settingsStore.syncOnlyWhenCharging

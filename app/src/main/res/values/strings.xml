@@ -79,7 +79,7 @@
 
   <string name="synchronization">Syncing</string>
   <string name="syncing">Syncing</string>
-  <string name="only_on_wifi">Only on Wi-Fi</string>
+  <string name="only_on_wifi">Fetch feeds only on Wi-Fi</string>
   <string name="show_thumbnails">Show thumbnails</string>
   <string name="use_detect_language">Detect language</string>
   <string name="only_available_on_android_n">Only available on Android %1$s and above</string>
@@ -497,6 +497,9 @@
   <string name="episode_keep">Download</string>
   <string name="episode_downloading">Downloading</string>
   <string name="episode_downloading_percent">Downloading %d%%</string>
+  <string name="episode_waiting_for_wifi">Waiting for wifi</string>
+  <string name="episodes_only_on_wifi">Download episodes only on Wi-Fi</string>
+  <string name="episodes_only_on_wifi_summary">Off, a podcast episode can download over mobile data. Playing streams over either.</string>
   <string name="episode_kept">On this phone</string>
   <string name="episode_remove_armed">Remove — tap again</string>
   <string name="episode_download_failed">Download failed</string>

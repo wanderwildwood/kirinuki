@@ -56,6 +56,7 @@ fun SettingsScreen(
     modifier: Modifier = Modifier,
 ) {
     val syncOnlyOnWifi by viewModel.syncOnlyOnWifi.collectAsStateWithLifecycle()
+    val episodesOnlyOnWifi by viewModel.episodesOnlyOnWifi.collectAsStateWithLifecycle()
     val syncOnlyWhenCharging by viewModel.syncOnlyWhenCharging.collectAsStateWithLifecycle()
     val syncFrequency by viewModel.syncFrequency.collectAsStateWithLifecycle()
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
@@ -109,6 +110,17 @@ fun SettingsScreen(
                     title = stringResource(R.string.only_on_wifi),
                     checked = syncOnlyOnWifi,
                     onCheckedChange = viewModel::setSyncOnlyOnWifi,
+                )
+            }
+            item {
+                HorizontalDividerMMD()
+            }
+            item {
+                SwitchRow(
+                    title = stringResource(R.string.episodes_only_on_wifi),
+                    subtitle = stringResource(R.string.episodes_only_on_wifi_summary),
+                    checked = episodesOnlyOnWifi,
+                    onCheckedChange = viewModel::setEpisodesOnlyOnWifi,
                 )
             }
             item {

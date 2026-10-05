@@ -242,8 +242,19 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_SYNC_ON_RESUME, value).apply()
     }
 
-    private val _syncOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_WIFI, false))
+    // On until someone turns it off: on a phone with a data plan, the feeds wait for wifi.
+    private val _syncOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_SYNC_ONLY_WIFI, true))
     val syncOnlyOnWifi = _syncOnlyOnWifi.asStateFlow()
+
+    // Podcast episodes have their own switch: tens of megabytes each, against the feeds' few
+    // kilobytes, so a reader may well let one onto mobile data and not the other.
+    private val _episodesOnlyOnWifi = MutableStateFlow(sp.getBoolean(PREF_EPISODES_ONLY_WIFI, true))
+    val episodesOnlyOnWifi = _episodesOnlyOnWifi.asStateFlow()
+
+    fun setEpisodesOnlyOnWifi(value: Boolean) {
+        _episodesOnlyOnWifi.value = value
+        sp.edit().putBoolean(PREF_EPISODES_ONLY_WIFI, value).apply()
+    }
 
     fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
@@ -701,6 +712,7 @@ const val PREF_BLOCKLIST_APPLY_TO_LINKS = "pref_blocklist_apply_to_links"
  */
 const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
+const val PREF_EPISODES_ONLY_WIFI = "pref_episodes_only_wifi"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
 const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
 
@@ -794,6 +806,7 @@ enum class UserSettings(
     SETTING_SWIPE_AS_READ(key = PREF_SWIPE_AS_READ),
     SETTING_SYNC_ONLY_CHARGING(key = PREF_SYNC_ONLY_CHARGING),
     SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI),
+    SETTING_EPISODES_ONLY_WIFI(key = PREF_EPISODES_ONLY_WIFI),
     SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ),
     SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME),
     SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI),

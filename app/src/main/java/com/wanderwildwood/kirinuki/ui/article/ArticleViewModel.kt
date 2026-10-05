@@ -76,8 +76,8 @@ class ArticleViewModel(
     /** Off unless someone has turned it on in settings. See the setting itself for why. */
     val openTitleInBrowser: StateFlow<Boolean> = repository.openTitleInBrowser
 
-    /** An episode is downloaded under the same rule as the feeds are fetched. */
-    val onlyOnWifi: StateFlow<Boolean> = repository.syncOnlyOnWifi
+    /** Settings has its own switch for episodes, apart from the feeds'. */
+    val onlyOnWifi: StateFlow<Boolean> = repository.episodesOnlyOnWifi
 
     fun setTextScale(value: Float) = repository.setTextScale(value)
 

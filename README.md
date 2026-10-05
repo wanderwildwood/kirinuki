@@ -54,9 +54,9 @@ an article, with its show notes as the text and the player along the bottom.
 - **Remembers where you stopped** in every episode, and starts there next time.
 - **Back 15 seconds, on 30**, a speed button (1× to 2×) and a sleep timer of 15, 30, 45 or
   60 minutes.
-- **Download** keeps an episode on the phone to hear with the radio off. It follows the
-  wifi-only setting for syncing, and the episode is removed once you have heard it to the
-  end.
+- **Download** keeps an episode on the phone to hear with the radio off. It waits for wifi
+  unless **Download episodes only on Wi-Fi** is turned off in Settings — a switch of its own,
+  apart from the feeds' — and the episode is removed once you have heard it to the end.
 
 ## The smolnet
 

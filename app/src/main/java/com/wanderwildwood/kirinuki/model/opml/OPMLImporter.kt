@@ -70,6 +70,7 @@ open class OPMLImporter(
                 )
             UserSettings.SETTING_SYNC_ONLY_CHARGING -> settingsStore.setSyncOnlyWhenCharging(value.toBoolean())
             UserSettings.SETTING_SYNC_ONLY_WIFI -> settingsStore.setSyncOnlyOnWifi(value.toBoolean())
+            UserSettings.SETTING_EPISODES_ONLY_WIFI -> settingsStore.setEpisodesOnlyOnWifi(value.toBoolean())
             UserSettings.SETTING_SYNC_FREQ ->
                 settingsStore.setSyncFrequency(
                     syncFrequencyFromString(value),

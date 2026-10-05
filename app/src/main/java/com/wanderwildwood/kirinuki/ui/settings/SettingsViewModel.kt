@@ -28,6 +28,10 @@ class SettingsViewModel(
     private val feedItemDao: FeedItemDao by instance()
 
     val syncOnlyOnWifi: StateFlow<Boolean> = repository.syncOnlyOnWifi
+
+    val episodesOnlyOnWifi: StateFlow<Boolean> = repository.episodesOnlyOnWifi
+
+    fun setEpisodesOnlyOnWifi(value: Boolean) = repository.setEpisodesOnlyOnWifi(value)
     val syncOnlyWhenCharging: StateFlow<Boolean> = repository.syncOnlyWhenCharging
     val syncFrequency: StateFlow<SyncFrequency> = repository.syncFrequency
     val textScale: StateFlow<Float> = repository.textScale

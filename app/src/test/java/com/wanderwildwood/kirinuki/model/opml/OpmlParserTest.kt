@@ -63,6 +63,7 @@ class OpmlParserTest : DIAware {
                         UserSettings.SETTING_SWIPE_AS_READ -> "DISABLED"
                         UserSettings.SETTING_SYNC_ON_RESUME -> "true"
                         UserSettings.SETTING_SYNC_ONLY_WIFI -> "false"
+                        UserSettings.SETTING_EPISODES_ONLY_WIFI -> "true"
                         UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
                         UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
                         UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
@@ -139,6 +140,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setUseDetectLanguage(true)
                 settingsStore.setSyncOnlyWhenCharging(true)
                 settingsStore.setSyncOnlyOnWifi(false)
+                settingsStore.setEpisodesOnlyOnWifi(true)
                 settingsStore.setSyncFrequency(SyncFrequency.EVERY_12_HOURS)
                 settingsStore.setMaxLines(6)
                 settingsStore.setFeedListFilterRecentlyRead(true)
