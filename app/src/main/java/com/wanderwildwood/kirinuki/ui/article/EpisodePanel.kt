@@ -212,7 +212,9 @@ fun EpisodePanel(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 16.dp),
+            // Clear of the bottom edge: a Kompakt has no navigation bar under the app, so
+            // without this the labels under the buttons sit on the very last row of pixels.
+            modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp).height(56.dp).padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
