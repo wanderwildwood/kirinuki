@@ -482,4 +482,22 @@
   <string name="text_scale_percent">%1$s%%</string>
   <!-- Shown by the launcher when a home-screen shortcut points at a feed that has since been deleted -->
   <string name="shortcut_feed_deleted">Feed deleted</string>
+  <!-- Podcast episodes -->
+  <string name="episode_play">Play</string>
+  <string name="episode_pause">Pause</string>
+  <string name="episode_back_seconds">Back %d seconds</string>
+  <string name="episode_on_seconds">On %d seconds</string>
+  <string name="episode_speed">Speed</string>
+  <string name="episode_sleep">Sleep timer</string>
+  <string name="episode_sleep_minutes">%d min</string>
+  <string name="episode_not_started">Not started</string>
+  <string name="episode_heard">Heard</string>
+  <string name="episode_position_of">%1$s of %2$s</string>
+  <string name="episode_keep">Download</string>
+  <string name="episode_downloading">Downloading</string>
+  <string name="episode_downloading_percent">Downloading %d%%</string>
+  <string name="episode_kept">On this phone</string>
+  <string name="episode_remove_armed">Remove — tap again</string>
+  <string name="episode_download_failed">Download failed</string>
+  <string name="episode_failed">Could not reach it</string>
 </resources>

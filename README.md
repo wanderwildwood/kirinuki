@@ -42,6 +42,20 @@ Three screens. The feeds, what is in one, and the thing itself.
   read. A swipe pages it too, and stops at the paragraph the bottom of the screen cut
   through, so the next page opens on the line you did not finish.
 
+## Podcasts
+
+A podcast is a feed whose posts carry a sound file, so it is subscribed to like any other
+feed — paste its address into Add feed, or bring it in with OPML. An episode opens like an
+article, with its show notes as the text and the player along the bottom.
+
+- **Plays with the screen off**, from the lock screen and the notification as well.
+- **Remembers where you stopped** in every episode, and starts there next time.
+- **Back 15 seconds, on 30**, a speed button (1× to 2×) and a sleep timer of 15, 30, 45 or
+  60 minutes.
+- **Download** keeps an episode on the phone to hear with the radio off. It follows the
+  wifi-only setting for syncing, and the episode is removed once you have heard it to the
+  end.
+
 ## The smolnet
 
 `gemini://`, `gopher://` and `spartan://` open in the app and read like anything else.
@@ -117,9 +131,10 @@ MMD comes from Mudita's own Artifactory repository, which is already declared in
 
 Feeder is a much larger app, and most of the work here was removal: the OpenAI integration,
 the Bergamot translation engine, the device-to-device sync chain, the home screen widget,
-read-aloud, the podcast player, image loading, and the bundled fonts. The reader's own
-machinery — the feed parsers, the full-text extraction, the HTML-to-text pipeline, the
-database — is Feeder's and is the reason this exists at all.
+read-aloud, image loading, and the bundled fonts. Its podcast player went too; a smaller
+one was written back in later. The reader's own machinery — the feed parsers, the
+full-text extraction, the HTML-to-text pipeline, the database — is Feeder's and is the
+reason this exists at all.
 
 ## Credits
 

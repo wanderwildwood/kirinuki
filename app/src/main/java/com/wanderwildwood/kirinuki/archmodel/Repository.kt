@@ -853,6 +853,20 @@ data class Enclosure(
 val Enclosure.isImage: Boolean
     get() = type.startsWith("image/")
 
+/**
+ * A podcast episode. Some feeds leave the type out or call it something generic, so the file's
+ * own name is asked too.
+ */
+val Enclosure.isAudio: Boolean
+    get() =
+        present &&
+            (
+                type.startsWith("audio/") ||
+                    name.substringAfterLast('.', "").lowercase() in AUDIO_EXTENSIONS
+            )
+
+private val AUDIO_EXTENSIONS = setOf("mp3", "m4a", "aac", "ogg", "oga", "opus", "flac", "wav")
+
 @Immutable
 data class Article(
     val item: FeedItemWithFeed?,

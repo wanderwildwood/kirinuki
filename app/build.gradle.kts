@@ -28,8 +28,8 @@ android {
 
     defaultConfig {
         applicationId = "com.wanderwildwood.kirinuki"
-        versionCode = 20
-        versionName = "0.3.12"
+        versionCode = 21
+        versionName = "0.4.0"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
@@ -247,6 +247,10 @@ dependencies {
 
     // Markdown
     implementation(libs.jetbrains.markdown)
+
+    // Podcast episodes: the player, and the session the lock screen and notification talk to.
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.session)
 
     // Tests
     testImplementation(libs.bundles.kotlin)

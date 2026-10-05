@@ -163,7 +163,10 @@ data class FeedItem
                     current = this.thumbnailImage,
                     incoming = entry.image,
                 )
-            val firstEnclosure = entry.attachments?.firstOrNull()
+            // Only one is kept, so a podcast's sound wins over a cover picture listed first.
+            val firstEnclosure =
+                entry.attachments?.firstOrNull { it.mime_type?.startsWith("audio/") == true }
+                    ?: entry.attachments?.firstOrNull()
             this.enclosureLink = firstEnclosure?.url
             this.enclosureType = firstEnclosure?.mime_type?.lowercase()
 

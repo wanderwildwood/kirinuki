@@ -13,6 +13,7 @@ import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.db.room.FeedItemDao
 import com.wanderwildwood.kirinuki.model.DownloadedArticles
+import com.wanderwildwood.kirinuki.podcast.EpisodeStore
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.logDebug
 import java.io.File
@@ -27,7 +28,7 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.instance
 
 class CleanupOrphanedFilesJob(
-    context: Context,
+    private val context: Context,
     override val params: JobParameters,
 ) : BackgroundJob,
     DIAware {
@@ -54,6 +55,13 @@ class CleanupOrphanedFilesJob(
 
             // Clean up full article files in fullArticleDir
             cleanupDirectory(filePathProvider.fullArticleDir, validFeedItemIds, ::blobFullFile)
+
+            // Podcast episodes: the place and the kept sound of any whose item is gone.
+            val episodes =
+                withContext(Dispatchers.IO) {
+                    EpisodeStore(context).forgetAllBut(validFeedItemIds.toSet())
+                }
+            Log.i(LOG_TAG, "Removed $episodes downloaded episodes no longer in any feed")
 
             // Whole articles older than the setting allows, other than the kept ones. They
             // are in filesDir now, which nothing else would ever empty.
