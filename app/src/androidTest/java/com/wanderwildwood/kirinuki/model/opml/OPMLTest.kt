@@ -814,6 +814,7 @@ class OPMLTest : DIAware {
                         UserSettings.SETTING_SYNC_ON_RESUME -> "true"
                         UserSettings.SETTING_SYNC_ONLY_WIFI -> "false"
                         UserSettings.SETTING_EPISODES_ONLY_WIFI -> "true"
+                        UserSettings.SETTING_PODCASTS_IN_ALL_FEEDS -> "false"
                         UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
                         UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
                         UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB

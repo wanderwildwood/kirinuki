@@ -81,6 +81,7 @@ class RepositoryTest : DIAware {
 
         every { settingsStore.syncOnlyWhenCharging } returns MutableStateFlow(false)
         every { settingsStore.syncOnlyOnWifi } returns MutableStateFlow(false)
+        every { settingsStore.podcastsInAllFeeds } returns MutableStateFlow(false)
         every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
         every { settingsStore.minReadTime } returns MutableStateFlow(Instant.EPOCH)
 
@@ -272,7 +273,7 @@ class RepositoryTest : DIAware {
         }
 
         coVerify {
-            feedItemStore.markAllAsRead()
+            feedItemStore.markAllAsRead(includePodcasts = false)
         }
         verify {
             settingsStore.setMinReadTime(any())

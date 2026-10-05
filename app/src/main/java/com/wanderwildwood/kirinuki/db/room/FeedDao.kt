@@ -138,7 +138,7 @@ interface FeedDao {
                 -- all items
                 select $ID_ALL_FEEDS as id, '' as display_title, '' as tag, '' as image_url, coalesce(sum(unread), 0) as unread_count, 0 as expanded, 0 as sort_section, 0 as sort_tag_or_feed
                 from feeds_with_items_for_nav_drawer
-                where feed_id not in ($PODCAST_FEED_IDS)
+                where :includePodcasts or feed_id not in ($PODCAST_FEED_IDS)
                 -- starred
                 union
                 select $ID_SAVED_ARTICLES as id, '' as display_title, '' as tag, '' as image_url, sum(bookmarked) as unread_count, 0 as expanded, 1 as sort_section, 0 as sort_tag_or_feed
@@ -173,7 +173,10 @@ interface FeedDao {
             order by sort_section, tag, sort_tag_or_feed, display_title collate nocase
         """,
     )
-    fun getPagedNavDrawerItems(expandedTags: Set<String>): PagingSource<Int, FeedUnreadCount>
+    fun getPagedNavDrawerItems(
+        expandedTags: Set<String>,
+        includePodcasts: Boolean,
+    ): PagingSource<Int, FeedUnreadCount>
 
     @Query("UPDATE feeds SET notify = :notify WHERE id IS :id")
     suspend fun setNotify(

@@ -196,6 +196,7 @@ class OpmlWriterKtTest {
               <feeder:setting key="pref_sync_only_charging" value="true"/>
               <feeder:setting key="pref_sync_only_wifi" value="false"/>
               <feeder:setting key="pref_episodes_only_wifi" value="true"/>
+              <feeder:setting key="pref_podcasts_in_all_feeds" value="false"/>
               <feeder:setting key="pref_sync_freq" value="720"/>
               <feeder:setting key="pref_sync_on_resume" value="true"/>
               <feeder:setting key="pref_img_only_wifi" value="true"/>
@@ -263,6 +264,7 @@ class OpmlWriterKtTest {
                         UserSettings.SETTING_SYNC_ON_RESUME -> "true"
                         UserSettings.SETTING_SYNC_ONLY_WIFI -> "false"
                         UserSettings.SETTING_EPISODES_ONLY_WIFI -> "true"
+                        UserSettings.SETTING_PODCASTS_IN_ALL_FEEDS -> "false"
                         UserSettings.SETTING_IMG_ONLY_WIFI -> "true"
                         UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
                         UserSettings.SETTING_OPEN_ADJACENT -> "true"

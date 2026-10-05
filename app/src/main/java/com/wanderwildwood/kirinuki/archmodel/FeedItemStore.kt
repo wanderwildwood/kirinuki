@@ -63,6 +63,7 @@ class FeedItemStore(
         minReadTime: Instant,
         filter: FeedListFilter,
         search: String,
+        includePodcasts: Boolean = false,
     ): Flow<Int> {
         val queryString = StringBuilder()
         val args = mutableListOf<Any?>()
@@ -72,7 +73,7 @@ class FeedItemStore(
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
 
-            rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts)
         }
 
         return dao.getPreviewsCount(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
@@ -85,6 +86,7 @@ class FeedItemStore(
         newestFirst: Boolean,
         filter: FeedListFilter,
         search: String,
+        includePodcasts: Boolean = false,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config =
@@ -103,7 +105,7 @@ class FeedItemStore(
                 append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
                 append("WHERE\n")
 
-                rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
+                rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts)
 
                 when (newestFirst) {
                     true -> append("ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC\n")
@@ -125,6 +127,7 @@ class FeedItemStore(
         minReadTime: Instant,
         feedId: Long,
         tag: String,
+        includePodcasts: Boolean,
     ) {
         val onlySavedArticles = feedId == ID_SAVED_ARTICLES
 
@@ -167,9 +170,10 @@ class FeedItemStore(
             onlySavedArticles -> append("AND bookmarked = 1\n")
             feedId > ID_UNSET -> append("AND feed_id IS ?\n").also { args.add(feedId) }
             tag.isNotEmpty() -> append("AND tag IS ?\n").also { args.add(tag) }
-            // Podcasts have their own row, and All feeds is the reading.
+            // Podcasts have their own row; All feeds is the reading, unless the reader has
+            // asked for the episodes to be shown in it too.
             feedId == ID_PODCASTS -> append("AND feed_id IN ($PODCAST_FEED_IDS)\n")
-            else -> append("AND feed_id NOT IN ($PODCAST_FEED_IDS)\n")
+            !includePodcasts -> append("AND feed_id NOT IN ($PODCAST_FEED_IDS)\n")
         }
     }
 
@@ -181,6 +185,7 @@ class FeedItemStore(
         minReadTime: Instant,
         descending: Boolean,
         cursor: FeedItemCursor,
+        includePodcasts: Boolean = false,
     ) {
         val queryString = StringBuilder()
         val args = mutableListOf<Any?>()
@@ -194,7 +199,7 @@ class FeedItemStore(
             append("SELECT feed_items.id FROM feed_items\n")
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
-            rawQueryFilter(filter, search, args, minReadTime, feedId, tag)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts)
             // this version of sqlite doesn't seem to support tuple comparisons
             append("and (\n")
 
@@ -301,8 +306,8 @@ class FeedItemStore(
         dao.markAllAsRead(tag)
     }
 
-    suspend fun markAllAsRead() {
-        dao.markAllAsReadExceptPodcasts()
+    suspend fun markAllAsRead(includePodcasts: Boolean = false) {
+        if (includePodcasts) dao.markAllAsRead() else dao.markAllAsReadExceptPodcasts()
     }
 
     suspend fun markAllPodcastsAsRead() {

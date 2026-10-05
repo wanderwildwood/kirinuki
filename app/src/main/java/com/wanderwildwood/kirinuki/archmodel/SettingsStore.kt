@@ -256,6 +256,15 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_EPISODES_ONLY_WIFI, value).apply()
     }
 
+    // Podcasts have their own row whatever this says. On, All feeds is everything together.
+    private val _podcastsInAllFeeds = MutableStateFlow(sp.getBoolean(PREF_PODCASTS_IN_ALL_FEEDS, false))
+    val podcastsInAllFeeds = _podcastsInAllFeeds.asStateFlow()
+
+    fun setPodcastsInAllFeeds(value: Boolean) {
+        _podcastsInAllFeeds.value = value
+        sp.edit().putBoolean(PREF_PODCASTS_IN_ALL_FEEDS, value).apply()
+    }
+
     fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
@@ -713,6 +722,7 @@ const val PREF_BLOCKLIST_APPLY_TO_LINKS = "pref_blocklist_apply_to_links"
 const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_EPISODES_ONLY_WIFI = "pref_episodes_only_wifi"
+const val PREF_PODCASTS_IN_ALL_FEEDS = "pref_podcasts_in_all_feeds"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
 const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
 
@@ -807,6 +817,7 @@ enum class UserSettings(
     SETTING_SYNC_ONLY_CHARGING(key = PREF_SYNC_ONLY_CHARGING),
     SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI),
     SETTING_EPISODES_ONLY_WIFI(key = PREF_EPISODES_ONLY_WIFI),
+    SETTING_PODCASTS_IN_ALL_FEEDS(key = PREF_PODCASTS_IN_ALL_FEEDS),
     SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ),
     SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME),
     SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI),

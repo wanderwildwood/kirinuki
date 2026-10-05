@@ -500,6 +500,8 @@
   <string name="episode_waiting_for_wifi">Waiting for wifi</string>
   <string name="episodes_only_on_wifi">Download episodes only on Wi-Fi</string>
   <string name="episodes_only_on_wifi_summary">Off, a podcast episode can download over mobile data. Playing streams over either.</string>
+  <string name="podcasts_in_all_feeds">Show podcasts in All feeds</string>
+  <string name="podcasts_in_all_feeds_summary">Episodes and articles together, newest first. Podcasts keep their own row either way.</string>
   <string name="episode_kept">On this phone</string>
   <string name="episode_remove_armed">Remove — tap again</string>
   <string name="episode_download_failed">Download failed</string>

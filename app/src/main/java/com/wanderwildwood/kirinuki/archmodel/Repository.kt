@@ -86,6 +86,9 @@ class Repository(
         minReadTime = Instant.now(),
         filter = emptyFeedListFilter,
         search = "",
+        // Read once rather than followed: the count is asked for afresh each time a list
+        // opens, which is the only place the setting can have changed since.
+        includePodcasts = settingsStore.podcastsInAllFeeds.value,
     )
 
     fun setCurrentFeedAndTag(
@@ -359,6 +362,8 @@ class Repository(
                 filter = feedListFilter,
                 search = search,
             )
+        }.combine(settingsStore.podcastsInAllFeeds) { args, includePodcasts ->
+            args.copy(includePodcasts = includePodcasts)
         }.flatMapLatest {
             feedItemStore.getPagedFeedItemsRaw(
                 feedId = it.feedId,
@@ -367,6 +372,7 @@ class Repository(
                 newestFirst = it.newestFirst,
                 filter = it.filter,
                 search = it.search,
+                includePodcasts = it.includePodcasts,
             )
         }
 
@@ -391,6 +397,8 @@ class Repository(
                 filter = feedListFilter,
                 search = search,
             )
+        }.combine(settingsStore.podcastsInAllFeeds) { args, includePodcasts ->
+            args.copy(includePodcasts = includePodcasts)
         }.flatMapLatest {
             feedItemStore.getFeedItemCountRaw(
                 feedId = it.feedId,
@@ -398,6 +406,7 @@ class Repository(
                 minReadTime = it.minReadTime,
                 filter = it.filter,
                 search = it.search,
+                includePodcasts = it.includePodcasts,
             )
         }
 
@@ -570,7 +579,7 @@ class Repository(
             feedId > ID_UNSET -> feedItemStore.markAllAsReadInFeed(feedId)
             tag.isNotBlank() -> feedItemStore.markAllAsReadInTag(tag)
             feedId == ID_PODCASTS -> feedItemStore.markAllPodcastsAsRead()
-            else -> feedItemStore.markAllAsRead()
+            else -> feedItemStore.markAllAsRead(includePodcasts = settingsStore.podcastsInAllFeeds.value)
         }
         setMinReadTime(Instant.now())
     }
@@ -588,6 +597,7 @@ class Repository(
             minReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
             cursor = cursor,
+            includePodcasts = settingsStore.podcastsInAllFeeds.value,
         )
     }
 
@@ -604,15 +614,22 @@ class Repository(
             minReadTime = minReadTime.value,
             descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
             cursor = cursor,
+            includePodcasts = settingsStore.podcastsInAllFeeds.value,
         )
     }
 
     val allTags: Flow<List<String>> = feedStore.allTags
 
     fun getPagedNavDrawerItems(): Flow<PagingData<FeedUnreadCount>> =
-        expandedTags.flatMapLatest {
-            feedStore.getPagedNavDrawerItems(it)
+        combine(expandedTags, settingsStore.podcastsInAllFeeds) { tags, includePodcasts ->
+            tags to includePodcasts
+        }.flatMapLatest { (tags, includePodcasts) ->
+            feedStore.getPagedNavDrawerItems(tags, includePodcasts)
         }
+
+    val podcastsInAllFeeds: StateFlow<Boolean> = settingsStore.podcastsInAllFeeds
+
+    fun setPodcastsInAllFeeds(value: Boolean) = settingsStore.setPodcastsInAllFeeds(value)
 
     val getUnreadBookmarksCount
         get() =
@@ -832,6 +849,7 @@ private data class FeedListArgs(
     val minReadTime: Instant,
     val filter: FeedListFilter,
     val search: String,
+    val includePodcasts: Boolean = false,
 )
 
 // Wrapper class because flow combine doesn't like nulls

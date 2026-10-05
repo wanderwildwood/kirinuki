@@ -68,7 +68,10 @@ class FeedStore(
 
     val feedForSettings: Flow<List<FeedForSettings>> = feedDao.loadFlowOfFeedsForSettings()
 
-    fun getPagedNavDrawerItems(expandedTags: Set<String>): Flow<PagingData<FeedUnreadCount>> =
+    fun getPagedNavDrawerItems(
+        expandedTags: Set<String>,
+        includePodcasts: Boolean,
+    ): Flow<PagingData<FeedUnreadCount>> =
         Pager(
             config =
                 PagingConfig(
@@ -78,7 +81,7 @@ class FeedStore(
                     jumpThreshold = 50,
                 ),
         ) {
-            feedDao.getPagedNavDrawerItems(expandedTags)
+            feedDao.getPagedNavDrawerItems(expandedTags, includePodcasts)
         }.flow
 
     fun getFeedTitles(
