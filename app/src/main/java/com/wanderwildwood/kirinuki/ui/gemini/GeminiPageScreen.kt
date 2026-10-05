@@ -1,5 +1,7 @@
 package com.wanderwildwood.kirinuki.ui.gemini
 
+import com.wanderwildwood.kirinuki.ui.compose.utils.textActions
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -89,6 +91,8 @@ fun GeminiPageScreen(
                     .fillMaxSize()
                     .padding(padding),
         ) {
+            // Selectable, with the shop's selection menu and its ⋮ (TextActions.kt), as in the reader.
+            SelectionContainer(modifier = Modifier.textActions()) {
             LazyColumnMMD(
                 state = listState,
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -133,6 +137,7 @@ fun GeminiPageScreen(
                             },
                         )
                 }
+            }
             }
 
             // Last, so it is on top: the edges take their taps before the text

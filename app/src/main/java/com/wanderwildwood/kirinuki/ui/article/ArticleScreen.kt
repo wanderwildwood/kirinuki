@@ -1,5 +1,7 @@
 package com.wanderwildwood.kirinuki.ui.article
 
+import com.wanderwildwood.kirinuki.ui.compose.utils.textActions
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -149,6 +151,10 @@ fun ArticleScreen(
         ) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                 CompositionLocalProvider(LocalLineFence provides lineFence) {
+                    // Selectable again, as it was before the MMD rebuild dropped it: a word in an
+                    // article is what Define and Note are most often wanted for. The menu over a
+                    // selection is the shop's, with its ⋮ given back (TextActions.kt).
+                    SelectionContainer(modifier = Modifier.textActions()) {
                     LazyColumnMMD(
                         state = listState,
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
@@ -210,6 +216,7 @@ fun ArticleScreen(
                                     )
                                 }
                         }
+                    }
                     }
                 }
 
