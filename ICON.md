@@ -1,5 +1,10 @@
 # The icon
 
+The launcher now shows `app/src/main/res/drawable/ic_launcher_mudita.xml`: a plain 81×81
+vector in the style of the Kompakt's own apps, a ring with the glyph inside, black on
+transparent, drawn the way the stock icons are so the launcher shows it unmasked. What
+follows is about the earlier drawing, which stays in the repo.
+
 切抜 — a column cut out of a page with scissors. It lives in
 `app/src/main/res/drawable/ic_launcher_foreground.xml`.
 
