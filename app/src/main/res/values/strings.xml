@@ -219,7 +219,7 @@
   <string name="new_indicator">New</string>
 
   <string name="permission_read_desc">Allows the application to read feeds and articles</string>
-  <string name="permission_read_label">Clippings read-only access</string>
+  <string name="permission_read_label">Feeds read-only access</string>
 
   <string name="explanation_permission_notifications">Permission must be granted before notifications can be enabled.</string>
   <string name="article_image">Article image</string>
@@ -413,8 +413,8 @@
   <string name="imported_feeds_from_opml">Feeds imported.</string>
   <!-- gemini -->
   <string name="gemini_not_gemtext">This is not a page of text, so there is nothing to read here.</string>
-  <string name="gemini_wants_input">This page is asking a question, and Clippings cannot answer one yet.</string>
-  <string name="gemini_wants_certificate">This page wants a certificate to identify you, which Clippings does not have.</string>
+  <string name="gemini_wants_input">This page is asking a question, and Feeds cannot answer one yet.</string>
+  <string name="gemini_wants_certificate">This page wants a certificate to identify you, which Feeds does not have.</string>
   <string name="gemini_refused">The capsule refused, with code %1$d.</string>
   <!-- Settings: the certificates remembered for Gemini capsules, one row per capsule -->
   <string name="capsule_certificates">Capsule certificates</string>
@@ -447,7 +447,7 @@
   <!-- Off by default, and the row says why: this app renders the article itself, and the
        Kompakt as it ships has nothing that opens a web page. Shown only where one exists. -->
   <string name="open_title_in_browser">Open the title in a browser</string>
-  <string name="open_title_in_browser_detail">The article title opens the page it came from. Off by default: Clippings renders the article itself.</string>
+  <string name="open_title_in_browser_detail">The article title opens the page it came from. Off by default: Feeds renders the article itself.</string>
   <string name="open_title_in_browser_no_browser">Nothing on this phone opens a web page, so there is nowhere for the title to go.</string>
   <string name="feed_folder">Folder</string>
   <string name="full_text_by_default">Always fetch the whole article</string>
@@ -466,7 +466,7 @@
     <string name="about">About</string>
   <!-- The About dialog -->
   <!-- Heading. %1$s is the version number, e.g. 0.3.2 -->
-  <string name="about_title">Clippings %1$s</string>
+  <string name="about_title">Feeds %1$s</string>
   <string name="about_what">A reader for feeds and for the smolnet — Gemini, gopher and Spartan. Text on paper, no images, and everything kept on the phone.</string>
   <string name="about_privacy">It fetches the feeds and the pages you point it at, from the addresses you gave it, and nothing else. There is no account, no tracking, and nothing is sent anywhere on your behalf.</string>
   <string name="about_built_on">Built on Feeder by Jonas Kalderstam. Full-text extraction by Readability4J.</string>

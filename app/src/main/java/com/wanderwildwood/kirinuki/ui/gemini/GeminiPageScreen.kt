@@ -129,7 +129,7 @@ fun GeminiPageScreen(
                                 // A smolnet link stays in the app. Anything else is somebody
                                 // else's protocol and goes to whatever handles it -- a gopher
                                 // menu can point at the web, and often does.
-                                // A capsule may link out to the web. Clippings cannot follow
+                                // A capsule may link out to the web. Feeds cannot follow
                                 // that anywhere sane on this phone, so it is text, not a link.
                                 if (isSmolnetUrl(target)) {
                                     onFollow(target)

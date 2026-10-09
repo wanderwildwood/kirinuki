@@ -763,7 +763,7 @@ fun LinearText.toAnnotatedString(
             }
 
             is LinearTextAnnotationLink -> {
-                // Only a link Clippings can follow itself is drawn as one. A web address
+                // Only a link Feeds can follow itself is drawn as one. A web address
                 // has nowhere to go on this phone -- the only handler registered for http
                 // is the AOSP WebView test shell -- so it stays as the words it was, rather
                 // than as something that looks tappable and then is not.

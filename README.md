@@ -1,4 +1,4 @@
-# 切抜 kirinuki — Clippings
+# 切抜 kirinuki — Feeds
 
 A reader for the [Mudita Kompakt](https://mudita.com/products/kompakt/), built for its
 E Ink screen: text on paper, no images, and everything kept on the phone. Feeds, and the
@@ -29,7 +29,7 @@ Three screens. The feeds, what is in one, and the thing itself.
   redraw to say less than the headline did, and a page that drags in a site's own CSS is
   unreadable on this screen.
 - **OPML in and out.** How you arrive with feeds, and how you leave with them.
-- **Save a single page.** Share an article's link to Clippings, or type it into Add feed,
+- **Save a single page.** Share an article's link to Feeds, or type it into Add feed,
   and choose **Save the page**. The whole article is fetched and kept under **Pages** and
   in Saved articles, to read offline like anything else. With no network it is fetched on
   the next sync.
@@ -62,7 +62,7 @@ an article, with its show notes as the text and the player along the bottom.
 ## The smolnet
 
 `gemini://`, `gopher://` and `spartan://` open in the app and read like anything else.
-Nothing else on the phone opens them, so Clippings offers to — a capsule link tapped or
+Nothing else on the phone opens them, so Feeds offers to — a capsule link tapped or
 shared anywhere arrives here.
 
 - **Subscribe to a gemlog.** Gemini has no feed format; the convention is that a page *is*
@@ -80,7 +80,7 @@ shared anywhere arrives here.
 
 ## What it will not do for you
 
-Most feeds carry a summary rather than the whole article. Clippings will fetch the full
+Most feeds carry a summary rather than the whole article. Feeds will fetch the full
 text from the page and keep it beside the summary — and that fetch is genuinely unreliable,
 because it depends on a stranger's markup. When it fails, the screen says so and gives you
 back the summary. It does not show you half an article as though it were whole.
@@ -105,7 +105,7 @@ Android 12 (API 31) or newer.
 ## On a Mudita Kompakt
 
 DuraSpeed, a MediaTek service on the Kompakt, closes installed apps a few minutes after the
-screen goes dark and keeps them closed until they are opened again. For Clippings that means
+screen goes dark and keeps them closed until they are opened again. For Feeds that means
 feeds are not refreshed in the background. Mudita's own apps are on its allow list; this one has
 to be added, once.
 
@@ -118,7 +118,7 @@ and Whereabouts each have a button that goes there; without either, from a compu
 Then, on the phone:
 
 1. Tap **Open** on DuraSpeed's App info page.
-2. Switch **Clippings** on in the list. **On means allowed** to run in the background, which is
+2. Switch **Feeds** on in the list. **On means allowed** to run in the background, which is
    easy to read the wrong way round. Switching DuraSpeed off at the top works too, for every app.
 
 ## Building it

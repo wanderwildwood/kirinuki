@@ -196,7 +196,7 @@ fun ArticleScreen(
                             TextToDisplay.CONTENT ->
                                 linearArticleContent(
                                     articleContent = content,
-                                    // Clippings hands nothing to the system. A stock Kompakt has no
+                                    // Feeds hands nothing to the system. A stock Kompakt has no
                                     // browser -- only the AOSP WebView test shell is registered for http --
                                     // so an external open is a crash waiting to happen rather than a way
                                     // out. The renderer only makes followable links tappable; this is the
