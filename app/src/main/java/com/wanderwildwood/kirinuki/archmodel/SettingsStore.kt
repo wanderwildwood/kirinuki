@@ -538,8 +538,19 @@ class SettingsStore(
     }
 
     private val _syncFrequency by lazy {
+        // Feeds are fetched when the reader asks, not on a timer. Until 0.4.9 the default was
+        // every hour, and with a few dozen podcast feeds each of those runs kept the processor
+        // busy for minutes -- most of a day's battery on a Kompakt. Anyone still on that old
+        // default is moved to Manually once; a reader who wants a timer can set one again.
+        if (!sp.getBoolean(PREF_SYNC_FREQ_MANUAL_DEFAULT, false)) {
+            val editor = sp.edit()
+            if (sp.getString(PREF_SYNC_FREQ, null) == "60") {
+                editor.remove(PREF_SYNC_FREQ)
+            }
+            editor.putBoolean(PREF_SYNC_FREQ_MANUAL_DEFAULT, true).apply()
+        }
         MutableStateFlow(
-            syncFrequencyFromString(sp.getStringNonNull(PREF_SYNC_FREQ, "60")),
+            syncFrequencyFromString(sp.getStringNonNull(PREF_SYNC_FREQ, "-1")),
         )
     }
     val syncFrequency = _syncFrequency.asStateFlow()
@@ -724,6 +735,7 @@ const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_EPISODES_ONLY_WIFI = "pref_episodes_only_wifi"
 const val PREF_PODCASTS_IN_ALL_FEEDS = "pref_podcasts_in_all_feeds"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
+const val PREF_SYNC_FREQ_MANUAL_DEFAULT = "pref_sync_freq_manual_default"
 const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
 
 /**

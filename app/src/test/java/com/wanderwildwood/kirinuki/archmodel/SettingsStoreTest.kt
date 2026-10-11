@@ -47,7 +47,7 @@ class SettingsStoreTest : DIAware {
         every { sp.getString(PREF_DARK_THEME, null) } returns null
         every { sp.getString(PREF_SORT, null) } returns null
         every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns null
-        every { sp.getString(PREF_SYNC_FREQ, "60") } returns null
+        every { sp.getString(PREF_SYNC_FREQ, "-1") } returns null
         every { sp.getBoolean(PREF_BLOCKLIST_APPLY_TO_SUMMARIES, false) } returns false
         // Incorrect value by design
         every {

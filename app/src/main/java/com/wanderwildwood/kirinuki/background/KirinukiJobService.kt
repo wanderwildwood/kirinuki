@@ -5,6 +5,8 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
+import com.wanderwildwood.kirinuki.archmodel.Repository
+import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.base.DIAwareJobService
 import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.Job
@@ -13,6 +15,7 @@ import org.kodein.di.instance
 
 class KirinukiJobService : DIAwareJobService() {
     private val notificationManager: NotificationManagerCompat by instance()
+    private val repository: Repository by instance()
 
     private val coroutineScope = BackgroundCoroutineScope()
     private val jobs: MutableMap<Int, Job> = mutableMapOf()
@@ -45,7 +48,14 @@ class KirinukiJobService : DIAwareJobService() {
                 runJob(RssSyncJob(context = this, params = params))
             }
             BackgroundJobId.RSS_SYNC_PERIODIC.jobId -> {
-                runJob(RssSyncJob(context = this, params = params))
+                // A timer scheduled by an older version, before the reader turned it off or
+                // before Manually became the default. Cancel it rather than fetch.
+                if (repository.syncFrequency.value == SyncFrequency.MANUAL) {
+                    schedulePeriodicRssSync(di = di, replace = true)
+                    false
+                } else {
+                    runJob(RssSyncJob(context = this, params = params))
+                }
             }
             BackgroundJobId.FULL_TEXT_SYNC.jobId -> {
                 runJob(FullTextSyncJob(context = this, params = params))
