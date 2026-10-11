@@ -101,6 +101,7 @@ fun GeminiPageScreen(
                 // measured off the screen rather than counted in items.
                 scrollStep = rememberReaderScrollStep(listState),
                 modifier = Modifier.fillMaxSize(),
+                isScrollbarVisible = false,
             ) {
                 when (val current = state) {
                     is GeminiPageState.Loading ->

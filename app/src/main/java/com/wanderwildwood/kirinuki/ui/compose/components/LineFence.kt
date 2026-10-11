@@ -18,10 +18,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import java.util.WeakHashMap
 
 /**
@@ -131,19 +128,15 @@ fun rememberFencedText(): FencedText {
 }
 
 /**
- * Covers the line the bottom of the reader cuts, leaving the scrollbar's column alone.
+ * Covers the line the bottom of the reader cuts.
  *
  * Drawn only: a Canvas takes no touches, so a link above it is still a link and the page-turning
  * edges still turn the page.
  */
 @Composable
-fun BoxScope.LineFenceCover(
-    fence: LineFence,
-    scrollbarColumn: Dp = 40.dp,
-) {
+fun BoxScope.LineFenceCover(fence: LineFence) {
     var box by remember { mutableStateOf<LayoutCoordinates?>(null) }
     val background = MaterialTheme.colorScheme.background
-    val scrollbarPx = with(LocalDensity.current) { scrollbarColumn.toPx() }
     Canvas(
         modifier =
             Modifier
@@ -159,7 +152,7 @@ fun BoxScope.LineFenceCover(
         drawRect(
             color = background,
             topLeft = Offset(0f, from),
-            size = Size((size.width - scrollbarPx).coerceAtLeast(0f), size.height - from),
+            size = Size(size.width, size.height - from),
         )
     }
 }

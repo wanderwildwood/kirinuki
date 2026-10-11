@@ -164,6 +164,7 @@ fun ArticleScreen(
                         // and the ones that did not fit were being stepped straight past.
                         scrollStep = rememberReaderScrollStep(listState),
                         modifier = Modifier.fillMaxSize(),
+                        isScrollbarVisible = false,
                     ) {
                         item {
                             // The body is bodyLarge through ProvideScaledText, and the title was the

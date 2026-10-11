@@ -109,6 +109,7 @@ fun ArticleListScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(padding),
+            isScrollbarVisible = false,
         ) {
             items(
                 count = items.itemCount,
