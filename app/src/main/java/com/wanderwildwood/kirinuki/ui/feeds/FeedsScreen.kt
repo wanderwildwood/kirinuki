@@ -33,6 +33,8 @@ import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.PODCASTS_EXPANDED_KEY
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
+import com.wanderwildwood.kirinuki.ui.ListJump
+import com.wanderwildwood.kirinuki.ui.ListJumpBox
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
@@ -105,49 +107,48 @@ fun FeedsScreen(
             return@Scaffold
         }
 
-        LazyColumnMMD(
-            state = listState,
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-            isScrollbarVisible = false,
-        ) {
-            items(
-                count = items.itemCount,
-                key = { index -> items.peek(index)?.let { "${it.id}/${it.tag}" } ?: index },
-            ) { index ->
-                val item = items[index] ?: return@items
-                // The Podcasts row opens like a folder: tapped, every episode; its +, the shows.
-                val isPodcasts = item.id == ID_PODCASTS
-                FeedRow(
-                    item = item,
-                    expanded =
-                        if (isPodcasts) PODCASTS_EXPANDED_KEY in expandedTags else item.tag in expandedTags,
-                    onClick = {
-                        when {
-                            item.id == ID_UNSET && item.tag.isNotEmpty() -> {
-                                viewModel.open(feedId = ID_UNSET, tag = item.tag)
-                                onOpenFeed()
+        // Neither list is in one run of names, so page dots rather than letters.
+        ListJumpBox(listState, ListJump.Pages, Modifier.padding(padding)) {
+            LazyColumnMMD(
+                state = listState,
+                isScrollbarVisible = false,
+            ) {
+                items(
+                    count = items.itemCount,
+                    key = { index -> items.peek(index)?.let { "${it.id}/${it.tag}" } ?: index },
+                ) { index ->
+                    val item = items[index] ?: return@items
+                    // The Podcasts row opens like a folder: tapped, every episode; its +, the shows.
+                    val isPodcasts = item.id == ID_PODCASTS
+                    FeedRow(
+                        item = item,
+                        expanded =
+                            if (isPodcasts) PODCASTS_EXPANDED_KEY in expandedTags else item.tag in expandedTags,
+                        onClick = {
+                            when {
+                                item.id == ID_UNSET && item.tag.isNotEmpty() -> {
+                                    viewModel.open(feedId = ID_UNSET, tag = item.tag)
+                                    onOpenFeed()
+                                }
+                                else -> {
+                                    viewModel.open(feedId = item.id, tag = item.tag)
+                                    onOpenFeed()
+                                }
                             }
-                            else -> {
-                                viewModel.open(feedId = item.id, tag = item.tag)
-                                onOpenFeed()
-                            }
-                        }
-                    },
-                    onToggleTag = {
-                        viewModel.toggleTagExpansion(if (isPodcasts) PODCASTS_EXPANDED_KEY else item.tag)
-                    },
-                    // A tag, All feeds and Saved articles are not feeds, so there is
-                    // nothing to edit on those rows either.
-                    onEdit =
-                        when {
-                            item.id > ID_UNSET -> ({ onEditFeed(item.id) })
-                            else -> null
                         },
-                )
-                HorizontalDividerMMD()
+                        onToggleTag = {
+                            viewModel.toggleTagExpansion(if (isPodcasts) PODCASTS_EXPANDED_KEY else item.tag)
+                        },
+                        // A tag, All feeds and Saved articles are not feeds, so there is
+                        // nothing to edit on those rows either.
+                        onEdit =
+                            when {
+                                item.id > ID_UNSET -> ({ onEditFeed(item.id) })
+                                else -> null
+                            },
+                    )
+                    HorizontalDividerMMD()
+                }
             }
         }
     }

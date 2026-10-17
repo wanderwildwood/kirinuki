@@ -27,6 +27,8 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.FeedType
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.FeedListItem
+import com.wanderwildwood.kirinuki.ui.ListJump
+import com.wanderwildwood.kirinuki.ui.ListJumpBox
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
@@ -117,29 +119,28 @@ fun ArticleListScreen(
             return@Scaffold
         }
 
-        LazyColumnMMD(
-            state = listState,
-            modifier =
-                Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-            isScrollbarVisible = false,
-        ) {
-            items(
-                count = items.itemCount,
-                key = { index -> items.peek(index)?.id ?: index },
-            ) { index ->
-                val item = items[index] ?: return@items
-                ArticleRow(
-                    item = item,
-                    showFeedName = showFeedName,
-                    onClick = {
-                        viewModel.open(item.id)
-                        viewModel.markAsOpened(item.id)
-                        onOpenArticle()
-                    },
-                )
-                HorizontalDividerMMD()
+        // Neither list is in one run of names, so page dots rather than letters.
+        ListJumpBox(listState, ListJump.Pages, Modifier.padding(padding)) {
+            LazyColumnMMD(
+                state = listState,
+                isScrollbarVisible = false,
+            ) {
+                items(
+                    count = items.itemCount,
+                    key = { index -> items.peek(index)?.id ?: index },
+                ) { index ->
+                    val item = items[index] ?: return@items
+                    ArticleRow(
+                        item = item,
+                        showFeedName = showFeedName,
+                        onClick = {
+                            viewModel.open(item.id)
+                            viewModel.markAsOpened(item.id)
+                            onOpenArticle()
+                        },
+                    )
+                    HorizontalDividerMMD()
+                }
             }
         }
     }
