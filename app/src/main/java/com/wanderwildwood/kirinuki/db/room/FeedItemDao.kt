@@ -375,6 +375,10 @@ interface FeedItemDao {
         readTime: Instant = Instant.now(),
     )
 
+    /** A podcast is a feed with any audio episode, as [PODCAST_FEED_IDS] has it. */
+    @Query("SELECT EXISTS(SELECT 1 FROM feed_items WHERE feed_id IS :feedId AND enclosure_type LIKE 'audio/%')")
+    fun isPodcastFeed(feedId: Long): Flow<Boolean>
+
     @Query("UPDATE feed_items SET read_time = null WHERE id IS :id")
     suspend fun markAsUnread(id: Long)
 

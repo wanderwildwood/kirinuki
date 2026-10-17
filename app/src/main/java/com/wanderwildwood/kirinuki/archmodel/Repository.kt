@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
@@ -364,6 +365,8 @@ class Repository(
             )
         }.combine(settingsStore.podcastsInAllFeeds) { args, includePodcasts ->
             args.copy(includePodcasts = includePodcasts)
+        }.combine(settingsStore.podcastsUnplayedOnly) { args, unplayedOnly ->
+            args.copy(unplayedOnly = unplayedOnly)
         }.flatMapLatest {
             feedItemStore.getPagedFeedItemsRaw(
                 feedId = it.feedId,
@@ -373,6 +376,7 @@ class Repository(
                 filter = it.filter,
                 search = it.search,
                 includePodcasts = it.includePodcasts,
+                unplayedOnly = it.unplayedOnly,
             )
         }
 
@@ -399,6 +403,8 @@ class Repository(
             )
         }.combine(settingsStore.podcastsInAllFeeds) { args, includePodcasts ->
             args.copy(includePodcasts = includePodcasts)
+        }.combine(settingsStore.podcastsUnplayedOnly) { args, unplayedOnly ->
+            args.copy(unplayedOnly = unplayedOnly)
         }.flatMapLatest {
             feedItemStore.getFeedItemCountRaw(
                 feedId = it.feedId,
@@ -407,6 +413,7 @@ class Repository(
                 filter = it.filter,
                 search = it.search,
                 includePodcasts = it.includePodcasts,
+                unplayedOnly = it.unplayedOnly,
             )
         }
 
@@ -499,6 +506,38 @@ class Repository(
             }
         }
     }
+
+    /**
+     * An article is read the moment it is opened. An episode is not: opening it is how it is
+     * played, and played is what read means for an episode -- heard to the end, or marked so.
+     */
+    suspend fun markAsOpened(itemId: Long) {
+        val item = feedItemStore.loadFeedItemWithFeed(itemId) ?: return
+        if (!Article(item).enclosure.isAudio) markAsReadAndNotified(itemId)
+    }
+
+    /** Played or not, by hand. The same read time an article has, so counts and lists agree. */
+    suspend fun setPlayed(
+        itemId: Long,
+        played: Boolean,
+    ) {
+        if (played) markAsReadAndNotified(itemId) else markAsUnread(itemId)
+    }
+
+    val podcastsUnplayedOnly: StateFlow<Boolean> = settingsStore.podcastsUnplayedOnly
+
+    fun setPodcastsUnplayedOnly(value: Boolean) = settingsStore.setPodcastsUnplayedOnly(value)
+
+    /** The Podcasts row, or one podcast: the lists where "only unplayed" means something. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val currentListIsPodcasts: Flow<Boolean> =
+        currentFeedAndTag.flatMapLatest { (feedId, _) ->
+            when {
+                feedId == ID_PODCASTS -> flowOf(true)
+                feedId > ID_UNSET -> feedItemStore.isPodcastFeed(feedId)
+                else -> flowOf(false)
+            }
+        }
 
     suspend fun markAsUnread(itemId: Long) {
         feedItemStore.markAsUnread(itemId)
@@ -598,6 +637,7 @@ class Repository(
             descending = SortingOptions.NEWEST_FIRST != currentSorting.value,
             cursor = cursor,
             includePodcasts = settingsStore.podcastsInAllFeeds.value,
+            unplayedOnly = settingsStore.podcastsUnplayedOnly.value,
         )
     }
 
@@ -615,6 +655,7 @@ class Repository(
             descending = SortingOptions.NEWEST_FIRST == currentSorting.value,
             cursor = cursor,
             includePodcasts = settingsStore.podcastsInAllFeeds.value,
+            unplayedOnly = settingsStore.podcastsUnplayedOnly.value,
         )
     }
 
@@ -850,6 +891,7 @@ private data class FeedListArgs(
     val filter: FeedListFilter,
     val search: String,
     val includePodcasts: Boolean = false,
+    val unplayedOnly: Boolean = false,
 )
 
 // Wrapper class because flow combine doesn't like nulls
@@ -918,6 +960,7 @@ data class Article(
     val feedId: Long = item?.feedId ?: ID_UNSET
     val feedUrl: String? = item?.feedUrl?.toString()
     val bookmarked: Boolean = item?.bookmarked ?: false
+    val unread: Boolean = item?.readTime == null
     val fullTextByDefault: Boolean = item?.fullTextByDefault ?: false
     val wordCount: Int = item?.wordCount ?: 0
     val wordCountFull: Int = item?.wordCountFull ?: 0

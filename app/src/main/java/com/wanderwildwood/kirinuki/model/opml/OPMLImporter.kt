@@ -72,6 +72,7 @@ open class OPMLImporter(
             UserSettings.SETTING_SYNC_ONLY_WIFI -> settingsStore.setSyncOnlyOnWifi(value.toBoolean())
             UserSettings.SETTING_EPISODES_ONLY_WIFI -> settingsStore.setEpisodesOnlyOnWifi(value.toBoolean())
             UserSettings.SETTING_PODCASTS_IN_ALL_FEEDS -> settingsStore.setPodcastsInAllFeeds(value.toBoolean())
+            UserSettings.SETTING_PODCASTS_UNPLAYED_ONLY -> settingsStore.setPodcastsUnplayedOnly(value.toBoolean())
             UserSettings.SETTING_SYNC_FREQ ->
                 settingsStore.setSyncFrequency(
                     syncFrequencyFromString(value),

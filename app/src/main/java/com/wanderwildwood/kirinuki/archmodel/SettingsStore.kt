@@ -265,6 +265,15 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_PODCASTS_IN_ALL_FEEDS, value).apply()
     }
 
+    // A podcast list shows every episode until asked to show only the ones not yet played.
+    private val _podcastsUnplayedOnly = MutableStateFlow(sp.getBoolean(PREF_PODCASTS_UNPLAYED_ONLY, false))
+    val podcastsUnplayedOnly = _podcastsUnplayedOnly.asStateFlow()
+
+    fun setPodcastsUnplayedOnly(value: Boolean) {
+        _podcastsUnplayedOnly.value = value
+        sp.edit().putBoolean(PREF_PODCASTS_UNPLAYED_ONLY, value).apply()
+    }
+
     fun setSyncOnlyOnWifi(value: Boolean) {
         _syncOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_SYNC_ONLY_WIFI, value).apply()
@@ -734,6 +743,7 @@ const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_EPISODES_ONLY_WIFI = "pref_episodes_only_wifi"
 const val PREF_PODCASTS_IN_ALL_FEEDS = "pref_podcasts_in_all_feeds"
+const val PREF_PODCASTS_UNPLAYED_ONLY = "pref_podcasts_unplayed_only"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
 const val PREF_SYNC_FREQ_MANUAL_DEFAULT = "pref_sync_freq_manual_default"
 const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"
@@ -830,6 +840,7 @@ enum class UserSettings(
     SETTING_SYNC_ONLY_WIFI(key = PREF_SYNC_ONLY_WIFI),
     SETTING_EPISODES_ONLY_WIFI(key = PREF_EPISODES_ONLY_WIFI),
     SETTING_PODCASTS_IN_ALL_FEEDS(key = PREF_PODCASTS_IN_ALL_FEEDS),
+    SETTING_PODCASTS_UNPLAYED_ONLY(key = PREF_PODCASTS_UNPLAYED_ONLY),
     SETTING_SYNC_FREQ(key = PREF_SYNC_FREQ),
     SETTING_SYNC_ON_RESUME(key = PREF_SYNC_ON_RESUME),
     SETTING_IMG_ONLY_WIFI(key = PREF_IMG_ONLY_WIFI),

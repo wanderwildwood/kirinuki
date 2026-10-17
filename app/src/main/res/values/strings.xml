@@ -493,6 +493,12 @@
   <string name="episode_sleep_minutes">%d min</string>
   <string name="episode_not_started">Not started</string>
   <string name="episode_heard">Heard</string>
+  <string name="mark_played">Mark played</string>
+  <string name="mark_unplayed">Mark unplayed</string>
+  <string name="mark_all_as_played">Mark all as played</string>
+  <string name="show_only_unplayed">Show only unplayed episodes</string>
+  <string name="show_played_episodes">Show played episodes too</string>
+  <string name="nothing_unplayed">No unplayed episodes.</string>
   <string name="episode_position_of">%1$s of %2$s</string>
   <string name="episode_keep">Download</string>
   <string name="episode_downloading">Downloading</string>

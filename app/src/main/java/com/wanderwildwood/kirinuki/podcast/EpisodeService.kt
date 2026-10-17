@@ -16,8 +16,15 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.wanderwildwood.kirinuki.ApplicationCoroutineScope
 import com.wanderwildwood.kirinuki.R
+import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.ui.MainActivity
+import kotlinx.coroutines.launch
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.android.closestDI
+import org.kodein.di.instance
 
 /**
  * Plays an episode, with the screen off and the app closed.
@@ -29,7 +36,13 @@ import com.wanderwildwood.kirinuki.ui.MainActivity
  *
  * The same shape as mimidoku's player, cut down to what one episode at a time needs.
  */
-class EpisodeService : MediaSessionService() {
+class EpisodeService :
+    MediaSessionService(),
+    DIAware {
+    override val di: DI by closestDI()
+    private val repository: Repository by instance()
+    private val appScope: ApplicationCoroutineScope by instance()
+
     private var player: ExoPlayer? = null
     private var session: MediaSession? = null
     private lateinit var store: EpisodeStore
@@ -91,7 +104,12 @@ class EpisodeService : MediaSessionService() {
 
                 override fun onPlaybackStateChanged(playbackState: Int) {
                     if (playbackState == Player.STATE_ENDED) {
-                        currentItemId()?.let(store::markFinished)
+                        currentItemId()?.let { id ->
+                            store.markFinished(id)
+                            // Heard to the end is played: the episode leaves the count and,
+                            // when the list is showing only what is left, the list.
+                            appScope.launch { repository.setPlayed(id, played = true) }
+                        }
                     }
                 }
             },

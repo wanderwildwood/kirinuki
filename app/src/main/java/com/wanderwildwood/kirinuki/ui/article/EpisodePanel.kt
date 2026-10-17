@@ -37,6 +37,7 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionToken
@@ -127,6 +128,8 @@ fun EpisodePanel(
     fun playOrPause() {
         val c = controller ?: return
         if (isThis && c.playerError == null) {
+            // Heard to the end and still loaded: Play starts it over rather than doing nothing.
+            if (c.playbackState == Player.STATE_ENDED) c.seekTo(0L)
             if (c.isPlaying) c.pause() else c.play()
             return
         }

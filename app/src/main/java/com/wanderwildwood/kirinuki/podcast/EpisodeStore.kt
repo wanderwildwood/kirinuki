@@ -54,6 +54,11 @@ class EpisodeStore(
         removeDownload(itemId)
     }
 
+    /** Marked unplayed: "heard" no longer stands, and it starts again from the beginning. */
+    fun clearFinished(itemId: Long) {
+        prefs.edit { remove(FINISHED + itemId) }
+    }
+
     /** One speed for every episode: a listener who likes 1.5x likes it for all of them. */
     var speed: Float
         get() = prefs.getFloat(SPEED, 1f)

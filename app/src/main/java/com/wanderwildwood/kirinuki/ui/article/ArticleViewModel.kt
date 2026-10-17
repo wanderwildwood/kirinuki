@@ -17,6 +17,7 @@ import com.wanderwildwood.kirinuki.model.gemtext.GemtextParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import com.wanderwildwood.kirinuki.net.isGeminiUrl
+import com.wanderwildwood.kirinuki.podcast.EpisodeStore
 import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
@@ -91,6 +92,18 @@ class ArticleViewModel(
         val current = article.value ?: return
         viewModelScope.launch {
             repository.setBookmarked(itemId = current.id, bookmarked = !current.bookmarked)
+        }
+    }
+
+    /**
+     * An episode played or not, by hand. Unplayed also forgets that it was heard to the end,
+     * so the panel offers it from the start again rather than saying "Heard".
+     */
+    fun togglePlayed() {
+        val current = article.value ?: return
+        viewModelScope.launch {
+            repository.setPlayed(itemId = current.id, played = current.unread)
+            if (!current.unread) EpisodeStore(getApplication<Application>()).clearFinished(current.id)
         }
     }
 

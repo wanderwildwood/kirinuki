@@ -47,6 +47,8 @@ fun ArticleListScreen(
     val screenTitle by viewModel.screenTitle.collectAsStateWithLifecycle(initialValue = null)
     val (openFeedId, _) = viewModel.currentFeedAndTag.collectAsStateWithLifecycle().value
     val listState = rememberLazyListState()
+    val isPodcastList by viewModel.isPodcastList.collectAsStateWithLifecycle(initialValue = false)
+    val unplayedOnly by viewModel.unplayedOnly.collectAsStateWithLifecycle()
 
     // One feed open: the bar above the list already says whose these are, and the name
     // under every title is that same word again, once per row. A tag and the two lists
@@ -77,9 +79,21 @@ fun ArticleListScreen(
                     )
                 },
                 actions = {
+                    // Only where there are episodes: a reading list has nothing to play.
+                    if (isPodcastList) {
+                        BarIcon(
+                            icon = if (unplayedOnly) Icons.FilterOn else Icons.FilterOff,
+                            contentDescription =
+                                stringResource(
+                                    if (unplayedOnly) R.string.show_played_episodes else R.string.show_only_unplayed,
+                                ),
+                            onClick = { viewModel.toggleUnplayedOnly() },
+                        )
+                    }
                     BarIcon(
                         icon = Icons.DoneAll,
-                        contentDescription = stringResource(R.string.mark_all_as_read),
+                        contentDescription =
+                            stringResource(if (isPodcastList) R.string.mark_all_as_played else R.string.mark_all_as_read),
                         onClick = { viewModel.markAllAsRead() },
                     )
                     BarIcon(
@@ -93,7 +107,7 @@ fun ArticleListScreen(
     ) { padding ->
         if (items.itemCount == 0) {
             TextMMD(
-                text = stringResource(R.string.nothing_here),
+                text = stringResource(if (isPodcastList && unplayedOnly) R.string.nothing_unplayed else R.string.nothing_here),
                 modifier =
                     Modifier
                         .fillMaxSize()
@@ -121,7 +135,7 @@ fun ArticleListScreen(
                     showFeedName = showFeedName,
                     onClick = {
                         viewModel.open(item.id)
-                        viewModel.markAsRead(item.id)
+                        viewModel.markAsOpened(item.id)
                         onOpenArticle()
                     },
                 )

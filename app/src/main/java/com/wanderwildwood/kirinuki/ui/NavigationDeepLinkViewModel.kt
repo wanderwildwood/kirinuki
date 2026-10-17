@@ -23,7 +23,7 @@ class NavigationDeepLinkViewModel(
 
     fun setCurrentArticle(itemId: Long) {
         viewModelScope.launch {
-            repository.markAsReadAndNotified(itemId)
+            repository.markAsOpened(itemId)
         }
         repository.setCurrentArticle(itemId)
         // Should open article in portrait

@@ -101,6 +101,19 @@ fun ArticleScreen(
                     )
                 },
                 actions = {
+                    // An episode is played once heard to the end; this says so, or takes it
+                    // back, by hand. Filled like the star when it is.
+                    val episode = article?.takeIf { it.enclosure.isAudio }
+                    if (episode != null) {
+                        BarIcon(
+                            icon = if (episode.unread) Icons.NotPlayed else Icons.Played,
+                            contentDescription =
+                                stringResource(
+                                    if (episode.unread) R.string.mark_played else R.string.mark_unplayed,
+                                ),
+                            onClick = { viewModel.togglePlayed() },
+                        )
+                    }
                     // The setting is in settings, where it is set once. This is the same
                     // setting reached from the one screen where the size is a question you
                     // can actually answer, because the page you are judging is behind it.

@@ -64,6 +64,7 @@ class FeedItemStore(
         filter: FeedListFilter,
         search: String,
         includePodcasts: Boolean = false,
+        unplayedOnly: Boolean = false,
     ): Flow<Int> {
         val queryString = StringBuilder()
         val args = mutableListOf<Any?>()
@@ -73,7 +74,7 @@ class FeedItemStore(
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
 
-            rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts, unplayedOnly)
         }
 
         return dao.getPreviewsCount(SimpleSQLiteQuery(queryString.toString(), args.toTypedArray()))
@@ -87,6 +88,7 @@ class FeedItemStore(
         filter: FeedListFilter,
         search: String,
         includePodcasts: Boolean = false,
+        unplayedOnly: Boolean = false,
     ): Flow<PagingData<FeedListItem>> =
         Pager(
             config =
@@ -105,7 +107,7 @@ class FeedItemStore(
                 append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
                 append("WHERE\n")
 
-                rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts)
+                rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts, unplayedOnly)
 
                 when (newestFirst) {
                     true -> append("ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC\n")
@@ -128,6 +130,7 @@ class FeedItemStore(
         feedId: Long,
         tag: String,
         includePodcasts: Boolean,
+        unplayedOnly: Boolean = false,
     ) {
         val onlySavedArticles = feedId == ID_SAVED_ARTICLES
 
@@ -175,6 +178,15 @@ class FeedItemStore(
             feedId == ID_PODCASTS -> append("AND feed_id IN ($PODCAST_FEED_IDS)\n")
             !includePodcasts -> append("AND feed_id NOT IN ($PODCAST_FEED_IDS)\n")
         }
+
+        // Played is read: an episode heard to the end, or marked so, has a read time. In a
+        // podcast list asked to show only what is left, those go -- except any played since
+        // the list was opened, so an episode finished a moment ago does not vanish under the
+        // thumb. A reading feed has no episodes, and is left as it was.
+        if (unplayedOnly && (feedId == ID_PODCASTS || feedId > ID_UNSET)) {
+            append("AND (read_time is null OR read_time >= ? OR feed_id NOT IN ($PODCAST_FEED_IDS))\n")
+                .also { args.add(minReadTime.toEpochMilli()) }
+        }
     }
 
     suspend fun markAsReadRaw(
@@ -186,6 +198,7 @@ class FeedItemStore(
         descending: Boolean,
         cursor: FeedItemCursor,
         includePodcasts: Boolean = false,
+        unplayedOnly: Boolean = false,
     ) {
         val queryString = StringBuilder()
         val args = mutableListOf<Any?>()
@@ -199,7 +212,7 @@ class FeedItemStore(
             append("SELECT feed_items.id FROM feed_items\n")
             append("LEFT JOIN feeds ON feed_items.feed_id = feeds.id\n")
             append("WHERE\n")
-            rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts)
+            rawQueryFilter(filter, search, args, minReadTime, feedId, tag, includePodcasts, unplayedOnly)
             // this version of sqlite doesn't seem to support tuple comparisons
             append("and (\n")
 
@@ -273,6 +286,10 @@ class FeedItemStore(
             readTime = readTime.coerceAtLeast(Instant.EPOCH),
         )
     }
+
+    suspend fun loadFeedItemWithFeed(itemId: Long): FeedItemWithFeed? = dao.loadFeedItemWithFeed(itemId)
+
+    fun isPodcastFeed(feedId: Long): Flow<Boolean> = dao.isPodcastFeed(feedId)
 
     suspend fun markAsUnread(itemId: Long) {
         dao.markAsUnread(itemId)
