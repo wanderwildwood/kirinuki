@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mudita.mmd.components.lazy.LazyColumnMMD
+import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
@@ -41,7 +41,6 @@ import com.wanderwildwood.kirinuki.ui.compose.components.rememberLineFence
 import com.wanderwildwood.kirinuki.ui.compose.components.LineFenceCover
 import com.wanderwildwood.kirinuki.ui.compose.components.LocalLineFence
 import com.wanderwildwood.kirinuki.ui.compose.components.ReaderEdges
-import com.wanderwildwood.kirinuki.ui.compose.components.rememberReaderScrollStep
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.compose.theme.TextScaleDialog
@@ -168,16 +167,11 @@ fun ArticleScreen(
                     // article is what Define and Note are most often wanted for. The menu over a
                     // selection is the shop's, with its ⋮ given back (TextActions.kt).
                     SelectionContainer(modifier = Modifier.textActions()) {
-                    LazyColumnMMD(
+                    PagedColumn(
                         state = listState,
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        // A swipe moves on to the paragraph the bottom of the screen cut through,
-                        // rather than MMD's four items -- four paragraphs are however tall they are,
-                        // and the ones that did not fit were being stepped straight past.
-                        scrollStep = rememberReaderScrollStep(listState),
                         modifier = Modifier.fillMaxSize(),
-                        isScrollbarVisible = false,
                     ) {
                         item {
                             // The body is bodyLarge through ProvideScaledText, and the title was the

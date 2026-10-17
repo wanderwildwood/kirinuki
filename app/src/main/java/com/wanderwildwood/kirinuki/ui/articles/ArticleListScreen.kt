@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
+import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
@@ -121,9 +121,8 @@ fun ArticleListScreen(
 
         // Neither list is in one run of names, so page dots rather than letters.
         ListJumpBox(listState, ListJump.Pages, Modifier.padding(padding)) {
-            LazyColumnMMD(
+            PagedColumn(
                 state = listState,
-                isScrollbarVisible = false,
             ) {
                 items(
                     count = items.itemCount,

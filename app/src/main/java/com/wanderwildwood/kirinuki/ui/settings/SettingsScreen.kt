@@ -25,7 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
-import com.mudita.mmd.components.lazy.LazyColumnMMD
+import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -100,12 +100,11 @@ fun SettingsScreen(
         // MMD's list, not a scrolling Column: it steps four rows to a swipe and stops, with no
         // scrollbar beside it. A screen that coasts was the one screen in
         // the app that did not behave like the phone it is on.
-        LazyColumnMMD(
+        PagedColumn(
             modifier =
                 Modifier
                     .fillMaxSize()
                     .padding(padding),
-            isScrollbarVisible = false,
         ) {
             item {
                 SwitchRow(
