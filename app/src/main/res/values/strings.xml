@@ -512,4 +512,7 @@
   <string name="episode_remove_armed">Remove — tap again</string>
   <string name="episode_download_failed">Download failed</string>
   <string name="episode_failed">Could not reach it</string>
+    <string name="list_jump_setting">Letters and page dots</string>
+    <string name="list_jump_shown">Shown</string>
+    <string name="list_jump_hidden">Hidden</string>
 </resources>
