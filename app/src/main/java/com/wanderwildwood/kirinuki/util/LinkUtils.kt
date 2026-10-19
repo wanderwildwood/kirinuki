@@ -106,21 +106,3 @@ fun relativeLinkIntoAbsoluteOrThrow(
     } catch (_: MalformedURLException) {
         URL(base, link)
     }
-
-/**
- * On error, this method returns null. It does *not* throw exceptions.
- */
-fun relativeLinkIntoAbsoluteOrNullIfNotValid(
-    base: URL,
-    link: String?,
-): URL? =
-    try {
-        // If no exception, it's valid
-        if (link != null) {
-            relativeLinkIntoAbsoluteOrThrow(base, link)
-        } else {
-            null
-        }
-    } catch (_: MalformedURLException) {
-        null
-    }

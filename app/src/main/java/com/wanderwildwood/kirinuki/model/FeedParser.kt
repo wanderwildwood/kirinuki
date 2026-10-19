@@ -11,7 +11,6 @@ import com.wanderwildwood.kirinuki.model.gofeed.GoPerson
 import com.wanderwildwood.kirinuki.util.Either
 import com.wanderwildwood.kirinuki.util.flatMap
 import com.wanderwildwood.kirinuki.util.relativeLinkIntoAbsolute
-import com.wanderwildwood.kirinuki.util.relativeLinkIntoAbsoluteOrNullIfNotValid
 import com.wanderwildwood.kirinuki.util.relativeLinkIntoAbsoluteOrThrow
 import com.wanderwildwood.kirinuki.util.sloppyLinkToStrictURLOrNull
 import kotlinx.coroutines.Dispatchers.IO
@@ -283,21 +282,14 @@ class FeedParser(
     }
 }
 
-private fun GoFeed.asFeed(url: URL): ParsedFeed {
-    // Feed can update its URL which the reader will respect, but going from https -> http, or
-    // http -> https will not be respected. This is often a bug in self-hosted feeds and similar.
-    val selfLink = feedLink?.let { relativeLinkIntoAbsoluteOrNullIfNotValid(url, it) } ?: url
-    val feedUrl =
-        if (selfLink.protocol == url.protocol) {
-            selfLink
-        } else {
-            url
-        }
-
-    return ParsedFeed(
+private fun GoFeed.asFeed(url: URL): ParsedFeed =
+    ParsedFeed(
         title = title,
         home_page_url = link?.let { relativeLinkIntoAbsolute(url, it) },
-        feed_url = feedUrl.toString(),
+        // Never take the feed's own self link as its address. The specs say to, but many feeds
+        // carry a broken self link, and following it moves the subscription somewhere that
+        // never updates. The address we fetched is the one that works.
+        feed_url = url.toString(),
         description = description,
         user_comment = "",
         next_url = "",
@@ -307,7 +299,6 @@ private fun GoFeed.asFeed(url: URL): ParsedFeed {
         expired = null,
         items = items?.mapNotNull { it?.let { KirinukiGoItem(it, author, url).asParsedArticle() } },
     )
-}
 
 private fun KirinukiGoItem.asParsedArticle() =
     ParsedArticle(
