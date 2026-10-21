@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -157,7 +156,7 @@ class MainActivity : DIAwareComponentActivity() {
         mainActivityViewModel.ensurePeriodicSyncConfigured()
         schedulePeriodicOrphanedFilesCleanup(di)
 
-        enableEdgeToEdge()
+        enableEdgeToEdgeDarkIcons()
 
         setContent {
             withAllProviders {

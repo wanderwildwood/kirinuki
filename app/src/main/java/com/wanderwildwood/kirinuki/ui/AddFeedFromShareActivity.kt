@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
 import com.wanderwildwood.kirinuki.base.diAwareViewModel
 import com.wanderwildwood.kirinuki.net.addressIn
@@ -20,7 +19,7 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
+        enableEdgeToEdgeDarkIcons()
 
         val initialFeedUrl =
             addressIn((intent?.dataString ?: intent?.getStringExtra(Intent.EXTRA_TEXT)).orEmpty())

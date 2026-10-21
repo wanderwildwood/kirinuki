@@ -2,7 +2,6 @@ package com.wanderwildwood.kirinuki.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +33,7 @@ class ImportOPMLFileActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
+        enableEdgeToEdgeDarkIcons()
 
         val uri = intent.data
         logDebug(LOG_TAG, "Uri: $uri")

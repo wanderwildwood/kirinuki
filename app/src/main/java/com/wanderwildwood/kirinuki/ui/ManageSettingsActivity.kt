@@ -2,7 +2,6 @@ package com.wanderwildwood.kirinuki.ui
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
 import com.wanderwildwood.kirinuki.base.diAwareViewModel
 import com.wanderwildwood.kirinuki.ui.compose.utils.withAllProviders
@@ -18,7 +17,7 @@ class ManageSettingsActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge()
+        enableEdgeToEdgeDarkIcons()
 
         setContent {
             withAllProviders {
