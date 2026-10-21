@@ -862,6 +862,12 @@ class Repository(
         sessionStore.setSyncWorkerRunning(running)
     }
 
+    val syncOutcome: StateFlow<SyncOutcome?> = sessionStore.syncOutcome
+
+    fun setSyncOutcome(outcome: SyncOutcome) {
+        sessionStore.setSyncOutcome(outcome)
+    }
+
     /**
      * Set the retry after time for feeds with the given base URL.
      *

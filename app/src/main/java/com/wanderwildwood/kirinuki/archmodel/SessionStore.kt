@@ -42,4 +42,20 @@ class SessionStore {
             running
         }
     }
+
+    private val _syncOutcome = MutableStateFlow<SyncOutcome?>(null)
+
+    /** How the last sync of the feeds went; a new object each time, so a pull can tell its own. */
+    val syncOutcome: StateFlow<SyncOutcome?> = _syncOutcome.asStateFlow()
+
+    fun setSyncOutcome(outcome: SyncOutcome) {
+        _syncOutcome.value = outcome
+    }
 }
+
+/** What a sync of the feeds did: [tried] feeds asked for, [failed] of them not got, [ok] if it ran through. */
+class SyncOutcome(
+    val tried: Int,
+    val failed: Int,
+    val ok: Boolean = true,
+)

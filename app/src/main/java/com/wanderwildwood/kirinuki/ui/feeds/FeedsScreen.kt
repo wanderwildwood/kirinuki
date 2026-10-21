@@ -5,12 +5,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +26,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.wanderwildwood.kirinuki.ui.PagedColumn
+import com.wanderwildwood.kirinuki.ui.pulledWords
+import com.wanderwildwood.kirinuki.ui.rememberPull
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
@@ -59,6 +63,7 @@ fun FeedsScreen(
     val syncing by viewModel.syncing.collectAsStateWithLifecycle(initialValue = false)
     val expandedTags by viewModel.expandedTags.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    val pull = rememberPull(viewModel::refresh, viewModel.syncOutcome, viewModel.syncRunning)
 
     Scaffold(
         modifier = modifier,
@@ -107,10 +112,20 @@ fun FeedsScreen(
             return@Scaffold
         }
 
+        Column(Modifier.fillMaxSize().padding(padding)) {
+                    pulledWords(pull.pulled)?.let { line ->
+                        TextMMD(
+                            text = line,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                        )
+                        HorizontalDividerMMD()
+                    }
         // Neither list is in one run of names, so page dots rather than letters.
-        ListJumpBox(listState, ListJump.Pages, Modifier.padding(padding)) {
+        ListJumpBox(listState, ListJump.Pages, Modifier.weight(1f)) {
             PagedColumn(
                 state = listState,
+                onPullAtTop = pull::pull,
             ) {
                 items(
                     count = items.itemCount,
@@ -149,6 +164,7 @@ fun FeedsScreen(
                     HorizontalDividerMMD()
                 }
             }
+        }
         }
     }
 }

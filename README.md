@@ -28,6 +28,9 @@ Three screens. The feeds, what is in one, and the thing itself.
 - **Text only.** No images, no embedded web view. A photograph at sixteen greys costs a
   redraw to say less than the headline did, and a page that drags in a site's own CSS is
   unreadable on this screen.
+- **Pull down to fetch again.** A swipe down at the top of a feed list or a feed's articles
+  fetches the feeds as the Sync button does, and a line says "Syncing…", then "Up to date" or
+  what went wrong. Saved articles, which live on the phone, do nothing.
 - **OPML in and out.** How you arrive with feeds, and how you leave with them.
 - **Save a single page.** Share an article's link to Feeds, or type it into Add feed,
   and choose **Save the page**. The whole article is fetched and kept under **Pages** and

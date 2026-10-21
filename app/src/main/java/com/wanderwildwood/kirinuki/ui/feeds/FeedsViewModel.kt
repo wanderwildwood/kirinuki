@@ -23,6 +23,9 @@ class FeedsViewModel(
 
     val syncing: Flow<Boolean> = repository.currentlySyncing
 
+    val syncOutcome = repository.syncOutcome
+    val syncRunning = repository.syncWorkerRunning
+
     val expandedTags: StateFlow<Set<String>> = repository.expandedTags
 
     fun toggleTagExpansion(tag: String) = repository.toggleTagExpansion(tag)

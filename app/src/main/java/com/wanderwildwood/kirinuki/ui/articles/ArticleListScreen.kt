@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,6 +22,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.wanderwildwood.kirinuki.ui.PagedColumn
+import com.wanderwildwood.kirinuki.ui.pulledWords
+import com.wanderwildwood.kirinuki.ui.rememberPull
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
@@ -49,6 +52,7 @@ fun ArticleListScreen(
     val screenTitle by viewModel.screenTitle.collectAsStateWithLifecycle(initialValue = null)
     val (openFeedId, _) = viewModel.currentFeedAndTag.collectAsStateWithLifecycle().value
     val listState = rememberLazyListState()
+    val pull = rememberPull(viewModel::refresh, viewModel.syncOutcome, viewModel.syncRunning)
     val isPodcastList by viewModel.isPodcastList.collectAsStateWithLifecycle(initialValue = false)
     val unplayedOnly by viewModel.unplayedOnly.collectAsStateWithLifecycle()
 
@@ -120,9 +124,20 @@ fun ArticleListScreen(
         }
 
         // Neither list is in one run of names, so page dots rather than letters.
-        ListJumpBox(listState, ListJump.Pages, Modifier.padding(padding)) {
+        Column(Modifier.fillMaxSize().padding(padding)) {
+                    pulledWords(pull.pulled)?.let { line ->
+                        TextMMD(
+                            text = line,
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                        )
+                        HorizontalDividerMMD()
+                    }
+        ListJumpBox(listState, ListJump.Pages, Modifier.weight(1f)) {
             PagedColumn(
                 state = listState,
+                // What was kept lives on this phone; there is nothing to fetch for it.
+                onPullAtTop = if (screenTitle?.type == FeedType.SAVED_ARTICLES) null else pull::pull,
             ) {
                 items(
                     count = items.itemCount,
@@ -141,6 +156,7 @@ fun ArticleListScreen(
                     HorizontalDividerMMD()
                 }
             }
+        }
         }
     }
 }

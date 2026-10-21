@@ -15,6 +15,7 @@ import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedItem
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.util.Either
+import com.wanderwildwood.kirinuki.archmodel.SyncOutcome
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.fetchOgImage
 import com.wanderwildwood.kirinuki.util.flatMap
@@ -103,6 +104,8 @@ class RssLocalSync(
     ): Boolean {
         var result = false
         var needFullTextSync = false
+        val tried = java.util.concurrent.atomic.AtomicInteger()
+        val failed = java.util.concurrent.atomic.AtomicInteger()
         // Let all new items share download time
         val downloadTime = Instant.now()
         val time =
@@ -128,6 +131,7 @@ class RssLocalSync(
                         // the full text pass this sync chains. So they count for that.
                         needFullTextSync = candidates.any { it.fullTextByDefault }
                         val feedsToFetch = candidates.filterNot { it.isSavedPages }
+                        tried.set(feedsToFetch.size)
 
                         logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 
@@ -144,12 +148,14 @@ class RssLocalSync(
                                             .filterIndexed { index, _ ->
                                                 index % concurrentJobs == jobIndex
                                             }.forEach { feed ->
-                                                handleFeed(
-                                                    feed = feed,
-                                                    maxFeedItemCount = maxFeedItemCount,
-                                                    forceNetwork = forceNetwork,
-                                                    downloadTime = downloadTime,
-                                                )
+                                                val fetched =
+                                                    handleFeed(
+                                                        feed = feed,
+                                                        maxFeedItemCount = maxFeedItemCount,
+                                                        forceNetwork = forceNetwork,
+                                                        downloadTime = downloadTime,
+                                                    )
+                                                if (!fetched) failed.incrementAndGet()
                                             }
                                     }
                                 }
@@ -167,6 +173,7 @@ class RssLocalSync(
                 } catch (e: Throwable) {
                     Log.e(LOG_TAG, "Outer error", e)
                 } finally {
+                    repository.setSyncOutcome(SyncOutcome(tried = tried.get(), failed = failed.get(), ok = result))
                     if (needFullTextSync) {
                         runOnceFullTextSync(
                             di = di,
@@ -184,7 +191,8 @@ class RssLocalSync(
         maxFeedItemCount: Int,
         forceNetwork: Boolean,
         downloadTime: Instant,
-    ) {
+    ): Boolean {
+        var fetched = false
         try {
             // Want unique sync times.
             val syncTime = Instant.now()
@@ -215,6 +223,7 @@ class RssLocalSync(
                     }
                 }
             }.onRight {
+                fetched = true
                 repository.setBlockStatusForNewInFeed(feedId = feed.id, blockTime = syncTime)
             }
         } catch (e: Throwable) {
@@ -229,6 +238,7 @@ class RssLocalSync(
                 syncing = false,
             )
         }
+        return fetched
     }
 
     /**

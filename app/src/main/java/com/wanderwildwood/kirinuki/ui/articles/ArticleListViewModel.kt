@@ -26,6 +26,9 @@ class ArticleListViewModel(
 
     val syncing: Flow<Boolean> = repository.currentlySyncing
 
+    val syncOutcome = repository.syncOutcome
+    val syncRunning = repository.syncWorkerRunning
+
     val currentFeedAndTag: StateFlow<Pair<Long, String>> = repository.currentFeedAndTag
 
     fun open(itemId: Long) = repository.setCurrentArticle(itemId)
