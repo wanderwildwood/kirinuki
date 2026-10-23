@@ -148,6 +148,10 @@ reason this exists at all.
 - Full-text extraction via [Readability4J](https://github.com/dankito/Readability4J).
 - UI built with Mudita's [MMD](https://github.com/mudita/MMD) component library for Kompakt.
 
+## Privacy
+
+Privacy: what the app stores and what it sends is set out in [PRIVACY.md](PRIVACY.md).
+
 ## Licence
 
 GPL-3.0, the same as upstream Feeder. See [LICENSE](LICENSE).
