@@ -1,6 +1,8 @@
 package com.wanderwildwood.kirinuki.ui.addfeed
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -205,6 +207,7 @@ fun AddFeedScreen(
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
+                Spacer(Modifier.width(16.dp))
                 SwitchMMD(checked = fullText, onCheckedChange = { fullText = it })
             }
             // Two boxes rather than a rule editor: a rule is one line of text, and a

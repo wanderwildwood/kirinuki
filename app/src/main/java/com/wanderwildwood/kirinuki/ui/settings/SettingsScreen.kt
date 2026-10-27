@@ -1,6 +1,8 @@
 package com.wanderwildwood.kirinuki.ui.settings
 
 import android.text.format.Formatter
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -327,6 +329,7 @@ private fun SwitchRow(
                 )
             }
         }
+        Spacer(Modifier.width(16.dp))
         SwitchMMD(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
     }
 }
