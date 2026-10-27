@@ -1,9 +1,7 @@
 package com.wanderwildwood.kirinuki.ui.gemini
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -11,6 +9,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.sp
 import com.mudita.mmd.components.text.TextMMD
+import com.wanderwildwood.kirinuki.ui.compose.components.rememberFencedText
 import kotlin.math.floor
 import kotlin.math.min
 
@@ -23,8 +22,9 @@ import kotlin.math.min
  * reflowing it destroys the tables, the art and anything aligned — so the page is fitted
  * to the screen rather than the text to the page.
  *
- * Below [MIN_SIZE_SP] it stops shrinking and scrolls sideways instead: type too small to
- * read is not a fit, it is a different failure.
+ * Below [MIN_SIZE_SP] it stops shrinking and wraps instead: type too small to read is not a
+ * fit, it is a different failure, and a sideways scroll hides half of every line. Short lines
+ * keep their columns either way; only a line wider than the screen is broken.
  */
 @Composable
 fun FittedPreformattedText(
@@ -47,20 +47,18 @@ fun FittedPreformattedText(
         val size = min(DEFAULT_SIZE_SP, fitted)
         val tooSmallToRead = size < MIN_SIZE_SP
 
+        val fenced = rememberFencedText()
         TextMMD(
             text = text,
             fontFamily = FontFamily.Monospace,
             fontSize = (if (tooSmallToRead) MIN_SIZE_SP else size).sp,
-            softWrap = false,
-            modifier =
-                when {
-                    tooSmallToRead -> Modifier.horizontalScroll(rememberScrollState())
-                    else -> Modifier
-                },
+            softWrap = tooSmallToRead,
+            onTextLayout = fenced.onTextLayout,
+            modifier = fenced.modifier,
         )
     }
 }
 
 private const val DEFAULT_SIZE_SP = 16f
-private const val MIN_SIZE_SP = 9f
+private const val MIN_SIZE_SP = 14f
 private const val MONO_ADVANCE = 0.6f
