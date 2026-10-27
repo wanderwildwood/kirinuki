@@ -302,7 +302,8 @@ private fun PanelButton(
     enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
-    val ink = if (enabled) Color.Black else Color.Gray
+    // Black either way: no grey on this paper. A button that can do nothing yet simply does nothing.
+    val ink = Color.Black
     Box(
         modifier = Modifier.fillMaxHeight().width(56.dp).clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,

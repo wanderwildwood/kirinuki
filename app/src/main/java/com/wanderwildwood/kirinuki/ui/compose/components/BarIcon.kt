@@ -31,7 +31,7 @@ fun BarIcon(
         modifier =
             modifier
                 .clickable(onClick = onClick)
-                .padding(8.dp)
+                .padding(12.dp)
                 .size(24.dp),
     )
 }
