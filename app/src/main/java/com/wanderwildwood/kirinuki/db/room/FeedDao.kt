@@ -148,14 +148,15 @@ interface FeedDao {
             -- wrap in select so we can collate in order
             select * from (
                 -- all items
-                select $ID_ALL_FEEDS as id, '' as display_title, '' as tag, '' as image_url, coalesce(sum(unread), 0) as unread_count, 0 as expanded, 0 as sort_section, 0 as sort_tag_or_feed
+                select $ID_ALL_FEEDS as id, '' as display_title, '' as tag, '' as image_url, coalesce(sum(unread), 0) + (select count(*) from feed_items where feed_id is null and read_time is null and block_time is null) as unread_count, 0 as expanded, 0 as sort_section, 0 as sort_tag_or_feed
                 from feeds_with_items_for_nav_drawer
                 where :includePodcasts or feed_id not in ($PODCAST_FEED_IDS)
-                -- starred
+                -- starred (kept)
                 union
                 select $ID_SAVED_ARTICLES as id, '' as display_title, '' as tag, '' as image_url, sum(bookmarked) as unread_count, 0 as expanded, 1 as sort_section, 0 as sort_tag_or_feed
-                from feeds_with_items_for_nav_drawer
-                where bookmarked
+                -- from the items, not the feeds view: a kept article whose feed was removed has no feed row
+                from feed_items
+                where bookmarked = 1 and block_time is null
                 -- podcasts, below the saved articles, and their shows under them when opened
                 union
                 select $ID_PODCASTS as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, '$PODCASTS_EXPANDED_KEY' in (:expandedTags) as expanded, 1 as sort_section, 1 as sort_tag_or_feed
