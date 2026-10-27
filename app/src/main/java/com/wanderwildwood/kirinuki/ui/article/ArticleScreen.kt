@@ -100,15 +100,20 @@ fun ArticleScreen(
                     )
                 },
                 actions = {
-                    // An episode is played once heard to the end; this says so, or takes it
-                    // back, by hand. Filled like the star when it is.
-                    val episode = article?.takeIf { it.enclosure.isAudio }
-                    if (episode != null) {
+                    // An article is read once opened and an episode once heard to the end; this
+                    // says so, or takes it back, by hand. Filled like the star when it is.
+                    article?.let { item ->
+                        val isEpisode = item.enclosure.isAudio
                         BarIcon(
-                            icon = if (episode.unread) Icons.NotPlayed else Icons.Played,
+                            icon = if (item.unread) Icons.NotPlayed else Icons.Played,
                             contentDescription =
                                 stringResource(
-                                    if (episode.unread) R.string.mark_played else R.string.mark_unplayed,
+                                    when {
+                                        isEpisode && item.unread -> R.string.mark_played
+                                        isEpisode -> R.string.mark_unplayed
+                                        item.unread -> R.string.mark_read
+                                        else -> R.string.mark_unread
+                                    },
                                 ),
                             onClick = { viewModel.togglePlayed() },
                         )

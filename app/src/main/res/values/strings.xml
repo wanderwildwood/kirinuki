@@ -502,6 +502,8 @@
   <string name="episode_heard">Heard</string>
   <string name="mark_played">Mark played</string>
   <string name="mark_unplayed">Mark unplayed</string>
+  <string name="mark_read">Mark read</string>
+  <string name="mark_unread">Mark unread</string>
   <string name="mark_all_as_played">Mark all as played</string>
   <string name="show_only_unplayed">Show only unplayed episodes</string>
   <string name="show_played_episodes">Show played episodes too</string>
