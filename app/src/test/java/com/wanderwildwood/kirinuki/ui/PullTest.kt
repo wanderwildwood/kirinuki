@@ -24,6 +24,10 @@ class PullTest {
 
     @Test
     fun someFailingIsSaidSo() {
-        assertEquals(Pulled.SomeFailed, pulledAfter(SyncOutcome(tried = 5, failed = 2)))
+        assertEquals(Pulled.SomeFailed(emptyList()), pulledAfter(SyncOutcome(tried = 5, failed = 2)))
+        assertEquals(
+            Pulled.SomeFailed(listOf("Alpha", "Beta")),
+            pulledAfter(SyncOutcome(tried = 5, failed = 2, failedTitles = listOf("Alpha", "Beta"))),
+        )
     }
 }
