@@ -360,4 +360,4 @@ private fun Long.asClock(): String {
 private val SPEEDS = listOf(1f, 1.25f, 1.5f, 1.75f, 2f)
 private val SLEEP_MINUTES = listOf(0, 15, 30, 45, 60)
 private const val TICK_MS = 1000L
-private const val ARMED_MILLIS = 4000L
+private const val ARMED_MILLIS = 6000L

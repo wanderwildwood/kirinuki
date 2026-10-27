@@ -43,7 +43,11 @@ import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageViewModel
 import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
 import com.wanderwildwood.kirinuki.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
+import org.kodein.di.direct
 import org.kodein.di.instance
+import com.wanderwildwood.kirinuki.R
+import com.wanderwildwood.kirinuki.db.room.FeedDao
+import com.wanderwildwood.kirinuki.util.ToastMaker
 import java.time.LocalDate
 
 class MainActivity : DIAwareComponentActivity() {
@@ -192,14 +196,29 @@ class MainActivity : DIAwareComponentActivity() {
         val importLauncher =
             rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
                 uri ?: return@rememberLauncherForActivityResult
-                lifecycleScope.launch { importOpml(di, uri) }
+                lifecycleScope.launch {
+                    val feedDao = di.direct.instance<FeedDao>()
+                    val before = feedDao.getFeedsOrderedByUrl().size
+                    importOpml(di, uri)
+                    val added = feedDao.getFeedsOrderedByUrl().size - before
+                    if (added > 0) {
+                        di.direct.instance<ToastMaker>()
+                            .makeToast(getString(R.string.opml_imported_count, added))
+                    }
+                }
             }
         val exportLauncher =
             rememberLauncherForActivityResult(
                 ActivityResultContracts.CreateDocument("text/opml"),
             ) { uri ->
                 uri ?: return@rememberLauncherForActivityResult
-                lifecycleScope.launch { exportOpml(di, uri) }
+                lifecycleScope.launch {
+                    if (exportOpml(di, uri).isRight()) {
+                        val count = di.direct.instance<FeedDao>().getFeedsOrderedByUrl().size
+                        di.direct.instance<ToastMaker>()
+                            .makeToast(getString(R.string.opml_exported_count, count))
+                    }
+                }
             }
 
         // ⚠ Every view model here is taken from its own NavBackStackEntry rather than

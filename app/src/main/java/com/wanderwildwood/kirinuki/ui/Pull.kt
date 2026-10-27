@@ -31,7 +31,7 @@ sealed interface Pulled {
     /** Every feed asked for failed. */
     data object Unreachable : Pulled
     /** Some did, some did not. */
-    data object SomeFailed : Pulled
+    data class SomeFailed(val titles: List<String>) : Pulled
 }
 
 /** What a finished sync, which left [outcome] behind (null: nothing did), has to say to the one who pulled. */
@@ -39,14 +39,17 @@ fun pulledAfter(outcome: SyncOutcome?): Pulled = when {
     outcome == null -> Pulled.NotStarted
     !outcome.ok -> Pulled.Unreachable
     outcome.tried > 0 && outcome.failed >= outcome.tried -> Pulled.Unreachable
-    outcome.failed > 0 -> Pulled.SomeFailed
+    outcome.failed > 0 -> Pulled.SomeFailed(outcome.failedTitles)
     else -> Pulled.UpToDate
 }
 
 /** How long "Up to date" or the trouble stays above the list after a pull, in milliseconds. */
-const val PULLED_LINE_MS = 3_000L
+const val PULLED_LINE_MS = 6_000L
 
 /** How long a pull waits for the sync to begin, and then to finish, before it gives up on it. */
+/** How many failed feeds the line names before it says "and N more". */
+private const val PULLED_NAMES_SHOWN = 3
+
 const val PULL_START_MS = 10_000L
 const val PULL_FINISH_MS = 120_000L
 
@@ -95,5 +98,13 @@ fun pulledWords(pulled: Pulled?): String? = when (pulled) {
     Pulled.UpToDate -> stringResource(R.string.pull_up_to_date)
     Pulled.NotStarted -> stringResource(R.string.pull_not_started)
     Pulled.Unreachable -> stringResource(R.string.pull_unreachable)
-    Pulled.SomeFailed -> stringResource(R.string.pull_some_failed)
+    is Pulled.SomeFailed -> {
+        val shown = pulled.titles.take(PULLED_NAMES_SHOWN)
+        val more = pulled.titles.size - shown.size
+        when {
+            shown.isEmpty() -> stringResource(R.string.pull_some_failed)
+            more > 0 -> stringResource(R.string.pull_failed_named_more, shown.joinToString(", "), more)
+            else -> stringResource(R.string.pull_failed_named, shown.joinToString(", "))
+        }
+    }
 }

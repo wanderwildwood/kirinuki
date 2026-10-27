@@ -332,16 +332,15 @@ class SettingsStore(
 
     private val _textScale =
         MutableStateFlow(
-            sp.getFloat(
-                PREF_TEXT_SCALE,
-                1f,
-            ),
+            Math.round(sp.getFloat(PREF_TEXT_SCALE, 1f) * 10f) / 10f,
         )
     val textScale = _textScale.asStateFlow()
 
     fun setTextScale(value: Float) {
-        _textScale.value = value
-        sp.edit().putFloat(PREF_TEXT_SCALE, value).apply()
+        // Tenths only: 0.5 + 0.1 + ... drifts to 0.79 and would read as 79%.
+        val tenths = Math.round(value * 10f) / 10f
+        _textScale.value = tenths
+        sp.edit().putFloat(PREF_TEXT_SCALE, tenths).apply()
     }
 
     /**

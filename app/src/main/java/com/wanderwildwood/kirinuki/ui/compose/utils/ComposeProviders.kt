@@ -3,6 +3,8 @@ package com.wanderwildwood.kirinuki.ui.compose.utils
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalCursorBlinkEnabled
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -26,7 +28,11 @@ fun DIAwareComponentActivity.withAllProviders(content: @Composable () -> Unit) {
                         // is not built on a Scaffold draws on a transparent window, which
                         // on this panel means black paper and black ink on top of it.
                         Surface(modifier = Modifier.fillMaxSize()) {
-                            WithKirinukiTextToolbar(content)
+                            // A steady cursor: the blink repaints the field twice a second
+                            // for as long as it has focus, and on E Ink each one is a refresh.
+                            CompositionLocalProvider(LocalCursorBlinkEnabled provides false) {
+                                WithKirinukiTextToolbar(content)
+                            }
                         }
                     }
                 }

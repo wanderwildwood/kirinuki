@@ -106,6 +106,7 @@ class RssLocalSync(
         var needFullTextSync = false
         val tried = java.util.concurrent.atomic.AtomicInteger()
         val failed = java.util.concurrent.atomic.AtomicInteger()
+        val failedTitles = java.util.Collections.synchronizedList(mutableListOf<String>())
         // Let all new items share download time
         val downloadTime = Instant.now()
         val time =
@@ -155,7 +156,10 @@ class RssLocalSync(
                                                         forceNetwork = forceNetwork,
                                                         downloadTime = downloadTime,
                                                     )
-                                                if (!fetched) failed.incrementAndGet()
+                                                if (!fetched) {
+                                                    failed.incrementAndGet()
+                                                    failedTitles.add(feed.displayTitle)
+                                                }
                                             }
                                     }
                                 }
@@ -173,7 +177,7 @@ class RssLocalSync(
                 } catch (e: Throwable) {
                     Log.e(LOG_TAG, "Outer error", e)
                 } finally {
-                    repository.setSyncOutcome(SyncOutcome(tried = tried.get(), failed = failed.get(), ok = result))
+                    repository.setSyncOutcome(SyncOutcome(tried = tried.get(), failed = failed.get(), ok = result, failedTitles = failedTitles.toList()))
                     if (needFullTextSync) {
                         runOnceFullTextSync(
                             di = di,

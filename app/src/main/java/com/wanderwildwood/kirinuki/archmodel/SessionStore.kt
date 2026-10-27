@@ -58,4 +58,6 @@ class SyncOutcome(
     val tried: Int,
     val failed: Int,
     val ok: Boolean = true,
+    /** Titles of the feeds that were not got, so a pull can name them. */
+    val failedTitles: List<String> = emptyList(),
 )

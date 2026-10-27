@@ -84,6 +84,8 @@
   <string name="pull_not_started">Could not sync just now</string>
   <string name="pull_unreachable">Could not reach the feeds</string>
   <string name="pull_some_failed">Some feeds could not be fetched</string>
+  <string name="pull_failed_named">Could not fetch: %1$s</string>
+  <string name="pull_failed_named_more">Could not fetch: %1$s and %2$d more</string>
   <string name="only_on_wifi">Fetch feeds only on Wi-Fi</string>
   <string name="show_thumbnails">Show thumbnails</string>
   <string name="use_detect_language">Detect language</string>
@@ -415,6 +417,8 @@
   <string name="summary_only_notice">Only the summary the feed carried. Fetching the whole article does not always work.</string>
   <string name="add_feed_url">Feed address</string>
   <string name="add_feed_url_invalid">That does not look like an address.</string>
+  <string name="opml_imported_count">Imported %1$d new feeds</string>
+  <string name="opml_exported_count">Saved %1$d feeds to the file</string>
   <string name="imported_feeds_from_opml">Feeds imported.</string>
   <!-- gemini -->
   <string name="gemini_not_gemtext">This is not a page of text, so there is nothing to read here.</string>

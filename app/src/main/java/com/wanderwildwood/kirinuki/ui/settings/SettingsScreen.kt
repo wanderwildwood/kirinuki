@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.switcher.SwitchMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
@@ -114,18 +113,12 @@ fun SettingsScreen(
                 )
             }
             item {
-                HorizontalDividerMMD()
-            }
-            item {
                 SwitchRow(
                     title = stringResource(R.string.episodes_only_on_wifi),
                     subtitle = stringResource(R.string.episodes_only_on_wifi_summary),
                     checked = episodesOnlyOnWifi,
                     onCheckedChange = viewModel::setEpisodesOnlyOnWifi,
                 )
-            }
-            item {
-                HorizontalDividerMMD()
             }
             item {
                 SwitchRow(
@@ -136,17 +129,11 @@ fun SettingsScreen(
                 )
             }
             item {
-                HorizontalDividerMMD()
-            }
-            item {
                 SwitchRow(
                     title = stringResource(R.string.only_when_charging),
                     checked = syncOnlyWhenCharging,
                     onCheckedChange = viewModel::setSyncOnlyWhenCharging,
                 )
-            }
-            item {
-                HorizontalDividerMMD()
             }
             item {
                 StepperRow(
@@ -157,18 +144,12 @@ fun SettingsScreen(
                 )
             }
             item {
-                HorizontalDividerMMD()
-            }
-            item {
                 StepperRow(
                     title = stringResource(R.string.text_scale),
-                    value = stringResource(R.string.text_scale_percent, (textScale * 100).toInt().toString()),
+                    value = stringResource(R.string.text_scale_percent, Math.round(textScale * 100f).toString()),
                     onLess = { viewModel.setTextScale((textScale - 0.1f).coerceAtLeast(0.5f)) },
                     onMore = { viewModel.setTextScale((textScale + 0.1f).coerceAtMost(3.0f)) },
                 )
-            }
-            item {
-                HorizontalDividerMMD()
             }
             item {
                 SwitchRow(
@@ -176,9 +157,6 @@ fun SettingsScreen(
                     checked = showReadArticles,
                     onCheckedChange = viewModel::setShowReadArticles,
                 )
-            }
-            item {
-                HorizontalDividerMMD()
             }
             // Always here, even where it cannot do anything. A row that hides itself on
             // the phone this app was built for is a feature nobody can find; a row that
@@ -200,9 +178,6 @@ fun SettingsScreen(
                 )
             }
             item {
-                HorizontalDividerMMD()
-            }
-            item {
                 StepperRow(
                     title = stringResource(R.string.remove_downloaded_articles),
                     value =
@@ -216,28 +191,16 @@ fun SettingsScreen(
                 )
             }
             item {
-                HorizontalDividerMMD()
-            }
-            item {
                 ClearDownloadedRow(
                     size = downloadedBytes?.let { Formatter.formatShortFileSize(context, it) },
                     onClear = viewModel::clearDownloadedArticles,
                 )
             }
             item {
-                HorizontalDividerMMD()
-            }
-            item {
                 ActionRow(title = stringResource(R.string.import_feeds_from_opml), onClick = onImportOpml)
             }
             item {
-                HorizontalDividerMMD()
-            }
-            item {
                 ActionRow(title = stringResource(R.string.export_feeds_to_opml), onClick = onExportOpml)
-            }
-            item {
-                HorizontalDividerMMD()
             }
             // Last, because forgetting is the one thing on this screen that cannot be taken
             // back, and it is only ever wanted after a capsule has been refused.
@@ -263,9 +226,6 @@ fun SettingsScreen(
                         until = certificateDate.format(known.expiresAt.atZone(ZoneId.systemDefault())),
                         onForget = { viewModel.forgetCapsuleCertificate(known.host) },
                     )
-                }
-                item {
-                    HorizontalDividerMMD()
                 }
             }
         }
@@ -439,7 +399,7 @@ private fun CertificateRow(
 }
 
 /** Long enough to mean it, short enough not to leave a live forget under a thumb. */
-private const val ARMED_MILLIS = 4000L
+private const val ARMED_MILLIS = 6000L
 
 @Composable
 private fun ActionRow(
