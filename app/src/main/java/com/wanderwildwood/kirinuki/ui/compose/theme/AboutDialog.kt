@@ -47,6 +47,11 @@ fun AboutDialog(onDismiss: () -> Unit) {
         )
         Spacer(Modifier.height(14.dp))
         TextMMD(
+            text = stringResource(R.string.about_privacy_head),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium,
+        )
+        TextMMD(
             text = stringResource(R.string.about_privacy),
             style = MaterialTheme.typography.labelSmall,
         )
@@ -56,6 +61,11 @@ fun AboutDialog(onDismiss: () -> Unit) {
             style = MaterialTheme.typography.labelSmall,
         )
         Spacer(Modifier.height(14.dp))
+        TextMMD(
+            text = stringResource(R.string.about_terms_head),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium,
+        )
         TextMMD(
             text = stringResource(R.string.about_licence),
             style = MaterialTheme.typography.labelSmall,

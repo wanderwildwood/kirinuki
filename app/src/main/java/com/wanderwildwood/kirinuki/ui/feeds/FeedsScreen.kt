@@ -37,8 +37,6 @@ import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.PODCASTS_EXPANDED_KEY
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
-import com.wanderwildwood.kirinuki.ui.ListJump
-import com.wanderwildwood.kirinuki.ui.ListJumpBox
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
@@ -121,8 +119,7 @@ fun FeedsScreen(
                         )
                         HorizontalDividerMMD()
                     }
-        // Neither list is in one run of names, so page dots rather than letters.
-        ListJumpBox(listState, ListJump.Pages, Modifier.weight(1f)) {
+        Box(Modifier.weight(1f)) {
             PagedColumn(
                 state = listState,
                 onPullAtTop = pull::pull,

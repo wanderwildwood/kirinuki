@@ -18,7 +18,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import java.util.WeakHashMap
 
 /**
@@ -38,6 +41,16 @@ class LineFence {
      * rather than a fixed nine tenths, which cut a line at the top edge instead.
      */
     internal var coveredFrom: Float? = null
+
+    /** The list's own top and bottom edges on the screen, as last laid out. */
+    internal var viewTop = 0f
+    internal var viewBottom = 0f
+
+    /**
+     * How far to scroll to bring the first line the foot cuts to the top, or null if it cuts none.
+     * Read from where the lines are now, not from what was last drawn.
+     */
+    internal fun stepToCut(): Float? = cutAt(viewBottom)?.let { it - viewTop }?.takeIf { it > 0f }
 
     /** The top of the first line the given bottom edge cuts through, or null if none is cut. */
     internal fun cutAt(bottom: Float): Float? =
@@ -134,20 +147,32 @@ fun rememberFencedText(): FencedText {
  * edges still turn the page.
  */
 @Composable
-fun BoxScope.LineFenceCover(fence: LineFence) {
+fun BoxScope.LineFenceCover(
+    fence: LineFence,
+    insetTop: Dp = 0.dp,
+    insetBottom: Dp = 0.dp,
+) {
     var box by remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val top = with(LocalDensity.current) { insetTop.toPx() }
+    val foot = with(LocalDensity.current) { insetBottom.toPx() }
     val background = MaterialTheme.colorScheme.background
     Canvas(
         modifier =
             Modifier
                 .matchParentSize()
-                .onGloballyPositioned { box = it },
+                .onGloballyPositioned {
+                    box = it
+                    // The list sits inside this box, a margin in from the top and the foot, and
+                    // it is that foot which cuts a line.
+                    val y = it.positionInRoot().y
+                    fence.viewTop = y + top
+                    fence.viewBottom = y + it.size.height - foot
+                },
     ) {
         val c = box?.takeIf { it.isAttached } ?: return@Canvas
-        val top = c.positionInRoot().y
-        val bottom = top + size.height
-        val cut = fence.cutAt(bottom)
-        fence.coveredFrom = cut?.let { (it - top).coerceAtLeast(0f) }
+        val boxTop = c.positionInRoot().y
+        val cut = fence.cutAt(boxTop + size.height - foot)
+        fence.coveredFrom = cut?.let { (it - boxTop).coerceAtLeast(0f) }
         val from = fence.coveredFrom ?: return@Canvas
         drawRect(
             color = background,

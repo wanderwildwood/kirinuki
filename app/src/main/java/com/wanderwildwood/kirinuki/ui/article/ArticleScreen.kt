@@ -172,6 +172,7 @@ fun ArticleScreen(
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxSize(),
+                        rowStep = { lineFence.stepToCut() },
                     ) {
                         item {
                             // The body is bodyLarge through ProvideScaledText, and the title was the
@@ -229,7 +230,7 @@ fun ArticleScreen(
                 }
 
                 // The line the bottom edge cuts is covered, so the page stops on a whole one.
-                LineFenceCover(fence = lineFence)
+                LineFenceCover(fence = lineFence, insetTop = 8.dp, insetBottom = 8.dp)
 
                 // Last, so it is on top: the edges take their taps before the text
                 // under them does.

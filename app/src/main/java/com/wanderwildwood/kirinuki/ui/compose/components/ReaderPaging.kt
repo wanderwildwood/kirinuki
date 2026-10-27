@@ -1,34 +1,22 @@
 package com.wanderwildwood.kirinuki.ui.compose.components
 
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListState
 import com.wanderwildwood.kirinuki.ui.ScrollDirection
+import com.wanderwildwood.kirinuki.ui.pageBack
+import com.wanderwildwood.kirinuki.ui.pageForward
 
 /**
- * What a volume key does: a screenful of pixels, less a tenth of one to read on from.
+ * What a volume key or an edge tap does: the same page turn as a swipe, on whole rows.
  *
- * By pixels rather than by blocks, so it stops wherever the text does, even in the middle of
- * a paragraph. The overlap is there because the line the edge cut through is easier to find
- * again than to reconstruct. A swipe afterwards goes on from the block the foot cut.
+ * A turn by pixels would not agree with the rows, which a page shares the foot's spare room
+ * between and sets the ones that do not fit out of sight, and every line past the foot would be
+ * lost to a page that started further on. Through a row taller than the screen, which has no whole
+ * rows to turn on, the next page opens on the line the foot cut, flush with the top.
  */
 suspend fun LazyListState.turnPage(direction: ScrollDirection) {
-    val info = layoutInfo
-    val viewport = info.viewportEndOffset - info.viewportStartOffset
-    if (viewport <= 0) return
-    val page = viewport * PAGE
-    // Going on, a reader that covered a cut line opens the next page on exactly that line --
-    // flush with the top, since lines touch and any gap above shows a sliver of the one
-    // before. Never less than half a page, so one very tall cut block cannot make it crawl.
-    val toCovered =
-        LineFence.of(this)?.coveredFrom
-            ?.takeIf { it >= viewport / 2f }
-    scrollBy(
-        when (direction) {
-            ScrollDirection.DOWN -> toCovered ?: page
-            ScrollDirection.UP -> -page
-        },
-    )
+    when (direction) {
+        ScrollDirection.DOWN ->
+            pageForward(LineFence.of(this)?.let { fence -> { fence.stepToCut() } })
+        ScrollDirection.UP -> pageBack()
+    }
 }
-
-/** How much of the screen a volume key turns. The tenth left behind is the overlap. */
-private const val PAGE = 0.9f

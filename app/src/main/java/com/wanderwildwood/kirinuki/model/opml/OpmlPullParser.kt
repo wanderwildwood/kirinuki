@@ -13,6 +13,7 @@ import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.IOException
 import java.io.InputStream
+import com.wanderwildwood.kirinuki.net.parseUrlLeniently
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.Arrays
@@ -259,7 +260,7 @@ class OpmlPullParser(
             )
         try {
             val parsedUrlOrUri = parser.getAttributeValue(null, ATTR_XMLURL)
-            val feedUrl = URL(parsedUrlOrUri)
+            val feedUrl = parseUrlLeniently(parsedUrlOrUri)
             val feed =
                 Feed(
                     // Ensure not both are empty string: title will get replaced on sync

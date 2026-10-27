@@ -30,6 +30,18 @@ interface FeedDao {
     @Delete
     suspend fun deleteFeed(feed: Feed): Int
 
+    /** Articles saved with Keep outlive their feed: they stay, belonging to no feed. */
+    @Query("UPDATE feed_items SET feed_id = NULL WHERE feed_id IN (:ids) AND bookmarked = 1")
+    suspend fun detachKeptItems(ids: List<Long>): Int
+
+    @Query(
+        """
+        UPDATE feed_items SET feed_id = NULL
+        WHERE bookmarked = 1 AND feed_id IN (SELECT id FROM feeds WHERE url IS :url)
+        """,
+    )
+    suspend fun detachKeptItemsWithUrl(url: URL): Int
+
     @Query("DELETE FROM feeds WHERE id IS :feedId")
     suspend fun deleteFeedWithId(feedId: Long): Int
 

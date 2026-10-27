@@ -37,7 +37,7 @@ class AddFeedViewModel(
     val folders: Flow<List<String>> = repository.allTags
 
     /**
-     * Unsubscribes, and takes the articles that came with the feed with it.
+     * Unsubscribes, and takes the articles that came with the feed with it, except those kept with the star, which stay.
      *
      * This lived on the feeds screen as a bin on every row. It is here because it belongs
      * with the other two things you can do to a feed, and because a list of names and
@@ -68,6 +68,7 @@ class AddFeedViewModel(
         val parsed =
             try {
                 parseUrlLeniently(if (url.contains("://")) url.trim() else "https://${url.trim()}")
+                    .also { if (!looksLikeAddress(it)) throw MalformedURLException(url) }
             } catch (e: MalformedURLException) {
                 _error.value = url
                 return
@@ -107,7 +108,8 @@ class AddFeedViewModel(
                 // A bare hostname is what people type, so https is assumed -- but never
                 // over a scheme that was given, including gemini, which java.net.URL
                 // cannot parse without a handler of its own.
-                parseUrlLeniently(if (url.contains("://")) url else "https://$url")
+                parseUrlLeniently((if (url.contains("://")) url else "https://$url").trim())
+                    .also { if (!looksLikeAddress(it)) throw MalformedURLException(url) }
             } catch (e: MalformedURLException) {
                 _error.value = url
                 return
@@ -205,4 +207,15 @@ class AddFeedViewModel(
             _saved.value = true
         }
     }
+}
+
+/**
+ * Whether what was typed can be an address at all. java.net.URL accepts "https://what is this"
+ * and "https://word"; neither names a host, and the first fetch would fail with nothing said.
+ */
+internal fun looksLikeAddress(url: java.net.URL): Boolean {
+    val host = url.host
+    if (host.isBlank() || host.any { it.isWhitespace() }) return false
+    if (url.toString().any { it.isWhitespace() }) return false
+    return host.contains('.') || host.contains(':') || host.equals("localhost", ignoreCase = true)
 }

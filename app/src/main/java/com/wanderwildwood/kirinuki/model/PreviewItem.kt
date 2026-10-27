@@ -16,13 +16,14 @@ import java.net.URL
 import java.time.Instant
 import java.time.ZonedDateTime
 
+/** Feed columns are coalesced: an article kept after its feed was removed has no feed row to join. */
 const val PREVIEW_COLUMNS = """
     feed_items.id AS id, guid, plain_title, plain_snippet, feed_items.image_url, enclosure_link,
-    author, pub_date, link, read_time, feeds.tag AS tag, feeds.id AS feed_id, feeds.title AS feed_title,
-    feeds.custom_title as feed_customtitle, feeds.url AS feed_url,
-    feeds.open_articles_with AS feed_open_articles_with, bookmarked,
+    author, pub_date, link, read_time, coalesce(feeds.tag, '') AS tag, feeds.id AS feed_id, coalesce(feeds.title, '') AS feed_title,
+    coalesce(feeds.custom_title, '') as feed_customtitle, coalesce(feeds.url, '') AS feed_url,
+    coalesce(feeds.open_articles_with, '') AS feed_open_articles_with, bookmarked,
     feeds.image_url as feed_image_url, primary_sort_time, word_count, word_count_full,
-    feeds.fulltext_by_default as fulltext_by_default
+    coalesce(feeds.fulltext_by_default, 0) as fulltext_by_default
 """
 
 data class PreviewItem

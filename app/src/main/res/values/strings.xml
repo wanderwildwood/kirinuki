@@ -473,10 +473,12 @@
   <!-- Heading. %1$s is the version number, e.g. 0.3.2 -->
   <string name="about_title">Feeds %1$s</string>
   <string name="about_what">A reader for feeds and for the smolnet — Gemini, gopher and Spartan. Text on paper, no images, and everything kept on the phone.</string>
-  <string name="about_privacy">It fetches the feeds and the pages you point it at, from the addresses you gave it, and nothing else. There is no account, no tracking, and nothing is sent anywhere on your behalf.</string>
+  <string name="about_privacy_head">Privacy</string>
+  <string name="about_privacy">The app connects only to the feeds, pages and capsules you add, and fetches them directly; that request carries no account and nothing you have written. Your feeds and saved articles stay on this phone. Nothing is sent to the app\'s maker. There are no ads, no analytics and no tracking. Backups and exports go only where you choose to save them.</string>
   <string name="about_built_on">Built on Feeder by Jonas Kalderstam. Full-text extraction by Readability4J.</string>
   <!-- The name of the app's licence -->
-  <string name="about_licence">GNU General Public License v3</string>
+  <string name="about_terms_head">Terms</string>
+  <string name="about_licence">This app is free software under the GNU General Public License v3. It comes with no warranty: use it at your own risk.</string>
   <!-- The donation link label, beside a drawing of a llama. A fixed phrase: a verb and an object, so the reader knows what pressing it does -->
   <string name="about_feed_the_llamas">feed the llamas</string>
   <!-- Toast when the donation link cannot be opened -->
@@ -517,7 +519,4 @@
   <string name="episode_remove_armed">Remove — tap again</string>
   <string name="episode_download_failed">Download failed</string>
   <string name="episode_failed">Could not reach it</string>
-    <string name="list_jump_setting">Letters and page dots</string>
-    <string name="list_jump_shown">Shown</string>
-    <string name="list_jump_hidden">Hidden</string>
 </resources>

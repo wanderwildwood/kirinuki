@@ -313,7 +313,7 @@ fun AddFeedScreen(
 }
 
 /** Long enough to mean it, short enough not to leave a live delete under a thumb. */
-private const val ARMED_MILLIS = 4000L
+private const val ARMED_MILLIS = 6000L
 
 /**
  * The parse errors for one rule box, a line each.

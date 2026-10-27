@@ -2,6 +2,7 @@ package com.wanderwildwood.kirinuki.ui.articles
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,8 +31,6 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.FeedType
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.FeedListItem
-import com.wanderwildwood.kirinuki.ui.ListJump
-import com.wanderwildwood.kirinuki.ui.ListJumpBox
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 
@@ -123,7 +122,6 @@ fun ArticleListScreen(
             return@Scaffold
         }
 
-        // Neither list is in one run of names, so page dots rather than letters.
         Column(Modifier.fillMaxSize().padding(padding)) {
                     pulledWords(pull.pulled)?.let { line ->
                         TextMMD(
@@ -133,7 +131,7 @@ fun ArticleListScreen(
                         )
                         HorizontalDividerMMD()
                     }
-        ListJumpBox(listState, ListJump.Pages, Modifier.weight(1f)) {
+        Box(Modifier.weight(1f)) {
             PagedColumn(
                 state = listState,
                 // What was kept lives on this phone; there is nothing to fetch for it.

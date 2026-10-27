@@ -61,6 +61,7 @@ class FeedStore(
     }
 
     suspend fun deleteFeeds(feedIds: List<Long>) {
+        feedDao.detachKeptItems(feedIds)
         feedDao.deleteFeeds(feedIds)
     }
 
@@ -129,6 +130,7 @@ class FeedStore(
     suspend fun getFeedsOrderedByUrl(): List<Feed> = feedDao.getFeedsOrderedByUrl()
 
     suspend fun deleteFeed(url: URL) {
+        feedDao.detachKeptItemsWithUrl(url)
         feedDao.deleteFeedWithUrl(url)
     }
 

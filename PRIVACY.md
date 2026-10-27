@@ -1,6 +1,6 @@
 # Feeds — Privacy Policy
 
-Version 0.5.8. Last reviewed 23 October 2026.
+Version 0.5.9. Last reviewed 23 October 2026.
 
 ## The short version
 

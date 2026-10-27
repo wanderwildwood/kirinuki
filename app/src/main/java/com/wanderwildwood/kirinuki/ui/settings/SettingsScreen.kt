@@ -31,13 +31,11 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.model.DownloadedArticles
-import com.wanderwildwood.kirinuki.ui.ListJumpPrefs
 import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
-import com.wanderwildwood.kirinuki.ui.rememberListJumpShown
 import com.wanderwildwood.kirinuki.util.hasWebBrowser
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -177,17 +175,6 @@ fun SettingsScreen(
                     title = stringResource(R.string.show_read_articles),
                     checked = showReadArticles,
                     onCheckedChange = viewModel::setShowReadArticles,
-                )
-            }
-            item {
-                HorizontalDividerMMD()
-            }
-            item {
-                val jumpShown by rememberListJumpShown()
-                SwitchRow(
-                    title = stringResource(R.string.list_jump_setting),
-                    checked = jumpShown,
-                    onCheckedChange = { ListJumpPrefs.setShown(context, it) },
                 )
             }
             item {
