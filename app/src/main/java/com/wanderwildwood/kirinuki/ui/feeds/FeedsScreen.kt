@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.wanderwildwood.kirinuki.ui.PagedColumn
@@ -98,6 +99,14 @@ fun FeedsScreen(
             )
         },
     ) { padding ->
+        // A refresh can leave the list empty for a moment between the old rows and the new
+        // (Feeder #1288). Then the page stays blank and the list keeps its place, rather than
+        // saying there is nothing here and laying itself out again from the top: two full
+        // repaints on E Ink for a list that never changed. Only a load that has finished
+        // and found nothing says so.
+        if (items.itemCount == 0 && items.loadState.refresh !is LoadState.NotLoading) {
+            return@Scaffold
+        }
         if (items.itemCount == 0) {
             TextMMD(
                 text = stringResource(R.string.no_feeds_yet),
