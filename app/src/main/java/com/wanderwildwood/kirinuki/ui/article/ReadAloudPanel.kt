@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,6 +27,7 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.kirinuki.R
@@ -43,6 +45,8 @@ import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
  */
 @Composable
 fun ReadAloudPanel(
+    open: Boolean,
+    onToggle: () -> Unit,
     state: ReadAloudPlayer.State,
     timeline: ReadAloudTimeline,
     onPlayOrPause: () -> Unit,
@@ -55,18 +59,39 @@ fun ReadAloudPanel(
     Column(modifier = modifier.fillMaxWidth()) {
         HorizontalDividerMMD()
 
-        TextMMD(
-            text =
-                when {
-                    timeline.size == 0 -> stringResource(R.string.read_aloud_nothing)
-                    state.engine == ReadAloudPlayer.Engine.STARTING -> stringResource(R.string.read_aloud_starting)
-                    state.engine == ReadAloudPlayer.Engine.NONE -> stringResource(R.string.read_aloud_no_engine)
-                    state.finished -> stringResource(R.string.read_aloud_finished)
-                    else -> whereLine(index, timeline)
-                },
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-        )
+        // Closed, the strip is this one quiet button and nothing else. Open, the same button
+        // closes it, beside where the voice is.
+        Row(
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 8.dp, bottom = if (open) 0.dp else 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            TextMMD(
+                text =
+                    when {
+                        !open -> ""
+                        timeline.size == 0 -> stringResource(R.string.read_aloud_nothing)
+                        state.engine == ReadAloudPlayer.Engine.STARTING -> stringResource(R.string.read_aloud_starting)
+                        state.engine == ReadAloudPlayer.Engine.NONE -> stringResource(R.string.read_aloud_no_engine)
+                        state.finished -> stringResource(R.string.read_aloud_finished)
+                        else -> whereLine(index, timeline)
+                    },
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f),
+            )
+            OutlinedButtonMMD(
+                onClick = onToggle,
+                modifier = Modifier.heightIn(min = 48.dp),
+            ) {
+                TextMMD(text = stringResource(if (open) R.string.read_aloud_close else R.string.read_aloud))
+            }
+        }
+
+        if (!open) return@Column
 
         if (usable) {
             SeekSteps(

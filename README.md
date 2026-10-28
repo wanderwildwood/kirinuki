@@ -41,7 +41,7 @@ Three screens. The feeds, what is in one, and the thing itself.
   **Remove downloaded articles** (after 7, 30 or 90 days, or never; 30 to begin with) and
   **Clear downloaded articles**. Neither touches a kept (starred) article; anything removed
   is fetched again when you next open it.
-- **Read aloud**, with the phone's own text-to-speech voice. The sentence being read is
+- **Read aloud**, from a button under the text, with the phone's own text-to-speech voice. The sentence being read is
   underlined and the page turns with it; a row of steps under the text goes to another part
   of the article, and the buttons go back or on a sentence. Nothing on the screen changes
   between two sentences.

@@ -526,7 +526,7 @@
   <string name="episode_download_failed">Download failed</string>
   <string name="episode_failed">Could not reach it</string>
   <string name="read_aloud">Read aloud</string>
-  <string name="read_aloud_stop">Stop reading aloud</string>
+  <string name="read_aloud_close">Stop</string>
   <string name="read_aloud_where">Sentence %1$d of %2$d · about %3$d min left</string>
   <string name="read_aloud_where_last">Sentence %1$d of %2$d · under a minute left</string>
   <string name="read_aloud_starting">Getting the voice ready</string>

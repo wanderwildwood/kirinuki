@@ -146,15 +146,6 @@ fun ArticleScreen(
                             onClick = { viewModel.togglePlayed() },
                         )
                     }
-                    // Not for an episode, which has its own sound.
-                    if (article?.enclosure?.isAudio != true) {
-                        BarIcon(
-                            icon = Icons.ReadAloud,
-                            contentDescription =
-                                stringResource(if (readAloudOpen) R.string.read_aloud_stop else R.string.read_aloud),
-                            onClick = { viewModel.toggleReadAloud() },
-                        )
-                    }
                     // The setting is in settings, where it is set once. This is the same
                     // setting reached from the one screen where the size is a question you
                     // can actually answer, because the page you are judging is behind it.
@@ -279,10 +270,13 @@ fun ArticleScreen(
                 ReaderEdges(listState = listState)
             }
 
-            // A podcast episode: the text above is its show notes, and the sound is played
-            // from here. Outside the page-turning edges, which cover the whole text.
-            if (readAloudOpen) {
+            // Read aloud lives in the strip under the text, where an episode's player is, not in
+            // the bar: the bar keeps its width for the feed's name. Not for an episode, which
+            // has its own sound.
+            if (article != null && article?.enclosure?.isAudio != true) {
                 ReadAloudPanel(
+                    open = readAloudOpen,
+                    onToggle = viewModel::toggleReadAloud,
                     state = readAloud,
                     timeline = timeline,
                     onPlayOrPause = viewModel::playOrPauseReadAloud,
@@ -293,6 +287,8 @@ fun ArticleScreen(
                 )
             }
 
+            // A podcast episode: the text above is its show notes, and the sound is played
+            // from here. Outside the page-turning edges, which cover the whole text.
             val current = article
             if (current != null && current.enclosure.isAudio) {
                 EpisodePanel(
