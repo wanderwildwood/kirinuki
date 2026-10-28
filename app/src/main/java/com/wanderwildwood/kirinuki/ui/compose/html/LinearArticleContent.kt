@@ -23,7 +23,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,6 +89,7 @@ import com.wanderwildwood.kirinuki.model.html.LinearTextAnnotationSuperscript
 import com.wanderwildwood.kirinuki.model.html.LinearTextAnnotationUnderline
 import com.wanderwildwood.kirinuki.model.html.LinearTextBlockStyle
 import com.wanderwildwood.kirinuki.model.html.LinearVideo
+import com.wanderwildwood.kirinuki.model.readaloud.Spoken
 import com.wanderwildwood.kirinuki.ui.compose.components.rememberFencedText
 import com.wanderwildwood.kirinuki.ui.compose.layouts.Table
 import com.wanderwildwood.kirinuki.ui.compose.layouts.TableCell
@@ -122,6 +127,11 @@ fun LazyListScope.linearArticleContent(
                 TextStyle(color = MaterialTheme.colorScheme.onBackground),
             ),
         ) {
+            // Only the block being read changes when the voice moves on, and only once a sentence.
+            val spokenNow = LocalSpoken.current
+            val spoken by remember(index, spokenNow) {
+                derivedStateOf { spokenNow.value?.takeIf { it.element == index }?.let { it.start until it.end } }
+            }
             BoxWithConstraints(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center,
@@ -131,6 +141,7 @@ fun LazyListScope.linearArticleContent(
                     idToIndex = articleContent.idToIndex,
                     allowHorizontalScroll = true,
                     onLinkClick = onLinkClick,
+                    spoken = spoken,
                     modifier =
                         Modifier
                             .widthIn(max = minOf(maxWidth, LocalDimens.current.maxReaderWidth))
@@ -185,6 +196,7 @@ fun LinearElementContent(
     idToIndex: Map<String, Int>,
     onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
+    spoken: IntRange? = null,
 ) {
     when (linearElement) {
 //        is LinearList ->
@@ -229,6 +241,7 @@ fun LinearElementContent(
                         onLinkClick = onLinkClick,
                         idToIndex = idToIndex,
                         modifier = modifier,
+                        spoken = spoken,
                     )
                 }
 
@@ -409,11 +422,13 @@ fun LinearTextContent(
     onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
     softWrap: Boolean = true,
+    spoken: IntRange? = null,
 ) {
     ProvideScaledText {
         WithBidiDeterminedLayoutDirection(linearText.text) {
             val interactionSource = remember { MutableInteractionSource() }
-            val annotatedString = linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick)
+            val annotatedString =
+                linearText.toAnnotatedString(idToIndex = idToIndex, onLinkClick = onLinkClick).underlined(spoken)
             // Tells the reader where this paragraph's lines are, so the bottom edge can stop
             // on a whole one. See LineFence.
             val fenced = rememberFencedText()
@@ -431,6 +446,27 @@ fun LinearTextContent(
         }
     }
 }
+
+/**
+ * The sentence being read aloud, underlined: black on white like everything else here, and the
+ * same width as the text, so marking it moves no word. A grey wash would be the usual way and is
+ * the one thing this paper cannot draw.
+ */
+internal fun AnnotatedString.underlined(range: IntRange?): AnnotatedString {
+    if (range == null) return this
+    val start = range.first.coerceIn(0, length)
+    val end = (range.last + 1).coerceIn(start, length)
+    if (start == end) return this
+    return AnnotatedString.Builder(this).apply {
+        addStyle(SpanStyle(textDecoration = TextDecoration.Underline), start, end)
+    }.toAnnotatedString()
+}
+
+/**
+ * The sentence read aloud is on, for the article's blocks to find their own in. Null while
+ * nothing is being read, which is nearly always.
+ */
+val LocalSpoken = staticCompositionLocalOf<State<Spoken?>> { mutableStateOf(null) }
 
 @Composable
 fun LinearBlockQuoteContent(

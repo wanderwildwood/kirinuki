@@ -41,6 +41,10 @@ Three screens. The feeds, what is in one, and the thing itself.
   **Remove downloaded articles** (after 7, 30 or 90 days, or never; 30 to begin with) and
   **Clear downloaded articles**. Neither touches a kept (starred) article; anything removed
   is fetched again when you next open it.
+- **Read aloud**, with the phone's own text-to-speech voice. The sentence being read is
+  underlined and the page turns with it; a row of steps under the text goes to another part
+  of the article, and the buttons go back or on a sentence. Nothing on the screen changes
+  between two sentences.
 - **Volume keys page the article**, because dragging a finger down E Ink is a poor way to
   read. A swipe pages it too, and stops at the paragraph the bottom of the screen cut
   through, so the next page opens on the line you did not finish.
@@ -137,8 +141,8 @@ MMD comes from Mudita's own Artifactory repository, which is already declared in
 
 Feeder is a much larger app, and most of the work here was removal: the OpenAI integration,
 the Bergamot translation engine, the device-to-device sync chain, the home screen widget,
-read-aloud, image loading, and the bundled fonts. Its podcast player went too; a smaller
-one was written back in later. The reader's own machinery — the feed parsers, the
+read-aloud, image loading, and the bundled fonts. Its podcast player and read-aloud went too;
+smaller ones were written back in later. The reader's own machinery — the feed parsers, the
 full-text extraction, the HTML-to-text pipeline, the database — is Feeder's and is the
 reason this exists at all.
 

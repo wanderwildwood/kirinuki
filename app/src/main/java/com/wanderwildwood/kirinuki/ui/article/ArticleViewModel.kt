@@ -23,8 +23,14 @@ import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
 import com.wanderwildwood.kirinuki.model.html.HtmlLinearizer
 import com.wanderwildwood.kirinuki.model.html.withoutRepeatedTitle
+import com.wanderwildwood.kirinuki.model.readaloud.ReadAloudPlayer
+import com.wanderwildwood.kirinuki.model.readaloud.ReadAloudScript
+import com.wanderwildwood.kirinuki.model.readaloud.Spoken
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -60,6 +66,26 @@ class ArticleViewModel(
     private val _content = MutableStateFlow(LinearArticle(elements = emptyList()))
     val content: StateFlow<LinearArticle> = _content
 
+    private val _readAloudScript = MutableStateFlow<List<Spoken>>(emptyList())
+
+    /** The sentences read aloud would say, in order. */
+    val readAloudScript: StateFlow<List<Spoken>> = _readAloudScript
+
+    /** Made the first time it is opened, so an article only read never starts a speech engine. */
+    private var readAloudPlayer: ReadAloudPlayer? = null
+
+    private val _readAloudOpen = MutableStateFlow(false)
+    val readAloudOpen: StateFlow<Boolean> = _readAloudOpen
+
+    private val _readAloud = MutableStateFlow<StateFlow<ReadAloudPlayer.State>?>(null)
+
+    /** Where read aloud is: which sentence, and whether it is speaking. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val readAloudState: StateFlow<ReadAloudPlayer.State> =
+        _readAloud
+            .flatMapLatest { it ?: flowOf(ReadAloudPlayer.State()) }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, ReadAloudPlayer.State())
+
     init {
         viewModelScope.launch {
             combine(article, showingFullText) { article, fullText -> article to fullText }
@@ -69,6 +95,52 @@ class ArticleViewModel(
                         parseArticleContent(article, fullText).withoutRepeatedTitle(article.title)
                 }
         }
+        // Another article, or the same one switched between summary and whole text, is another
+        // script: what was being read stops, and the next Play starts at its top.
+        viewModelScope.launch {
+            combine(article, content) { article, content -> article?.title to content }
+                .collect { (title, content) ->
+                    val script = withContext(Dispatchers.Default) { ReadAloudScript.of(content, title) }
+                    _readAloudScript.value = script
+                    readAloudPlayer?.load(script)
+                }
+        }
+    }
+
+    /** Opens the panel and starts reading; a second press closes it and stops. */
+    fun toggleReadAloud() {
+        if (_readAloudOpen.value) {
+            closeReadAloud()
+            return
+        }
+        val player =
+            readAloudPlayer ?: ReadAloudPlayer(getApplication<Application>()).also {
+                readAloudPlayer = it
+                _readAloud.value = it.state
+            }
+        player.load(_readAloudScript.value)
+        _readAloudOpen.value = true
+        player.play()
+    }
+
+    fun closeReadAloud() {
+        readAloudPlayer?.pause()
+        _readAloudOpen.value = false
+    }
+
+    fun playOrPauseReadAloud() {
+        val player = readAloudPlayer ?: return
+        if (player.state.value.speaking) player.pause() else player.play()
+    }
+
+    fun seekReadAloud(index: Int) {
+        readAloudPlayer?.seekTo(index)
+    }
+
+    override fun onCleared() {
+        readAloudPlayer?.release()
+        readAloudPlayer = null
+        super.onCleared()
     }
 
     /** Settings owns this; the reader only needs to read it and nudge it. */

@@ -34,7 +34,7 @@ From `app/src/main/AndroidManifest.xml`:
 
 The store also lists `com.wanderwildwood.kirinuki.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` because it reads the APK. AndroidX declares it for its own internal receivers; it is signature-level and namespaced to this app, so nothing else can hold it and it grants no access to anything on the phone.
 
-The manifest also lets the app see whether anything on the phone opens web pages, a barcode scanner, a text-to-speech engine, or other apps' text actions, so it can offer them. It reads nothing from them. Plain http is permitted (`usesCleartextTraffic="true"`), because some feeds are only served that way; anything fetched over http can be read by others on the network.
+The manifest also lets the app see whether anything on the phone opens web pages, a barcode scanner, a text-to-speech engine, or other apps' text actions, so it can offer them. It reads nothing from them. Read aloud hands the article's text, a sentence at a time, to the phone's own text-to-speech engine, which speaks it; Feeds sends it nowhere else, and what the engine does with it is that engine's to say. Plain http is permitted (`usesCleartextTraffic="true"`), because some feeds are only served that way; anything fetched over http can be read by others on the network.
 
 ## Who else receives anything
 

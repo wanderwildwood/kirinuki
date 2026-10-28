@@ -17,6 +17,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,7 +43,9 @@ import com.wanderwildwood.kirinuki.ui.compose.components.rememberLineFence
 import com.wanderwildwood.kirinuki.ui.compose.components.LineFenceCover
 import com.wanderwildwood.kirinuki.ui.compose.components.LocalLineFence
 import com.wanderwildwood.kirinuki.ui.compose.components.ReaderEdges
+import com.wanderwildwood.kirinuki.ui.compose.html.LocalSpoken
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
+import com.wanderwildwood.kirinuki.model.readaloud.ReadAloudTimeline
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.compose.theme.TextScaleDialog
 import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
@@ -70,6 +74,30 @@ fun ArticleScreen(
     val onlyOnWifi by viewModel.onlyOnWifi.collectAsStateWithLifecycle()
     var scaleOpen by remember { mutableStateOf(false) }
     val lineFence = rememberLineFence(listState)
+
+    val readAloudOpen by viewModel.readAloudOpen.collectAsStateWithLifecycle()
+    val readAloud by viewModel.readAloudState.collectAsStateWithLifecycle()
+    val script by viewModel.readAloudScript.collectAsStateWithLifecycle()
+    // Reckoned at an ordinary pace until the voice has been heard; then at the pace it keeps.
+    val timeline = remember(script, readAloud.pace) { ReadAloudTimeline.at(script, readAloud.pace) }
+    // The sentence being read, for the text to underline and the page to follow; null when
+    // read aloud is closed, so a closed panel leaves no mark on the page, and null once it has
+    // read to the end, so the page stays on the last words rather than going back to the top.
+    val spoken =
+        rememberUpdatedState(
+            if (readAloudOpen && !readAloud.finished) script.getOrNull(readAloud.index) else null,
+        )
+    // Set by a press that moves the voice: the page goes to it even if the reader had paged away.
+    var jumpToSpoken by remember { mutableStateOf(false) }
+    FollowSpoken(
+        spoken = spoken.value,
+        content = content,
+        title = article?.title.orEmpty(),
+        listState = listState,
+        jump = { jumpToSpoken.also { jumpToSpoken = false } },
+    )
+    // Leaving the reader stops the voice; it does not go on reading a page nobody can see.
+    DisposableEffect(viewModel) { onDispose { viewModel.closeReadAloud() } }
 
     val context = LocalContext.current
     // Three things have to be true, and the default is that the first is not: the setting
@@ -116,6 +144,15 @@ fun ArticleScreen(
                                     },
                                 ),
                             onClick = { viewModel.togglePlayed() },
+                        )
+                    }
+                    // Not for an episode, which has its own sound.
+                    if (article?.enclosure?.isAudio != true) {
+                        BarIcon(
+                            icon = Icons.ReadAloud,
+                            contentDescription =
+                                stringResource(if (readAloudOpen) R.string.read_aloud_stop else R.string.read_aloud),
+                            onClick = { viewModel.toggleReadAloud() },
                         )
                     }
                     // The setting is in settings, where it is set once. This is the same
@@ -167,7 +204,7 @@ fun ArticleScreen(
                     .padding(padding),
         ) {
             Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
-                CompositionLocalProvider(LocalLineFence provides lineFence) {
+                CompositionLocalProvider(LocalLineFence provides lineFence, LocalSpoken provides spoken) {
                     // Selectable again, as it was before the MMD rebuild dropped it: a word in an
                     // article is what Define and Note are most often wanted for. The menu over a
                     // selection is the shop's, with its ⋮ given back (TextActions.kt).
@@ -244,6 +281,18 @@ fun ArticleScreen(
 
             // A podcast episode: the text above is its show notes, and the sound is played
             // from here. Outside the page-turning edges, which cover the whole text.
+            if (readAloudOpen) {
+                ReadAloudPanel(
+                    state = readAloud,
+                    timeline = timeline,
+                    onPlayOrPause = viewModel::playOrPauseReadAloud,
+                    onSeek = { index ->
+                        jumpToSpoken = true
+                        viewModel.seekReadAloud(index)
+                    },
+                )
+            }
+
             val current = article
             if (current != null && current.enclosure.isAudio) {
                 EpisodePanel(
