@@ -71,6 +71,10 @@ fun AddFeedScreen(
     // then leave them alone: without this, a second emission would undo what was typed.
     var filledIn by rememberSaveable { mutableStateOf(false) }
     val error by viewModel.error.collectAsStateWithLifecycle()
+    val formScroll = rememberScrollState()
+    // The message sits under the address box at the top; a press of Subscribe at the foot
+    // would otherwise leave it out of sight.
+    LaunchedEffect(error) { if (error != null) formScroll.scrollTo(0) }
     val saved by viewModel.saved.collectAsStateWithLifecycle()
     val feed by viewModel.feed.collectAsStateWithLifecycle()
     val folders by viewModel.folders.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -143,7 +147,7 @@ fun AddFeedScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(formScroll)
                     .padding(16.dp),
         ) {
             // The pages feed has an address nothing answers at, and changing it would only

@@ -72,11 +72,12 @@ class PullState internal constructor(
 
     /**
      * A sync that nobody pulled for -- the refresh button, a feed just added, the schedule --
-     * says how it went the same way, once it has finished. [seen] is the outcome already on
-     * hand when the screen came up, which belongs to an earlier visit and is not reported.
+     * says how it went the same way, once it has finished. Each outcome is said once:
+     * wherever the screen was when it arrived.
      */
-    fun finished(done: SyncOutcome?, seen: SyncOutcome?) {
-        if (done == null || done === seen || job?.isActive == true) return
+    fun finished(done: SyncOutcome?) {
+        if (done == null || done === lastReported || job?.isActive == true) return
+        lastReported = done
         reported?.cancel()
         reported = scope.launch {
             pulled = pulledAfter(done)
@@ -101,6 +102,7 @@ class PullState internal constructor(
             val done = if (started == null) null else withTimeoutOrNull(PULL_FINISH_MS) {
                 outcome.first { it !== before }
             }
+            lastReported = done
             pulled = pulledAfter(done)
             delay(PULLED_LINE_MS)
             pulled = null
@@ -108,14 +110,16 @@ class PullState internal constructor(
     }
 }
 
+/** The last sync outcome a line was shown for, so each one is said once. */
+private var lastReported: SyncOutcome? = null
+
 @Composable
 fun rememberPull(refresh: () -> Unit, outcome: StateFlow<SyncOutcome?>, running: StateFlow<Boolean>): PullState {
     val scope = rememberCoroutineScope()
     val latest = rememberUpdatedState(refresh)
     val state = remember { PullState(scope, { latest.value() }, outcome, running) }
-    val seen = remember { outcome.value }
     val done by outcome.collectAsState()
-    LaunchedEffect(done) { state.finished(done, seen) }
+    LaunchedEffect(done) { state.finished(done) }
     return state
 }
 
