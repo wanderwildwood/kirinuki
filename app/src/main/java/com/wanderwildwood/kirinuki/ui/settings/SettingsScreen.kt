@@ -53,6 +53,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onImportOpml: () -> Unit,
     onExportOpml: () -> Unit,
+    onLicences: () -> Unit,
     viewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -233,7 +234,7 @@ fun SettingsScreen(
         }
     }
 
-    if (aboutOpen) AboutDialog(onDismiss = { aboutOpen = false })
+    if (aboutOpen) AboutDialog(onDismiss = { aboutOpen = false }, onLicences = { aboutOpen = false; onLicences() })
 }
 
 /** One step along the choices, which run shortest to longest and then never. */

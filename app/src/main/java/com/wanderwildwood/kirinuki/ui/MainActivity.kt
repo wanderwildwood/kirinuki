@@ -40,6 +40,7 @@ import com.wanderwildwood.kirinuki.ui.feeds.FeedsScreen
 import com.wanderwildwood.kirinuki.ui.feeds.FeedsViewModel
 import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageScreen
 import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageViewModel
+import com.wanderwildwood.kirinuki.ui.licences.LicencesScreen
 import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
 import com.wanderwildwood.kirinuki.ui.settings.SettingsViewModel
 import kotlinx.coroutines.launch
@@ -270,8 +271,12 @@ class MainActivity : DIAwareComponentActivity() {
                     onBack = { navController.popBackStack() },
                     onImportOpml = { importLauncher.launch(arrayOf("*/*")) },
                     onExportOpml = { exportLauncher.launch("kirinuki-${LocalDate.now()}.opml") },
+                    onLicences = { navController.navigate(Route.LICENCES) },
                     viewModel = viewModel,
                 )
+            }
+            composable(Route.LICENCES) {
+                LicencesScreen(onBack = { navController.popBackStack() })
             }
             composable(
                 Route.GEMINI_ROUTE,

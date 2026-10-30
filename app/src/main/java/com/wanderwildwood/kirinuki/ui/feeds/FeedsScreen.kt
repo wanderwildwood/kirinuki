@@ -83,7 +83,7 @@ fun FeedsScreen(
                     BarIcon(
                         icon = Icons.Refresh,
                         contentDescription = stringResource(R.string.sync),
-                        onClick = { viewModel.refresh() },
+                        onClick = { pull.pull() },
                     )
                     BarIcon(
                         icon = Icons.Plus,

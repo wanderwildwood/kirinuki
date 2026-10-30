@@ -9,6 +9,8 @@ import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
+import com.wanderwildwood.kirinuki.net.isSmolnetUrl
+import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.net.parseUrlLeniently
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +27,11 @@ class AddFeedViewModel(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
+
+    /** The address is being fixed, so what was said about the last one no longer applies. */
+    fun clearError() {
+        _error.value = null
+    }
 
     private val _saved = MutableStateFlow(false)
     val saved: StateFlow<Boolean> = _saved
@@ -127,7 +134,7 @@ class AddFeedViewModel(
             // A feed with no title yet is a blank row in the list, and it stays blank if
             // the first fetch fails. Stand the host in until the feed says its own name:
             // this is `title`, not `customTitle`, so the sync overwrites it.
-            val placeholder = parsed.host.removePrefix("www.")
+            val placeholder = placeholderTitle(parsed)
             // A blank box means two different things in the two screens. Editing loaded
             // the boxes from the feed, so emptying one is how a rename or a move is taken
             // back -- the feed's own title returns, and it leaves the folder. Adding never
@@ -214,8 +221,22 @@ class AddFeedViewModel(
  * and "https://word"; neither names a host, and the first fetch would fail with nothing said.
  */
 internal fun looksLikeAddress(url: java.net.URL): Boolean {
+    // Only what the app can fetch: a web address, or gemini, gopher or spartan.
+    val spec = url.toString()
+    if (!isWebUrl(spec) && !isSmolnetUrl(spec)) return false
     val host = url.host
     if (host.isBlank() || host.any { it.isWhitespace() }) return false
     if (url.toString().any { it.isWhitespace() }) return false
     return host.contains('.') || host.contains(':') || host.equals("localhost", ignoreCase = true)
+}
+
+/**
+ * What a feed is called until it says its own name: the host, with the path after it when there
+ * is one, so two feeds from one server are told apart in the list when neither has answered.
+ */
+internal fun placeholderTitle(url: java.net.URL): String {
+    val host = url.host.removePrefix("www.")
+    val path = url.path.orEmpty().trimEnd('/')
+    val named = if (path.isEmpty()) host else host + path
+    return if (named.length <= 40) named else named.take(39) + "…"
 }

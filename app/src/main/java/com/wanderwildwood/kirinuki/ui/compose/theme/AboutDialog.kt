@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -33,7 +35,7 @@ import com.wanderwildwood.kirinuki.R
  * addresses it is given. What it does not do is the part a stranger cannot assume.
  */
 @Composable
-fun AboutDialog(onDismiss: () -> Unit) {
+fun AboutDialog(onDismiss: () -> Unit, onLicences: () -> Unit) {
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(
             text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
@@ -70,7 +72,14 @@ fun AboutDialog(onDismiss: () -> Unit) {
             text = stringResource(R.string.about_licence),
             style = MaterialTheme.typography.labelSmall,
         )
-        Spacer(Modifier.height(14.dp))
+        TextMMD(
+            text = stringResource(R.string.about_licences_row),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClick = onLicences)
+                .wrapContentHeight(Alignment.CenterVertically),
+        )
+        Spacer(Modifier.height(6.dp))
         Llama()
 
         Spacer(Modifier.height(18.dp))

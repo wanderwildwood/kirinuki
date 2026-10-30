@@ -4,7 +4,7 @@ import androidx.collection.ArrayMap
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -592,36 +592,29 @@ fun LinearBlockQuoteContent(
 //    }
 // }
 
+/**
+ * Preformatted text, kept in its own line breaks but wrapped at the screen's edge. It used to
+ * run off the right edge and wait for a sideways swipe, which a page-turning reader has no
+ * room for, so whatever lay past the edge was simply never read. No grey fill either: a thin
+ * rule round it sets it apart, as everywhere else in the house.
+ */
 @Composable
 fun CodeBlock(
     linearText: LinearText,
-    allowHorizontalScroll: Boolean,
+    @Suppress("UNUSED_PARAMETER") allowHorizontalScroll: Boolean,
     idToIndex: Map<String, Int>,
     onLinkClick: (url: String, index: Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val scrollState = rememberScrollState()
-    val interactionSource =
-        remember { MutableInteractionSource() }
     Box(
         modifier = modifier,
         contentAlignment = Alignment.TopStart,
     ) {
         Surface(
-            color = CodeBlockBackground(),
+            color = MaterialTheme.colorScheme.background,
             shape = MaterialTheme.shapes.medium,
-            modifier =
-                Modifier
-                    .run {
-                        if (allowHorizontalScroll) {
-                            horizontalScroll(scrollState)
-                        } else {
-                            this
-                        }
-                    }.indication(
-                        interactionSource,
-                        LocalIndication.current,
-                    ).focusableInNonTouchMode(interactionSource = interactionSource),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onBackground),
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Box(
                 contentAlignment = Alignment.TopStart,
@@ -636,7 +629,7 @@ fun CodeBlock(
                         linearText = linearText,
                         idToIndex = idToIndex,
                         onLinkClick = onLinkClick,
-                        softWrap = false,
+                        softWrap = true,
                     )
                 }
             }

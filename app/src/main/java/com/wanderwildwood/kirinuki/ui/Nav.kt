@@ -9,6 +9,7 @@ object Route {
     const val ARTICLES = "articles"
     const val ARTICLE = "article"
     const val SETTINGS = "settings"
+    const val LICENCES = "licences"
 
     /**
      * One screen, two jobs: with an address it subscribes, with a feed it edits that feed.

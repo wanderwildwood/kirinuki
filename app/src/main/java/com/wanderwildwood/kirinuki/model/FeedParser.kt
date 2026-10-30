@@ -584,3 +584,17 @@ data class FullTextTooLarge(
     override val description: String = "Response body exceeded $maxBytes bytes",
     override val throwable: Throwable? = null,
 ) : FeedParserError()
+
+/** What a reader can be told about [error]: the server could not be reached, it answered badly, or it did not send a feed. */
+fun syncFailureOf(error: FeedParserError): com.wanderwildwood.kirinuki.archmodel.SyncFailure {
+    val kind =
+        when (error) {
+            is FetchError -> com.wanderwildwood.kirinuki.archmodel.FailKind.NO_CONNECTION
+            is HttpError -> com.wanderwildwood.kirinuki.archmodel.FailKind.SERVER_ANSWERED
+            is NotHTML, is MetaDataParseError, is RSSParseError, is JsonFeedParseError, is NoAlternateFeeds,
+            is UnsupportedContentType, is NoBody,
+            -> com.wanderwildwood.kirinuki.archmodel.FailKind.NOT_A_FEED
+            else -> com.wanderwildwood.kirinuki.archmodel.FailKind.OTHER
+        }
+    return com.wanderwildwood.kirinuki.archmodel.SyncFailure("", kind, (error as? HttpError)?.code ?: 0)
+}

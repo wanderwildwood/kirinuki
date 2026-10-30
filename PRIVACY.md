@@ -1,6 +1,6 @@
 # Feeds — Privacy Policy
 
-Version 0.5.10. Last reviewed 23 October 2026.
+Version 0.5.14. Last reviewed 29 October 2026.
 
 ## The short version
 
@@ -34,7 +34,15 @@ From `app/src/main/AndroidManifest.xml`:
 
 The store also lists `com.wanderwildwood.kirinuki.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` because it reads the APK. AndroidX declares it for its own internal receivers; it is signature-level and namespaced to this app, so nothing else can hold it and it grants no access to anything on the phone.
 
-The manifest also lets the app see whether anything on the phone opens web pages, a barcode scanner, a text-to-speech engine, or other apps' text actions, so it can offer them. It reads nothing from them. Read aloud hands the article's text, a sentence at a time, to the phone's own text-to-speech engine, which speaks it; Feeds sends it nowhere else, and what the engine does with it is that engine's to say. Plain http is permitted (`usesCleartextTraffic="true"`), because some feeds are only served that way; anything fetched over http can be read by others on the network.
+The manifest also lets the app see whether anything on the phone opens web pages, a barcode scanner, a text-to-speech engine, or other apps' text actions, so it can offer them. It reads nothing from them. Read aloud hands the article's text, a sentence at a time, to the phone's own text-to-speech engine, which speaks it; Feeds sends it nowhere else, and what the engine does with it is that engine's to say. Plain http is permitted; see "Plain http (cleartext traffic)" below.
+
+### Plain http (cleartext traffic)
+
+The manifest sets `usesCleartextTraffic="true"`, and Android scanners flag it. It is on on purpose: some feeds, and many older sites, are only served over plain http, and gopher is a bare, unencrypted socket by design. Feeds served over plain http are fetched as the site serves them, with no encryption, so anyone on the same network can read the feed text on its way, and could alter it. Only the feed or page you asked for is requested, with the app's name and version as the user agent; nothing else about you or your phone is sent. An address that starts with https:// is always fetched encrypted, Gemini capsules are encrypted and pinned to the certificate seen on the first visit. Gopher and Spartan, like plain http, are not encrypted.
+
+## Licences
+
+Settings, About, Licences shows the licence of the app (GNU General Public License, version 3, in full), the open-source libraries it is built on and the licence of each, and a link to the source code. The terms are also in About, in the app, as two short paragraphs.
 
 ## Who else receives anything
 

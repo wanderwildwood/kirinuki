@@ -151,11 +151,23 @@ fun AddFeedScreen(
             if (feed?.isSavedPages != true) {
                 TextFieldMMD(
                     value = url,
-                    onValueChange = { url = it },
+                    onValueChange = {
+                        url = it
+                        if (error != null) viewModel.clearError()
+                    },
                     label = { TextMMD(text = stringResource(R.string.add_feed_url)) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                 )
+                // Said under the box it is about, not at the foot of a long form where the
+                // one who pressed Subscribe has to scroll to find out why nothing happened.
+                if (error != null) {
+                    TextMMD(
+                        text = stringResource(R.string.add_feed_url_invalid),
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    )
+                }
             }
             TextFieldMMD(
                 value = title,
@@ -244,9 +256,6 @@ fun AddFeedScreen(
                 text = stringResource(R.string.article_rules_effect),
                 style = MaterialTheme.typography.bodySmall,
             )
-            if (error != null) {
-                TextMMD(text = stringResource(R.string.add_feed_url_invalid))
-            }
             ButtonMMD(
                 onClick =
                     {

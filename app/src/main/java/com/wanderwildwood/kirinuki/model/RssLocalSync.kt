@@ -4,7 +4,10 @@ import android.app.Application
 import android.util.Log
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.model.gemtext.GemsubParser
+import com.wanderwildwood.kirinuki.model.gopher.GopherLogParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
+import com.wanderwildwood.kirinuki.net.gopher.GopherClient
+import com.wanderwildwood.kirinuki.net.gopher.GopherResponse
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.blob.blobFile
@@ -15,6 +18,8 @@ import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedItem
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.util.Either
+import com.wanderwildwood.kirinuki.archmodel.FailKind
+import com.wanderwildwood.kirinuki.archmodel.SyncFailure
 import com.wanderwildwood.kirinuki.archmodel.SyncOutcome
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.fetchOgImage
@@ -61,6 +66,7 @@ class RssLocalSync(
     private val feedParser: FeedParser by instance()
     private val okHttpClient: OkHttpClient by instance()
     private val geminiClient: GeminiClient by instance()
+    private val gopherClient: GopherClient by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val application: Application by instance()
 
@@ -107,6 +113,7 @@ class RssLocalSync(
         val tried = java.util.concurrent.atomic.AtomicInteger()
         val failed = java.util.concurrent.atomic.AtomicInteger()
         val failedTitles = java.util.Collections.synchronizedList(mutableListOf<String>())
+        val failures = java.util.Collections.synchronizedList(mutableListOf<SyncFailure>())
         // Let all new items share download time
         val downloadTime = Instant.now()
         val time =
@@ -149,16 +156,17 @@ class RssLocalSync(
                                             .filterIndexed { index, _ ->
                                                 index % concurrentJobs == jobIndex
                                             }.forEach { feed ->
-                                                val fetched =
+                                                val fetchFailure =
                                                     handleFeed(
                                                         feed = feed,
                                                         maxFeedItemCount = maxFeedItemCount,
                                                         forceNetwork = forceNetwork,
                                                         downloadTime = downloadTime,
                                                     )
-                                                if (!fetched) {
+                                                if (fetchFailure != null) {
                                                     failed.incrementAndGet()
                                                     failedTitles.add(feed.displayTitle)
+                                                    failures.add(fetchFailure.copy(title = feed.displayTitle))
                                                 }
                                             }
                                     }
@@ -177,7 +185,7 @@ class RssLocalSync(
                 } catch (e: Throwable) {
                     Log.e(LOG_TAG, "Outer error", e)
                 } finally {
-                    repository.setSyncOutcome(SyncOutcome(tried = tried.get(), failed = failed.get(), ok = result, failedTitles = failedTitles.toList()))
+                    repository.setSyncOutcome(SyncOutcome(tried = tried.get(), failed = failed.get(), ok = result, failedTitles = failedTitles.toList(), failures = failures.toList()))
                     if (needFullTextSync) {
                         runOnceFullTextSync(
                             di = di,
@@ -195,8 +203,9 @@ class RssLocalSync(
         maxFeedItemCount: Int,
         forceNetwork: Boolean,
         downloadTime: Instant,
-    ): Boolean {
-        var fetched = false
+    ): SyncFailure? {
+        // Null once the feed has been got; otherwise why not.
+        var failure: SyncFailure? = SyncFailure("", FailKind.OTHER)
         try {
             // Want unique sync times.
             val syncTime = Instant.now()
@@ -211,6 +220,7 @@ class RssLocalSync(
                 forceNetwork = forceNetwork,
                 downloadTime = downloadTime,
             ).onLeft { feedParserError ->
+                failure = syncFailureOf(feedParserError)
                 Log.e(
                     LOG_TAG,
                     "Failed to sync ${feed.displayTitle}: ${feed.url} because:\n${feedParserError.description}",
@@ -227,7 +237,7 @@ class RssLocalSync(
                     }
                 }
             }.onRight {
-                fetched = true
+                failure = null
                 repository.setBlockStatusForNewInFeed(feedId = feed.id, blockTime = syncTime)
             }
         } catch (e: Throwable) {
@@ -242,7 +252,7 @@ class RssLocalSync(
                 syncing = false,
             )
         }
-        return fetched
+        return failure
     }
 
     /**
@@ -258,7 +268,48 @@ class RssLocalSync(
     ): Either<FeedParserError, ParsedFeed> =
         when (url.protocol) {
             "gemini" -> fetchGemlog(feedSql, url, maxFeedItemCount)
+            "gopher" -> fetchPhlog(feedSql, url, maxFeedItemCount)
+            // Opened as a page, not followed as a feed: there is no dated-link convention to read.
+            "spartan" -> NoAlternateFeeds(url = url.toString()).left()
             else -> fetchOverHttp(url, forceNetwork)
+        }
+
+    /**
+     * A phlog is a gopher menu whose text-file lines carry dates, read the way a gemlog is.
+     * Gopher is a bare socket: no certificate, no status line, so what comes back is the menu or an error.
+     */
+    private suspend fun fetchPhlog(
+        feedSql: Feed,
+        url: URL,
+        maxFeedItemCount: Int,
+    ): Either<FeedParserError, ParsedFeed> =
+        Either
+            .catching(
+                onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
+            ) {
+                withContext(Dispatchers.IO) {
+                    gopherClient.fetch(url.toString())
+                }
+            }.flatMap { response ->
+                when (response) {
+                    is GopherResponse.Menu ->
+                        GopherLogParser()
+                            .parse(response.url, response.text)
+                            ?.let { withEntryText(feedSql, it, maxFeedItemCount, ::gopherTextAt).right() }
+                            ?: NoBody(url = url.toString()).left()
+
+                    else -> NotHTML(url = url.toString()).left()
+                }
+            }
+
+    private suspend fun gopherTextAt(link: String): String =
+        try {
+            withContext(Dispatchers.IO) {
+                (gopherClient.fetch(link) as? GopherResponse.Text)?.text.orEmpty()
+            }
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "Could not fetch the entry at $link", e)
+            ""
         }
 
     private suspend fun fetchOverHttp(
@@ -320,7 +371,7 @@ class RssLocalSync(
                     else ->
                         GemsubParser()
                             .parse(response.url, response.text())
-                            ?.let { withEntryText(feedSql, it, maxFeedItemCount).right() }
+                            ?.let { withEntryText(feedSql, it, maxFeedItemCount, ::gemtextAt).right() }
                             // Dated links are what makes a page a gemlog. Without any,
                             // there is nothing here to subscribe to, and saying so beats
                             // reporting a successful sync that can never produce an entry.
@@ -343,6 +394,7 @@ class RssLocalSync(
         feedSql: Feed,
         parsed: ParsedFeed,
         maxFeedItemCount: Int,
+        textAt: suspend (String) -> String,
     ): ParsedFeed {
         val items =
             parsed.items
@@ -354,7 +406,7 @@ class RssLocalSync(
                     if (repository.loadFeedItem(guid = guid, feedId = feedSql.id) != null) {
                         return@map item
                     }
-                    item.copy(content_text = gemtextAt(link))
+                    item.copy(content_text = textAt(link))
                 }
         return parsed.copy(items = items)
     }

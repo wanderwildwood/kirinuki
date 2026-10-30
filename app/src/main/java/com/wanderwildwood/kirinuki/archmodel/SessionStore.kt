@@ -60,4 +60,12 @@ class SyncOutcome(
     val ok: Boolean = true,
     /** Titles of the feeds that were not got, so a pull can name them. */
     val failedTitles: List<String> = emptyList(),
+    /** Why each of those was not got, so a line can say more than "could not fetch". */
+    val failures: List<SyncFailure> = emptyList(),
 )
+
+/** Why a feed was not got, in the few ways a reader can act on. */
+enum class FailKind { NO_CONNECTION, SERVER_ANSWERED, NOT_A_FEED, OTHER }
+
+/** One feed that was not got: its name, why, and the server's code when it answered with one. */
+data class SyncFailure(val title: String, val kind: FailKind, val code: Int = 0)

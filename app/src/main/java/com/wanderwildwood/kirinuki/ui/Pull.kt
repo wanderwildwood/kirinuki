@@ -1,6 +1,8 @@
 package com.wanderwildwood.kirinuki.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -9,6 +11,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import com.wanderwildwood.kirinuki.R
+import com.wanderwildwood.kirinuki.archmodel.FailKind
+import com.wanderwildwood.kirinuki.archmodel.SyncFailure
 import com.wanderwildwood.kirinuki.archmodel.SyncOutcome
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -30,6 +34,8 @@ sealed interface Pulled {
     data object NotStarted : Pulled
     /** Every feed asked for failed. */
     data object Unreachable : Pulled
+    /** Exactly one feed failed, and the reason is known. */
+    data class OneFailed(val failure: SyncFailure) : Pulled
     /** Some did, some did not. */
     data class SomeFailed(val titles: List<String>) : Pulled
 }
@@ -37,6 +43,7 @@ sealed interface Pulled {
 /** What a finished sync, which left [outcome] behind (null: nothing did), has to say to the one who pulled. */
 fun pulledAfter(outcome: SyncOutcome?): Pulled = when {
     outcome == null -> Pulled.NotStarted
+    outcome.ok && outcome.failures.size == 1 && outcome.failed == 1 -> Pulled.OneFailed(outcome.failures.single())
     !outcome.ok -> Pulled.Unreachable
     outcome.tried > 0 && outcome.failed >= outcome.tried -> Pulled.Unreachable
     outcome.failed > 0 -> Pulled.SomeFailed(outcome.failedTitles)
@@ -63,9 +70,27 @@ class PullState internal constructor(
         private set
     private var job: Job? = null
 
+    /**
+     * A sync that nobody pulled for -- the refresh button, a feed just added, the schedule --
+     * says how it went the same way, once it has finished. [seen] is the outcome already on
+     * hand when the screen came up, which belongs to an earlier visit and is not reported.
+     */
+    fun finished(done: SyncOutcome?, seen: SyncOutcome?) {
+        if (done == null || done === seen || job?.isActive == true) return
+        reported?.cancel()
+        reported = scope.launch {
+            pulled = pulledAfter(done)
+            delay(PULLED_LINE_MS)
+            pulled = null
+        }
+    }
+
+    private var reported: Job? = null
+
     /** Runs the same sync as the refresh button, and reports it. A second pull meanwhile is the same pull. */
     fun pull() {
         if (job?.isActive == true) return
+        reported?.cancel()
         job = scope.launch {
             pulled = Pulled.Syncing
             val before = outcome.value
@@ -87,7 +112,11 @@ class PullState internal constructor(
 fun rememberPull(refresh: () -> Unit, outcome: StateFlow<SyncOutcome?>, running: StateFlow<Boolean>): PullState {
     val scope = rememberCoroutineScope()
     val latest = rememberUpdatedState(refresh)
-    return remember { PullState(scope, { latest.value() }, outcome, running) }
+    val state = remember { PullState(scope, { latest.value() }, outcome, running) }
+    val seen = remember { outcome.value }
+    val done by outcome.collectAsState()
+    LaunchedEffect(done) { state.finished(done, seen) }
+    return state
 }
 
 /** [pulled] in words. */
@@ -98,6 +127,14 @@ fun pulledWords(pulled: Pulled?): String? = when (pulled) {
     Pulled.UpToDate -> stringResource(R.string.pull_up_to_date)
     Pulled.NotStarted -> stringResource(R.string.pull_not_started)
     Pulled.Unreachable -> stringResource(R.string.pull_unreachable)
+    is Pulled.OneFailed -> pulled.failure.let { f ->
+        when (f.kind) {
+            FailKind.NO_CONNECTION -> stringResource(R.string.pull_one_no_connection, f.title)
+            FailKind.SERVER_ANSWERED -> stringResource(R.string.pull_one_server_answered, f.title, f.code)
+            FailKind.NOT_A_FEED -> stringResource(R.string.pull_one_not_a_feed, f.title)
+            FailKind.OTHER -> stringResource(R.string.pull_failed_named, f.title)
+        }
+    }
     is Pulled.SomeFailed -> {
         val shown = pulled.titles.take(PULLED_NAMES_SHOWN)
         val more = pulled.titles.size - shown.size

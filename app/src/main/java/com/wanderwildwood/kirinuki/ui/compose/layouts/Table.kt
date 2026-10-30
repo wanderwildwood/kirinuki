@@ -40,15 +40,9 @@ fun Table(
         contentAlignment = Alignment.Center,
     ) {
         Layout(
-            modifier =
-                Modifier
-                    .run {
-                        if (allowHorizontalScroll) {
-                            horizontalScroll(horizontalScrollState)
-                        } else {
-                            this
-                        }
-                    },
+            // No sideways scroll: a column wider than its share of the screen wraps, so every
+            // cell is read where it is. A page-turning reader has no room for a swipe across.
+            modifier = Modifier,
             content = {
                 for (tableCell in tableData.cells) {
                     if (tableCell.rowSpan > 0 && tableCell.colSpan > 0) {
@@ -56,7 +50,9 @@ fun Table(
                     }
                 }
             },
-        ) { measurables, _ ->
+        ) { measurables, constraints ->
+            val columns = tableData.cells.maxOfOrNull { it.column + it.colSpan } ?: 1
+            val share = if (constraints.hasBoundedWidth) constraints.maxWidth / columns else Constraints.Infinity
             val placeables =
                 measurables.mapIndexed { index, measurable ->
                     val tableCell = tableData.cells[index]
@@ -67,7 +63,12 @@ fun Table(
                     measurable.measure(
                         Constraints(
                             minWidth = minWidth,
-                            maxWidth = Constraints.Infinity,
+                            maxWidth =
+                                if (share == Constraints.Infinity) {
+                                    Constraints.Infinity
+                                } else {
+                                    maxOf(share * tableCell.colSpan, minWidth)
+                                },
                             minHeight = minHeight,
                             maxHeight = Constraints.Infinity,
                         ),
