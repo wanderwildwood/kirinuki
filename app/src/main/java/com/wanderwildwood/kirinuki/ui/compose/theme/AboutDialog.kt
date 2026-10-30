@@ -27,6 +27,7 @@ import com.mudita.mmd.components.buttons.OutlinedButtonMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.kirinuki.BuildConfig
 import com.wanderwildwood.kirinuki.R
+import com.wanderwildwood.kirinuki.ui.PagedColumn
 
 /**
  * What this is, what it reaches for, and whose the parts are.
@@ -37,17 +38,22 @@ import com.wanderwildwood.kirinuki.R
 @Composable
 fun AboutDialog(onDismiss: () -> Unit, onLicences: (() -> Unit)? = null) {
     EInkDialog(onDismiss = onDismiss) {
+        // Taller than a small screen once Licences was added, so it pages a block at a time, and Close stays under it.
+        PagedColumn(modifier = Modifier.heightIn(max = 520.dp)) {
+            item {
         TextMMD(
             text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Medium,
         )
-        Spacer(Modifier.height(14.dp))
+            }
+            item {
         TextMMD(
             text = stringResource(R.string.about_what),
             style = MaterialTheme.typography.labelSmall,
         )
-        Spacer(Modifier.height(14.dp))
+            }
+            item {
         TextMMD(
             text = stringResource(R.string.about_privacy_head),
             style = MaterialTheme.typography.labelSmall,
@@ -57,12 +63,14 @@ fun AboutDialog(onDismiss: () -> Unit, onLicences: (() -> Unit)? = null) {
             text = stringResource(R.string.about_privacy),
             style = MaterialTheme.typography.labelSmall,
         )
-        Spacer(Modifier.height(14.dp))
+            }
+            item {
         TextMMD(
             text = stringResource(R.string.about_built_on),
             style = MaterialTheme.typography.labelSmall,
         )
-        Spacer(Modifier.height(14.dp))
+            }
+            item {
         TextMMD(
             text = stringResource(R.string.about_terms_head),
             style = MaterialTheme.typography.labelSmall,
@@ -80,11 +88,13 @@ fun AboutDialog(onDismiss: () -> Unit, onLicences: (() -> Unit)? = null) {
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClick = onLicences)
                 .wrapContentHeight(Alignment.CenterVertically),
         )
-        Spacer(Modifier.height(6.dp))
         }
+            }
+            item {
         Llama()
-
-        Spacer(Modifier.height(18.dp))
+            }
+        }
+        Spacer(Modifier.height(10.dp))
         OutlinedButtonMMD(
             onClick = onDismiss,
             modifier = Modifier.fillMaxWidth().height(48.dp),
