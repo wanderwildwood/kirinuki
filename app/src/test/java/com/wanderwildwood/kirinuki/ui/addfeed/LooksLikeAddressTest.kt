@@ -6,7 +6,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LooksLikeAddressTest {
-    private fun ok(spec: String) = looksLikeAddress(parseUrlLeniently(spec))
+    // An address the parser itself refuses is not an address either, which is how the form treats it.
+    private fun ok(spec: String) =
+        try {
+            looksLikeAddress(parseUrlLeniently(spec))
+        } catch (e: java.net.MalformedURLException) {
+            false
+        }
 
     @Test
     fun addressesTheAppCanFetchPass() {
