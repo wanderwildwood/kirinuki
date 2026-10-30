@@ -39,7 +39,7 @@ import com.wanderwildwood.kirinuki.ui.PagedColumn
 fun AboutDialog(onDismiss: () -> Unit, onLicences: (() -> Unit)? = null) {
     EInkDialog(onDismiss = onDismiss) {
         // Taller than a small screen once Licences was added, so it pages a block at a time, and Close stays under it.
-        PagedColumn(modifier = Modifier.heightIn(max = 520.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp)) {
+        PagedColumn(modifier = Modifier.heightIn(max = 430.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp)) {
             item {
         TextMMD(
             text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
