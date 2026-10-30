@@ -35,7 +35,7 @@ import com.wanderwildwood.kirinuki.R
  * addresses it is given. What it does not do is the part a stranger cannot assume.
  */
 @Composable
-fun AboutDialog(onDismiss: () -> Unit, onLicences: () -> Unit) {
+fun AboutDialog(onDismiss: () -> Unit, onLicences: (() -> Unit)? = null) {
     EInkDialog(onDismiss = onDismiss) {
         TextMMD(
             text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
@@ -72,6 +72,7 @@ fun AboutDialog(onDismiss: () -> Unit, onLicences: () -> Unit) {
             text = stringResource(R.string.about_licence),
             style = MaterialTheme.typography.labelSmall,
         )
+        if (onLicences != null) {
         TextMMD(
             text = stringResource(R.string.about_licences_row),
             style = MaterialTheme.typography.labelSmall,
@@ -80,6 +81,7 @@ fun AboutDialog(onDismiss: () -> Unit, onLicences: () -> Unit) {
                 .wrapContentHeight(Alignment.CenterVertically),
         )
         Spacer(Modifier.height(6.dp))
+        }
         Llama()
 
         Spacer(Modifier.height(18.dp))
