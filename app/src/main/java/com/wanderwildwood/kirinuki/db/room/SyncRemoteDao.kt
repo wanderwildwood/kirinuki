@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.wanderwildwood.kirinuki.crypto.AesCbcWithIntegrity
+import com.wanderwildwood.kirinuki.crypto.SyncKey
 import kotlinx.coroutines.flow.Flow
 import java.time.Instant
 
@@ -64,7 +64,7 @@ interface SyncRemoteDao {
             SyncRemote(
                 id = 1L,
                 deviceName = Build.PRODUCT.ifBlank { Build.MODEL.ifBlank { Build.BRAND } },
-                secretKey = AesCbcWithIntegrity.generateKey().toString(),
+                secretKey = SyncKey.generate(),
             ),
         )
     }

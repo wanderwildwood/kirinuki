@@ -14,7 +14,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.background.runOnceBlocklistUpdate
 import com.wanderwildwood.kirinuki.blob.blobOutputStream
-import com.wanderwildwood.kirinuki.crypto.AesCbcWithIntegrity
+import com.wanderwildwood.kirinuki.crypto.SyncKey
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.contentValues
 import com.wanderwildwood.kirinuki.util.forEach
@@ -576,7 +576,7 @@ object MIGRATION_20_21 : Migration(20, 21) {
             SET secret_key = ?
             WHERE id IS 1
             """.trimIndent(),
-            arrayOf(AesCbcWithIntegrity.generateKey().toString()),
+            arrayOf(SyncKey.generate()),
         )
     }
 }

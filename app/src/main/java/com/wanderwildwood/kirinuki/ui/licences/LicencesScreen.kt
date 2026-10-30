@@ -1,8 +1,6 @@
 package com.wanderwildwood.kirinuki.ui.licences
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +30,7 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import com.wanderwildwood.kirinuki.util.openInBrowser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -50,6 +49,9 @@ fun LicencesScreen(
     val gpl by produceTexts(context, "LICENSE")
     val apache by produceTexts(context, "licences/Apache-2.0.txt")
     val mit by produceTexts(context, "licences/MIT.txt")
+    val mpl by produceTexts(context, "licences/MPL-2.0.txt")
+    val unicode by produceTexts(context, "licences/Unicode-3.0.txt")
+    val gpl2 by produceTexts(context, "licences/GPL-2.0-with-Classpath-Exception.txt")
 
     Scaffold(
         modifier = modifier,
@@ -93,6 +95,12 @@ fun LicencesScreen(
             apache.forEach { item { Paragraph(it) } }
             item { Heading(stringResource(R.string.licences_mit)) }
             mit.forEach { item { Paragraph(it) } }
+            item { Heading(stringResource(R.string.licences_mpl)) }
+            mpl.forEach { item { Paragraph(it) } }
+            item { Heading(stringResource(R.string.licences_unicode)) }
+            unicode.forEach { item { Paragraph(it) } }
+            item { Heading(stringResource(R.string.licences_gpl2_cpe)) }
+            gpl2.forEach { item { Paragraph(it) } }
         }
     }
 }
@@ -132,8 +140,7 @@ fun SourceLink(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .heightIn(min = 48.dp)
                 .clickable {
-                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(SOURCE_URL))) }
-                        .onFailure { Toast.makeText(context, none, Toast.LENGTH_SHORT).show() }
+                    if (!context.openInBrowser(SOURCE_URL)) Toast.makeText(context, none, Toast.LENGTH_SHORT).show()
                 }
                 .wrapContentHeight(Alignment.CenterVertically),
     )

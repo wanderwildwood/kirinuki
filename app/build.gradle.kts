@@ -28,8 +28,8 @@ android {
 
     defaultConfig {
         applicationId = "com.wanderwildwood.kirinuki"
-        versionCode = 46
-        versionName = "0.5.14"
+        versionCode = 47
+        versionName = "0.5.15"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
@@ -228,7 +228,6 @@ dependencies {
     // BOMS
     implementation(platform(libs.okhttp.bom))
     implementation(platform(libs.compose.bom))
-    implementation(platform(libs.openai.client.bom))
     implementation(platform(libs.retrofit.bom))
 
     // Dependencies
@@ -237,8 +236,6 @@ dependencies {
     implementation(libs.bundles.jvm)
     implementation(libs.bundles.okhttp.android)
     implementation(libs.bundles.kotlin)
-    implementation(libs.openai.client)
-    implementation(libs.ktor.client.okhttp)
 
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)

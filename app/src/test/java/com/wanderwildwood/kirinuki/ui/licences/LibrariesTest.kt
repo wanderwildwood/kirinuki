@@ -16,7 +16,10 @@ class LibrariesTest {
 
     @Test
     fun `paragraphs keep every word of every licence in order`() {
-        for (name in listOf("LICENSE", "licences/Apache-2.0.txt", "licences/MIT.txt")) {
+        for (name in listOf(
+            "LICENSE", "licences/Apache-2.0.txt", "licences/MIT.txt", "licences/MPL-2.0.txt",
+            "licences/Unicode-3.0.txt", "licences/GPL-2.0-with-Classpath-Exception.txt",
+        )) {
             val text = asset(name)
             assertEquals(name, words(text), words(licenceParagraphs(text).joinToString(" ")))
         }
@@ -42,5 +45,15 @@ class LibrariesTest {
     @Test
     fun `the source link points at the repository`() {
         assertEquals("https://github.com/wanderwildwood/kirinuki", SOURCE_URL)
+    }
+
+    @Test
+    fun `every licence named in the list has its text`() {
+        val named = LIBRARIES.map { it.licence }.toSet()
+        if ("MPL-2.0" in named) assertTrue(asset("licences/MPL-2.0.txt").contains("Mozilla Public License Version 2.0"))
+        if ("Unicode-3.0" in named) assertTrue(asset("licences/Unicode-3.0.txt").contains("UNICODE LICENSE V3"))
+        if (named.any { it.startsWith("GPL-2.0") }) {
+            assertTrue(asset("licences/GPL-2.0-with-Classpath-Exception.txt").contains("CLASSPATH EXCEPTION"))
+        }
     }
 }

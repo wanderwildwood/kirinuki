@@ -246,15 +246,7 @@
     <string name="skip_duplicate_articles_desc">Статии с връзки или заглавия идентични на съществуващите се игнорират</string>
     <string name="feed_item_style_compact_card">Компактна карта</string>
     <string name="show_title_unread_count">Покажи броя на непрочетените статии в заглавието</string>
-    <string name="azure_api_version">Azure API версия</string>
-    <string name="model_id">ID модел</string>
-    <string name="azure_deployment_id">Azure ID внедряване</string>
     <string name="summarize">Обобщение</string>
-    <string name="openai_settings">AI интеграция</string>
-    <string name="unable_to_load_models">Не могат да се заредят модели.</string>
-    <string name="no_models_were_found">Няма намерени модели</string>
-    <string name="list_of_available_models">Списък на налични модели</string>
-    <string name="api_key">API ключ</string>
     <string name="show_message">Покажи съобщение</string>
     <string name="open_drawer_on_fab">Покажи емисии след маркиране на всичко като прочетено</string>
     <string name="nostr_feed_description">Nostr статии от %1$s</string>
@@ -279,7 +271,6 @@
     <string name="time_out_placeholder">Време на изчакване за AI заявки</string>
     <string name="summarize_on_open">Обобщение при отваряне</string>
     <string name="feed_search_suggestions_header">Предложения</string>
-    <string name="openai_settings_info">Съвместим с много доставчици на AI, но не с всички</string>
     <string name="apply_blocklist_to_summaries">Приложи към резюмета</string>
     <string name="open_article_in_reader">Отваряне в четец</string>
     <string name="open_article_in_default_browser">Отваряне в браузъра по подразбиране</string>

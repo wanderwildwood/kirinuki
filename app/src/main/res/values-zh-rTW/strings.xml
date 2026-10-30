@@ -247,14 +247,6 @@
     <string name="feed_item_style_compact_card">緊湊卡片</string>
     <string name="read_adjective">已讀</string>
     <string name="summarize">概述</string>
-    <string name="openai_settings">OpenAI 整合</string>
-    <string name="azure_deployment_id">Azure 部署 ID</string>
-    <string name="azure_api_version">Azure API 版本</string>
     <string name="generate_extra_unique_ids">産生附加的唯一 ID</string>
-    <string name="api_key">API 密鑰</string>
-    <string name="model_id">模型 ID</string>
     <string name="show_title_unread_count">在標題中顯示未讀文章數量</string>
-    <string name="unable_to_load_models">無法載入模型。</string>
-    <string name="no_models_were_found">沒有找到模型</string>
-    <string name="list_of_available_models">可用模型清單</string>
 </resources>

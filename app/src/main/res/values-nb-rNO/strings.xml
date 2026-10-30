@@ -243,9 +243,5 @@
     <string name="skip_duplicate_articles_desc">Artikler med lenker eller titler som er identiske med eksisterende artikler, blir ignorert</string>
     <string name="summarize">Oppsummer</string>
     <string name="summarize_on_open">Oppsummer ved åpning</string>
-    <string name="openai_settings">AI-integrering</string>
-    <string name="openai_settings_info">Kompatibel med mange AI-leverandører, men ikke alle</string>
-    <string name="api_key">API-nøkkel</string>
-    <string name="azure_api_version">Azure API-versjon</string>
     <string name="show_title_unread_count">Vis antall uleste artikler i tittelen</string>
 </resources>

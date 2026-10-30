@@ -38,8 +38,6 @@ val LIBRARIES: List<Library> =
         Library("ICU4J", "Unicode, Inc.", "Unicode-3.0"),
         Library("QRGen and ZXing", "Ken Glxn, ZXing authors", "Apache-2.0"),
         Library("LazyColumnScrollbar", "nani", "MIT"),
-        Library("OpenAI Kotlin client", "Aallam", "MIT"),
-        Library("Ktor client", "JetBrains", "Apache-2.0"),
         Library("Java library desugaring (desugar_jdk_libs)", "Google", "GPL-2.0 with Classpath Exception"),
         Library("Bergamot translator (bundled web files)", "Mozilla and contributors", "MPL-2.0"),
     )

@@ -35,6 +35,21 @@ class SettingsStore(
     private val blocklistDao: BlocklistDao by instance()
     private val filePathProvider: FilePathProvider by instance()
 
+    init {
+        // An API key or address from the removed AI and translation-service settings must not
+        // stay in the phone's preferences once nothing reads it.
+        runCatching {
+            val old =
+                sp.all.keys.filter {
+                    it.startsWith("pref_openai_") && it != PREF_PREFERRED_TRANSLATION_LANGUAGE ||
+                        it.startsWith("pref_translation_api_")
+                }
+            if (old.isNotEmpty()) {
+                sp.edit().also { e -> old.forEach { e.remove(it) } }.apply()
+            }
+        }
+    }
+
     private val _addedFeederNews = MutableStateFlow(sp.getBoolean(PREF_ADDED_FEEDER_NEWS, false))
     val addedFeederNews: StateFlow<Boolean> = _addedFeederNews.asStateFlow()
 
@@ -569,58 +584,6 @@ class SettingsStore(
         schedulePeriodicRssSync(di = di, replace = true)
     }
 
-    private val _openAiSettings =
-        MutableStateFlow(
-            OpenAISettings(
-                key = sp.getStringNonNull(PREF_OPENAI_KEY, ""),
-                modelId = sp.getStringNonNull(PREF_OPENAI_MODEL_ID, ""),
-                baseUrl = sp.getStringNonNull(PREF_OPENAI_URL, ""),
-                azureApiVersion = sp.getStringNonNull(PREF_OPENAI_AZURE_VERSION, ""),
-                azureDeploymentId = sp.getStringNonNull(PREF_OPENAI_AZURE_DEPLOYMENT_ID, ""),
-                timeoutSeconds = sp.getInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, 30),
-            ),
-        )
-    val openAiSettings = _openAiSettings.asStateFlow()
-
-    fun setOpenAiSettings(value: OpenAISettings) {
-        _openAiSettings.value = value
-        sp
-            .edit()
-            .putString(PREF_OPENAI_KEY, value.key)
-            .putString(PREF_OPENAI_MODEL_ID, value.modelId)
-            .putString(PREF_OPENAI_URL, value.baseUrl)
-            .putString(PREF_OPENAI_AZURE_VERSION, value.azureApiVersion)
-            .putString(PREF_OPENAI_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
-            .putInt(PREF_OPENAI_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
-            .apply()
-    }
-
-    private val _translationApiSettings =
-        MutableStateFlow(
-            OpenAISettings(
-                key = sp.getStringNonNull(PREF_TRANSLATION_API_KEY, ""),
-                modelId = sp.getStringNonNull(PREF_TRANSLATION_API_MODEL_ID, ""),
-                baseUrl = sp.getStringNonNull(PREF_TRANSLATION_API_URL, ""),
-                azureApiVersion = sp.getStringNonNull(PREF_TRANSLATION_API_AZURE_VERSION, ""),
-                azureDeploymentId = sp.getStringNonNull(PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID, ""),
-                timeoutSeconds = sp.getInt(PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS, 30),
-            ),
-        )
-    val translationApiSettings = _translationApiSettings.asStateFlow()
-
-    fun setTranslationApiSettings(value: TranslationApiSettings) {
-        _translationApiSettings.value = value
-        sp
-            .edit()
-            .putString(PREF_TRANSLATION_API_KEY, value.key)
-            .putString(PREF_TRANSLATION_API_MODEL_ID, value.modelId)
-            .putString(PREF_TRANSLATION_API_URL, value.baseUrl)
-            .putString(PREF_TRANSLATION_API_AZURE_VERSION, value.azureApiVersion)
-            .putString(PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID, value.azureDeploymentId)
-            .putInt(PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS, value.timeoutSeconds)
-            .apply()
-    }
-
     private val _preferredTranslationLanguage =
         MutableStateFlow(
             sp.getStringNonNull(PREF_PREFERRED_TRANSLATION_LANGUAGE, ""),
@@ -793,7 +756,8 @@ const val PREF_OPEN_DRAWER_ON_FAB = "pref_open_drawer_on_fab"
 const val PREF_READALOUD_USE_DETECT_LANGUAGE = "pref_readaloud_detect_lang"
 
 /**
- * OpenAI integration
+ * Feeder's OPML names for settings this app no longer has (AI and translation services). Kept
+ * only so an OPML file that carries them still reads; nothing is stored under them.
  */
 const val PREF_OPENAI_KEY = "pref_openai_key"
 const val PREF_OPENAI_MODEL_ID = "pref_openai_model_id"
@@ -801,15 +765,15 @@ const val PREF_OPENAI_URL = "pref_openai_url"
 const val PREF_OPENAI_AZURE_VERSION = "pref_openai_azure_version"
 const val PREF_OPENAI_AZURE_DEPLOYMENT_ID = "pref_openai_azure_deployment_id"
 const val PREF_OPENAI_REQUEST_TIMEOUT_SECONDS = "pref_openai_request_timeout_seconds"
-
-// Keep the legacy persisted key name for preference and OPML compatibility.
-const val PREF_PREFERRED_TRANSLATION_LANGUAGE = "pref_openai_translation_language"
 const val PREF_TRANSLATION_API_KEY = "pref_translation_api_key"
 const val PREF_TRANSLATION_API_MODEL_ID = "pref_translation_api_model_id"
 const val PREF_TRANSLATION_API_URL = "pref_translation_api_url"
 const val PREF_TRANSLATION_API_AZURE_VERSION = "pref_translation_api_azure_version"
 const val PREF_TRANSLATION_API_AZURE_DEPLOYMENT_ID = "pref_translation_api_azure_deployment_id"
 const val PREF_TRANSLATION_API_REQUEST_TIMEOUT_SECONDS = "pref_translation_api_request_timeout_seconds"
+
+// Keep the legacy persisted key name for preference and OPML compatibility.
+const val PREF_PREFERRED_TRANSLATION_LANGUAGE = "pref_openai_translation_language"
 
 // Keep the legacy persisted key name for preference and OPML compatibility.
 const val PREF_TRANSLATE_ARTICLE_PREVIEWS_BY_DEFAULT = "pref_translate_feed_cards_by_default"
@@ -962,17 +926,6 @@ enum class SwipeAsRead(
     ONLY_FROM_END(R.string.only_from_end),
     FROM_ANYWHERE(R.string.from_anywhere),
 }
-
-data class OpenAISettings(
-    val modelId: String = "",
-    val baseUrl: String = "",
-    val timeoutSeconds: Int = 30,
-    val azureApiVersion: String = "",
-    val azureDeploymentId: String = "",
-    val key: String = "",
-)
-
-typealias TranslationApiSettings = OpenAISettings
 
 fun String.dropEnds(
     starting: Int,

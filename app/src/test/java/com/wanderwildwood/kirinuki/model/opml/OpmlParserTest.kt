@@ -4,14 +4,12 @@ import com.wanderwildwood.kirinuki.archmodel.DarkThemePreferences
 import com.wanderwildwood.kirinuki.archmodel.FeedItemStyle
 import com.wanderwildwood.kirinuki.archmodel.ItemOpener
 import com.wanderwildwood.kirinuki.archmodel.LinkOpener
-import com.wanderwildwood.kirinuki.archmodel.OpenAISettings
 import com.wanderwildwood.kirinuki.archmodel.PREF_VAL_OPEN_WITH_CUSTOM_TAB
 import com.wanderwildwood.kirinuki.archmodel.SettingsStore
 import com.wanderwildwood.kirinuki.archmodel.SortingOptions
 import com.wanderwildwood.kirinuki.archmodel.SwipeAsRead
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.archmodel.ThemeOptions
-import com.wanderwildwood.kirinuki.archmodel.TranslationApiSettings
 import com.wanderwildwood.kirinuki.archmodel.UserSettings
 import com.wanderwildwood.kirinuki.db.room.FeedDao
 import com.wanderwildwood.kirinuki.model.OPMLParserHandler
@@ -116,10 +114,6 @@ class OpmlParserTest : DIAware {
     @Test
     fun handlesAllSettings(): Unit =
         runBlocking {
-            every { settingsStore.openAiSettings } returns MutableStateFlow(OpenAISettings())
-            every { settingsStore.translationApiSettings } returns MutableStateFlow(TranslationApiSettings())
-            every { settingsStore.setOpenAiSettings(any()) } just Runs
-            every { settingsStore.setTranslationApiSettings(any()) } just Runs
             setAllSettings()
             verify {
                 settingsStore.setLinkOpener(LinkOpener.CUSTOM_TAB)
@@ -159,11 +153,7 @@ class OpmlParserTest : DIAware {
                 settingsStore.setIsAnimatedPaging(true)
                 settingsStore.setShowTitleUnreadCount(true)
                 settingsStore.setMaxCountPerFeed(200)
-                settingsStore.openAiSettings
-                settingsStore.setOpenAiSettings(any())
                 settingsStore.setPreferredTranslationLanguage("French")
-                settingsStore.translationApiSettings
-                settingsStore.setTranslationApiSettings(any())
                 settingsStore.setTranslateArticlePreviewsByDefault(true)
                 settingsStore.setTranslateArticlesByDefault(true)
                 settingsStore.setApplyBlocklistToSummaries(true)

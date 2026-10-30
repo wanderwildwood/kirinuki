@@ -1,6 +1,6 @@
 package com.wanderwildwood.kirinuki.archmodel
 
-import com.wanderwildwood.kirinuki.crypto.AesCbcWithIntegrity
+import com.wanderwildwood.kirinuki.crypto.SyncKey
 import com.wanderwildwood.kirinuki.db.room.FeedItemForReadMark
 import com.wanderwildwood.kirinuki.db.room.ReadStatusSynced
 import com.wanderwildwood.kirinuki.db.room.ReadStatusSyncedDao
@@ -110,7 +110,7 @@ class SyncRemoteStore(
             SyncRemote(
                 id = 1L,
                 deviceName = generateDeviceName(),
-                secretKey = AesCbcWithIntegrity.generateKey().toString(),
+                secretKey = SyncKey.generate(),
             )
         dao.insert(remote)
         return remote

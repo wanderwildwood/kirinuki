@@ -251,15 +251,7 @@
     <string name="skip_duplicate_articles_desc">Články s odkazmi alebo nadpismi, ktoré su identické s existujúcimi článkami sú ignorované</string>
     <string name="summarize">Zhrnutie</string>
     <string name="summarize_on_open">Zhrnúť pri otvorení</string>
-    <string name="openai_settings">Integrácia OpenAI</string>
-    <string name="api_key">API kľúč</string>
-    <string name="model_id">Id modelu</string>
-    <string name="azure_api_version">Verzia API Azure</string>
     <string name="show_title_unread_count">Zobraziť počet neprečítaných článkov v nadpise</string>
-    <string name="unable_to_load_models">Nemožno nahrať modely.</string>
-    <string name="no_models_were_found">Neboli nájdené žiadne modely</string>
-    <string name="azure_deployment_id">Id nasadenia Azure</string>
-    <string name="list_of_available_models">Zoznam dostupných modelov</string>
     <string name="show_message">Zobraziť správu</string>
     <string name="open_drawer_on_fab">Zobrazovať kanály potom, čo označíte všetky ako prečítané</string>
     <string name="on">Zapnúť</string>
