@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
@@ -52,9 +53,59 @@ fun ReadAloudPanel(
     onPlayOrPause: () -> Unit,
     onSeek: (index: Int) -> Unit,
     modifier: Modifier = Modifier,
+    compact: Boolean = false,
 ) {
     val index = state.index.coerceIn(0, (timeline.size - 1).coerceAtLeast(0))
     val usable = state.engine == ReadAloudPlayer.Engine.READY && timeline.size > 0
+
+    // Sideways the screen is short, so the text keeps the room: Read aloud and Stop are in the top
+    // bar, nothing is under the text while it is closed, and open it is one row, where the voice is
+    // and the three buttons.
+    if (compact) {
+        if (!open) return
+        Column(modifier = modifier.fillMaxWidth()) {
+            HorizontalDividerMMD()
+            Row(
+                modifier = Modifier.fillMaxWidth().height(56.dp).padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                TextMMD(
+                    text =
+                        when {
+                            timeline.size == 0 -> stringResource(R.string.read_aloud_nothing)
+                            state.engine == ReadAloudPlayer.Engine.STARTING -> stringResource(R.string.read_aloud_starting)
+                            state.engine == ReadAloudPlayer.Engine.NONE -> stringResource(R.string.read_aloud_no_engine)
+                            state.finished -> stringResource(R.string.read_aloud_finished)
+                            else -> whereLine(index, timeline)
+                        },
+                    style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                )
+                PanelIcon(
+                    icon = Icons.Rewind,
+                    description = stringResource(R.string.read_aloud_back),
+                    size = 28.dp,
+                    enabled = usable,
+                ) { onSeek(timeline.step(index, -1)) }
+                PanelIcon(
+                    icon = if (state.speaking) Icons.Pause else Icons.Play,
+                    description = stringResource(if (state.speaking) R.string.read_aloud_pause else R.string.read_aloud_play),
+                    size = 40.dp,
+                    enabled = usable,
+                    onClick = onPlayOrPause,
+                )
+                PanelIcon(
+                    icon = Icons.Forward,
+                    description = stringResource(R.string.read_aloud_on),
+                    size = 28.dp,
+                    enabled = usable,
+                ) { onSeek(timeline.step(index, 1)) }
+            }
+        }
+        return
+    }
 
     Column(modifier = modifier.fillMaxWidth()) {
         HorizontalDividerMMD()

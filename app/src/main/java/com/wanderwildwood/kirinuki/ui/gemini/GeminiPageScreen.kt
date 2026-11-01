@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.wanderwildwood.kirinuki.ui.PagedColumn
+import com.wanderwildwood.kirinuki.ui.ReaderColumn
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
@@ -98,7 +98,7 @@ fun GeminiPageScreen(
             // Selectable, with the shop's selection menu and its ⋮ (TextActions.kt), as in the reader.
             CompositionLocalProvider(LocalLineFence provides lineFence) {
             SelectionContainer(modifier = Modifier.textActions()) {
-            PagedColumn(
+            ReaderColumn(
                 state = listState,
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),

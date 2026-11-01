@@ -124,7 +124,6 @@ open class OPMLImporter(
             UserSettings.SETTING_OPENAI_AZURE_VERSION,
             UserSettings.SETTING_OPENAI_AZURE_DEPLOYMENT_ID,
             UserSettings.SETTING_OPENAI_REQUEST_TIMEOUT_SECONDS,
-            UserSettings.SETTING_TRANSLATION_API_KEY,
             UserSettings.SETTING_TRANSLATION_API_MODEL_ID,
             UserSettings.SETTING_TRANSLATION_API_URL,
             UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION,

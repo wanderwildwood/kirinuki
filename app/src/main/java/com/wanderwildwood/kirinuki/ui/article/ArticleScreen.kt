@@ -2,6 +2,7 @@ package com.wanderwildwood.kirinuki.ui.article
 
 import com.wanderwildwood.kirinuki.ui.compose.utils.textActions
 import androidx.compose.foundation.text.selection.SelectionContainer
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,9 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -31,7 +35,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.wanderwildwood.kirinuki.ui.PagedColumn
+import com.wanderwildwood.kirinuki.ui.ReaderColumn
 import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
@@ -103,6 +107,7 @@ fun ArticleScreen(
     // Three things have to be true, and the default is that the first is not: the setting
     // is on, this phone has something that is not the WebView shell, and the cutting
     // remembers where it came from. Anything less and the title is what it always was.
+    val sideways = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     val articleLink = article?.link
     val titleOpensPage =
         openTitleInBrowser &&
@@ -128,6 +133,13 @@ fun ArticleScreen(
                     )
                 },
                 actions = {
+                    // Sideways, Read aloud is here, so the strip under the text can go and the text gets its room.
+                    if (sideways && article != null && article?.enclosure?.isAudio != true) {
+                        BarText(
+                            text = stringResource(if (readAloudOpen) R.string.read_aloud_close else R.string.read_aloud),
+                            onClick = viewModel::toggleReadAloud,
+                        )
+                    }
                     // An article is read once opened and an episode once heard to the end; this
                     // says so, or takes it back, by hand. Filled like the star when it is.
                     article?.let { item ->
@@ -200,7 +212,7 @@ fun ArticleScreen(
                     // article is what Define and Note are most often wanted for. The menu over a
                     // selection is the shop's, with its ⋮ given back (TextActions.kt).
                     SelectionContainer(modifier = Modifier.textActions()) {
-                    PagedColumn(
+                    ReaderColumn(
                         state = listState,
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -275,6 +287,7 @@ fun ArticleScreen(
             // has its own sound.
             if (article != null && article?.enclosure?.isAudio != true) {
                 ReadAloudPanel(
+                    compact = sideways,
                     open = readAloudOpen,
                     onToggle = viewModel::toggleReadAloud,
                     state = readAloud,
@@ -327,3 +340,17 @@ private fun TextToDisplay.messageRes(): Int =
         TextToDisplay.FAILED_NOT_HTML -> R.string.failed_to_fetch_full_article_not_html
         TextToDisplay.FAILED_FULLTEXT_TOO_LARGE -> R.string.failed_to_fetch_full_article_too_large
     }
+
+/** A word in the top bar, where a bar icon would not say enough; 48 dp to press. */
+@Composable
+private fun BarText(
+    text: String,
+    onClick: () -> Unit,
+) {
+    Box(
+        modifier = Modifier.heightIn(min = 48.dp).clickable(onClick = onClick).padding(horizontal = 12.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        TextMMD(text = text, style = MaterialTheme.typography.bodyMedium)
+    }
+}
