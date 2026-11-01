@@ -280,6 +280,15 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_PODCASTS_IN_ALL_FEEDS, value).apply()
     }
 
+    // Whether the readers turn sideways with the phone.
+    private val _turnWithPhone = MutableStateFlow(sp.getBoolean(PREF_TURN_WITH_PHONE, true))
+    val turnWithPhone = _turnWithPhone.asStateFlow()
+
+    fun setTurnWithPhone(value: Boolean) {
+        _turnWithPhone.value = value
+        sp.edit().putBoolean(PREF_TURN_WITH_PHONE, value).apply()
+    }
+
     // A podcast list shows every episode until asked to show only the ones not yet played.
     private val _podcastsUnplayedOnly = MutableStateFlow(sp.getBoolean(PREF_PODCASTS_UNPLAYED_ONLY, false))
     val podcastsUnplayedOnly = _podcastsUnplayedOnly.asStateFlow()
@@ -706,6 +715,7 @@ const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_EPISODES_ONLY_WIFI = "pref_episodes_only_wifi"
 const val PREF_PODCASTS_IN_ALL_FEEDS = "pref_podcasts_in_all_feeds"
 const val PREF_PODCASTS_UNPLAYED_ONLY = "pref_podcasts_unplayed_only"
+const val PREF_TURN_WITH_PHONE = "pref_turn_with_phone"
 const val PREF_SYNC_FREQ = "pref_sync_freq"
 const val PREF_SYNC_FREQ_MANUAL_DEFAULT = "pref_sync_freq_manual_default"
 const val PREF_SYNC_ON_RESUME = "pref_sync_on_resume"

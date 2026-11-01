@@ -35,6 +35,10 @@ class SettingsViewModel(
 
     fun setPodcastsInAllFeeds(value: Boolean) = repository.setPodcastsInAllFeeds(value)
 
+    val turnWithPhone: StateFlow<Boolean> = repository.turnWithPhone
+
+    fun setTurnWithPhone(value: Boolean) = repository.setTurnWithPhone(value)
+
     fun setEpisodesOnlyOnWifi(value: Boolean) = repository.setEpisodesOnlyOnWifi(value)
     val syncOnlyWhenCharging: StateFlow<Boolean> = repository.syncOnlyWhenCharging
     val syncFrequency: StateFlow<SyncFrequency> = repository.syncFrequency

@@ -14,10 +14,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
@@ -27,6 +29,7 @@ import com.wanderwildwood.kirinuki.base.diAwareViewModel
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.opml.exportOpml
 import com.wanderwildwood.kirinuki.model.opml.importOpml
+import com.wanderwildwood.kirinuki.archmodel.SettingsStore
 import com.wanderwildwood.kirinuki.notifications.NotificationsWorker
 import com.wanderwildwood.kirinuki.ui.addfeed.AddFeedScreen
 import com.wanderwildwood.kirinuki.ui.addfeed.AddFeedViewModel
@@ -72,6 +75,10 @@ class MainActivity : DIAwareComponentActivity() {
 
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
+    private val settingsStore: SettingsStore by instance()
+
+    /** Turns the screen with the phone, but only while an article or a capsule page is the screen in front. */
+    private val turner = TurnWithPhone(this)
 
     override fun onStart() {
         super.onStart()
@@ -87,6 +94,12 @@ class MainActivity : DIAwareComponentActivity() {
         super.onResume()
         mainActivityViewModel.setResumeTime()
         maybeRequestSync()
+        turner.resume()
+    }
+
+    override fun onPause() {
+        turner.pause()
+        super.onPause()
     }
 
     /**
@@ -158,6 +171,10 @@ class MainActivity : DIAwareComponentActivity() {
 
         pendingCapsule.value = capsuleFrom(intent)
 
+        // Until the screen in front is known, stay as the window came up, so a window built again
+        // after a turn does not turn back and forth.
+        turner.set(on = settingsStore.turnWithPhone.value, held = true)
+
         mainActivityViewModel.ensurePeriodicSyncConfigured()
         schedulePeriodicOrphanedFilesCleanup(di)
 
@@ -174,6 +191,14 @@ class MainActivity : DIAwareComponentActivity() {
     fun AppContent() {
         val navController = rememberNavController()
         val articleListState = rememberLazyListState()
+
+        val turnWithPhone by settingsStore.turnWithPhone.collectAsStateWithLifecycle()
+        val backStack by navController.currentBackStackEntryAsState()
+        LaunchedEffect(backStack, turnWithPhone) {
+            // Nothing is known until the first screen is up; leave the window as it is until then.
+            val route = backStack?.destination?.route ?: return@LaunchedEffect
+            turner.set(on = turnWithPhone && (route == Route.ARTICLE || route == Route.GEMINI_ROUTE))
+        }
 
         // Whichever reader is on screen puts its list here while it is, and the volume keys
         // page that one. A capsule page keeps its own list rather than sharing this one, so

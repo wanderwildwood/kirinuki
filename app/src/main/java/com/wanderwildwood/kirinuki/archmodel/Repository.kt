@@ -672,6 +672,10 @@ class Repository(
 
     fun setPodcastsInAllFeeds(value: Boolean) = settingsStore.setPodcastsInAllFeeds(value)
 
+    val turnWithPhone: StateFlow<Boolean> = settingsStore.turnWithPhone
+
+    fun setTurnWithPhone(value: Boolean) = settingsStore.setTurnWithPhone(value)
+
     val getUnreadBookmarksCount
         get() =
             feedItemStore.getFeedItemCountRaw(

@@ -498,6 +498,8 @@
   <string name="episodes_only_on_wifi">Download episodes only on Wi-Fi</string>
   <string name="episodes_only_on_wifi_summary">Off, a podcast episode can download over mobile data. Playing streams over either.</string>
   <string name="podcasts_in_all_feeds">Show podcasts in All feeds</string>
+  <string name="turn_with_phone">Turn with the phone</string>
+  <string name="turn_with_phone_summary">Articles and capsules turn sideways when the phone does. Everything else stays upright.</string>
   <string name="podcasts_in_all_feeds_summary">Episodes and articles together, newest first. Podcasts keep their own row either way.</string>
   <string name="episode_kept">On this phone</string>
   <string name="episode_remove_armed">Remove — tap again</string>

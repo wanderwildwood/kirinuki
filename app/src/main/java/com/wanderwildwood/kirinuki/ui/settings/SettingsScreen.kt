@@ -60,6 +60,7 @@ fun SettingsScreen(
     val syncOnlyOnWifi by viewModel.syncOnlyOnWifi.collectAsStateWithLifecycle()
     val episodesOnlyOnWifi by viewModel.episodesOnlyOnWifi.collectAsStateWithLifecycle()
     val podcastsInAllFeeds by viewModel.podcastsInAllFeeds.collectAsStateWithLifecycle()
+    val turnWithPhone by viewModel.turnWithPhone.collectAsStateWithLifecycle()
     val syncOnlyWhenCharging by viewModel.syncOnlyWhenCharging.collectAsStateWithLifecycle()
     val syncFrequency by viewModel.syncFrequency.collectAsStateWithLifecycle()
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
@@ -129,6 +130,14 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.podcasts_in_all_feeds_summary),
                     checked = podcastsInAllFeeds,
                     onCheckedChange = viewModel::setPodcastsInAllFeeds,
+                )
+            }
+            item {
+                SwitchRow(
+                    title = stringResource(R.string.turn_with_phone),
+                    subtitle = stringResource(R.string.turn_with_phone_summary),
+                    checked = turnWithPhone,
+                    onCheckedChange = viewModel::setTurnWithPhone,
                 )
             }
             item {

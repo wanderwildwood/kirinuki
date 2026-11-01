@@ -83,6 +83,7 @@ class RepositoryTest : DIAware {
         every { settingsStore.syncOnlyOnWifi } returns MutableStateFlow(false)
         every { settingsStore.podcastsInAllFeeds } returns MutableStateFlow(false)
         every { settingsStore.podcastsUnplayedOnly } returns MutableStateFlow(false)
+        every { settingsStore.turnWithPhone } returns MutableStateFlow(true)
         every { settingsStore.addedFeederNews } returns MutableStateFlow(true)
         every { settingsStore.minReadTime } returns MutableStateFlow(Instant.EPOCH)
 
