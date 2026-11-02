@@ -1,160 +1,46 @@
 package com.wanderwildwood.kirinuki.ui.compose.theme
 
-import android.widget.Toast
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import com.mudita.mmd.components.buttons.OutlinedButtonMMD
-import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.kirinuki.BuildConfig
 import com.wanderwildwood.kirinuki.R
-import com.wanderwildwood.kirinuki.util.openInBrowser
-import com.wanderwildwood.kirinuki.ui.PagedColumn
+import com.wanderwildwood.kirinuki.ui.AboutData
+import com.wanderwildwood.kirinuki.ui.AboutLabels
+import com.wanderwildwood.kirinuki.ui.AboutSection
+import com.wanderwildwood.kirinuki.ui.HouseAboutDialog
+import com.wanderwildwood.kirinuki.ui.LicencesScreen
+import com.wanderwildwood.kirinuki.ui.SOURCE_URL
+import com.wanderwildwood.kirinuki.ui.rememberLicencesData
+import com.wanderwildwood.kirinuki.ui.rememberLicencesLabels
 
 /**
- * What this is, what it reaches for, and whose the parts are.
+ * This app's About: only the words and the address. The dialog, its one Close button, the
+ * Licences row, the links and the llama are the shared HouseAbout.kt, the same in every app.
  *
  * An app that goes to the network owes the reader that line, and this one goes to whatever
- * addresses it is given. What it does not do is the part a stranger cannot assume.
+ * addresses it is given.
  */
 @Composable
-fun AboutDialog(onDismiss: () -> Unit, onLicences: (() -> Unit)? = null) {
-    EInkDialog(onDismiss = onDismiss) {
-        // Taller than a small screen once Licences was added, so it pages a block at a time, and Close stays under it.
-        PagedColumn(modifier = Modifier.heightIn(max = 430.dp), verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(14.dp)) {
-            item {
-        TextMMD(
-            text = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-        )
-            }
-            item {
-        TextMMD(
-            text = stringResource(R.string.about_what),
-            style = MaterialTheme.typography.labelSmall,
-        )
-            }
-            item {
-        TextMMD(
-            text = stringResource(R.string.about_privacy_head),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium,
-        )
-        TextMMD(
-            text = stringResource(R.string.about_privacy),
-            style = MaterialTheme.typography.labelSmall,
-        )
-            }
-            item {
-        TextMMD(
-            text = stringResource(R.string.about_built_on),
-            style = MaterialTheme.typography.labelSmall,
-        )
-            }
-            item {
-        TextMMD(
-            text = stringResource(R.string.about_terms_head),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium,
-        )
-        TextMMD(
-            text = stringResource(R.string.about_licence),
-            style = MaterialTheme.typography.labelSmall,
-        )
-        if (onLicences != null) {
-        TextMMD(
-            text = stringResource(R.string.about_licences_row),
-            style = MaterialTheme.typography.labelSmall,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp).clickable(onClick = onLicences)
-                .wrapContentHeight(Alignment.CenterVertically),
-        )
-        }
-            }
-            item {
-        Llama()
-            }
-        }
-        Spacer(Modifier.height(10.dp))
-        OutlinedButtonMMD(
-            onClick = onDismiss,
-            modifier = Modifier.fillMaxWidth().height(48.dp),
-        ) { TextMMD(text = stringResource(R.string.about_close), style = MaterialTheme.typography.bodySmall) }
-    }
-}
-
-/**
- * A llama at the foot of the About, which opens the page a donation goes to.
- *
- * Three words rather than an address: a verb and an object, so what happens when you press
- * them is not a surprise even though the page is not named. The drawing is his own, and it is
- * ink rather than an emoji, which is a colour glyph and reaches the panel as a pale smudge.
- * The site's address sits at the start of the same line and opens the site; the llama and its words
- * open the page.
- *
- * The Kompakt may have nothing registered for a web address, so the press is allowed to fail
- * and says so out loud rather than dying quietly.
- */
-@Composable
-private fun Llama() {
+fun AboutDialog(onDismiss: () -> Unit) {
     val context = LocalContext.current
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth(),
-    ) {
-        TextMMD(
-            text = "wanderthe.dev",
-            style = MaterialTheme.typography.labelSmall,
-            // The site's address opens the site, the way the llama beside it opens its page.
-            modifier = Modifier
-                .clickable {
-                    if (!context.openInBrowser("https://wanderthe.dev")) {
-                        Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_SHORT).show()
-                    }
-                }
-                .padding(vertical = 4.dp),
-        )
-        Spacer(Modifier.width(6.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .clickable {
-                    // Straight to the checkout. The Donate button on the site only leads
-                    // here anyway, so the page in between is a press the reader does not need.
-                    // The short square.link form, not the long checkout.square.site address it
-                    // redirects to -- the short one is what the site itself links to, so a
-                    // regenerated checkout follows it and a published app does not break.
-                    if (!context.openInBrowser("https://square.link/u/AGu8oT10")) {
-                        Toast.makeText(context, context.getString(R.string.about_no_browser), Toast.LENGTH_SHORT).show()
-                    }
-                }
-                .padding(vertical = 4.dp),
-        ) {
-            Image(
-                painter = painterResource(R.drawable.llama),
-                contentDescription = null,
-                modifier = Modifier.size(22.dp),
-            )
-            Spacer(Modifier.width(6.dp))
-            TextMMD(text = stringResource(R.string.about_feed_the_llamas), style = MaterialTheme.typography.labelSmall)
-        }
+    val data = AboutData(
+        title = stringResource(R.string.about_title, BuildConfig.VERSION_NAME),
+        sections = listOf(
+            AboutSection(null, stringResource(R.string.about_what)),
+            AboutSection(stringResource(R.string.about_privacy_head), stringResource(R.string.about_privacy)),
+            AboutSection(null, stringResource(R.string.about_built_on)),
+            AboutSection(stringResource(R.string.about_terms_head), stringResource(R.string.about_licence)),
+        ),
+        sourceUrl = SOURCE_URL,
+    )
+    val labels = AboutLabels(
+        close = stringResource(R.string.about_close),
+        licences = stringResource(R.string.licences_title),
+        feedTheLlamas = stringResource(R.string.about_feed_the_llamas),
+        noBrowser = { _ -> context.getString(R.string.about_no_browser) },
+    )
+    HouseAboutDialog(data, labels, R.drawable.llama, onDismiss) { modifier, back ->
+        LicencesScreen(rememberLicencesData(), rememberLicencesLabels(), onBack = back, modifier = modifier)
     }
 }
