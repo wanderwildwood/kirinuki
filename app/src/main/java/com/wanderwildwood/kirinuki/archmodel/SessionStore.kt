@@ -65,7 +65,7 @@ class SyncOutcome(
 )
 
 /** Why a feed was not got, in the few ways a reader can act on. */
-enum class FailKind { NO_CONNECTION, SERVER_ANSWERED, NOT_A_FEED, OTHER }
+enum class FailKind { NO_CONNECTION, SERVER_ANSWERED, NOT_A_FEED, SIGN_IN_REFUSED, OTHER }
 
 /** One feed that was not got: its name, why, and the server's code when it answered with one. */
 data class SyncFailure(val title: String, val kind: FailKind, val code: Int = 0)

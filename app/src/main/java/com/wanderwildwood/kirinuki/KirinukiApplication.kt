@@ -69,6 +69,7 @@ class KirinukiApplication :
         bind<RemoteReadMarkDao>() with singleton { instance<AppDatabase>().remoteReadMarkDao() }
         bind<RemoteFeedDao>() with singleton { instance<AppDatabase>().remoteFeedDao() }
         bind<SyncDeviceDao>() with singleton { instance<AppDatabase>().syncDeviceDao() }
+        bind<com.wanderwildwood.kirinuki.db.room.GReaderDao>() with singleton { instance<AppDatabase>().greaderDao() }
         bind<BlocklistDao>() with singleton { instance<AppDatabase>().blocklistDao() }
 
         import(androidModule)

@@ -42,6 +42,7 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlinx.coroutines.delay
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -53,6 +54,7 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onImportOpml: () -> Unit,
     onExportOpml: () -> Unit,
+    onServerSync: () -> Unit,
     viewModel: SettingsViewModel,
     modifier: Modifier = Modifier,
 ) {
@@ -68,6 +70,7 @@ fun SettingsScreen(
     val capsuleCertificates by viewModel.capsuleCertificates.collectAsStateWithLifecycle()
     val removeDownloadedAfterDays by viewModel.removeDownloadedAfterDays.collectAsStateWithLifecycle()
     val downloadedBytes by viewModel.downloadedBytes.collectAsStateWithLifecycle()
+    val serverSync by viewModel.serverSync.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val hasBrowser = remember(context) { context.hasWebBrowser() }
@@ -205,6 +208,20 @@ fun SettingsScreen(
                 ClearDownloadedRow(
                     size = downloadedBytes?.let { Formatter.formatShortFileSize(context, it) },
                     onClear = viewModel::clearDownloadedArticles,
+                )
+            }
+            // A door to its own screen, with where it syncs to as its value.
+            item {
+                ValueRow(
+                    title = stringResource(R.string.server_sync_title),
+                    value =
+                        serverSync.account?.let { account ->
+                            stringResource(
+                                R.string.server_sync_on,
+                                account.apiUrl.toHttpUrlOrNull()?.host ?: account.apiUrl,
+                            )
+                        } ?: stringResource(R.string.server_sync_off),
+                    onClick = onServerSync,
                 )
             }
             item {
@@ -412,6 +429,25 @@ private fun CertificateRow(
 
 /** Long enough to mean it, short enough not to leave a live forget under a thumb. */
 private const val ARMED_MILLIS = 6000L
+
+@Composable
+private fun ValueRow(
+    title: String,
+    value: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        TextMMD(text = title)
+        TextMMD(text = value, style = MaterialTheme.typography.bodySmall)
+    }
+}
 
 @Composable
 private fun ActionRow(

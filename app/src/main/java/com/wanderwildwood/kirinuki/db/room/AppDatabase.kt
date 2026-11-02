@@ -63,11 +63,13 @@ private const val LOG_TAG = "KIRINUKI_APPDB"
         RemoteReadMark::class,
         RemoteFeed::class,
         SyncDevice::class,
+        GReaderFeedRow::class,
+        GReaderItemRow::class,
     ],
     views = [
         FeedsWithItemsForNavDrawer::class,
     ],
-    version = 40,
+    version = 41,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -86,6 +88,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun remoteFeedDao(): RemoteFeedDao
 
     abstract fun syncDeviceDao(): SyncDeviceDao
+
+    abstract fun greaderDao(): GReaderDao
 
     companion object {
         // For Singleton instantiation
@@ -152,6 +156,7 @@ fun getAllMigrations(di: DI) =
         MigrationFrom37To38(di),
         MIGRATION_38_39,
         MIGRATION_39_40,
+        MIGRATION_40_41,
     )
 
 /*
@@ -230,6 +235,30 @@ object MIGRATION_38_39 : Migration(38, 39) {
 }
 
 @Suppress("ClassName")
+/**
+ * Sync with a feed server: which feeds and articles belong to a subscription there.
+ * Nothing existing changes; both tables start empty and stay empty until sync is switched on.
+ */
+object MIGRATION_40_41 : Migration(40, 41) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            "CREATE TABLE IF NOT EXISTS `greader_feeds` (`feed_id` INTEGER NOT NULL, `stream_id` TEXT, " +
+                "`synced_label` TEXT NOT NULL, PRIMARY KEY(`feed_id`))",
+        )
+        database.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_greader_feeds_stream_id` ON `greader_feeds` (`stream_id`)",
+        )
+        database.execSQL(
+            "CREATE TABLE IF NOT EXISTS `greader_items` (`item_id` INTEGER NOT NULL, `remote_id` TEXT NOT NULL, " +
+                "`synced_read` INTEGER NOT NULL, `synced_starred` INTEGER NOT NULL, PRIMARY KEY(`item_id`), " +
+                "FOREIGN KEY(`item_id`) REFERENCES `feed_items`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        )
+        database.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_greader_items_remote_id` ON `greader_items` (`remote_id`)",
+        )
+    }
+}
+
 object MIGRATION_39_40 : Migration(39, 40) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

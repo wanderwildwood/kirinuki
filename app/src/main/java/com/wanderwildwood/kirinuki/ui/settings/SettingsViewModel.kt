@@ -26,6 +26,10 @@ class SettingsViewModel(
     private val knownHosts: KnownHosts by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val feedItemDao: FeedItemDao by instance()
+    private val serverSyncer: com.wanderwildwood.kirinuki.sync.ServerSync by instance()
+
+    /** Whether, and where, the app syncs with a feed server; the row shows it. */
+    val serverSync: StateFlow<com.wanderwildwood.kirinuki.sync.ServerSyncState> = serverSyncer.state
 
     val syncOnlyOnWifi: StateFlow<Boolean> = repository.syncOnlyOnWifi
 

@@ -69,6 +69,7 @@ class RssLocalSync(
     private val gopherClient: GopherClient by instance()
     private val filePathProvider: FilePathProvider by instance()
     private val application: Application by instance()
+    private val serverSync: com.wanderwildwood.kirinuki.sync.ServerSync by instance()
 
     suspend fun syncFeeds(
         feedId: Long = ID_UNSET,
@@ -132,14 +133,25 @@ class RssLocalSync(
                                     .minus(minFeedAgeMinutes.toLong().coerceAtLeast(1), ChronoUnit.MINUTES)
                                     .toEpochMilli()
                             }
-                        val candidates =
-                            feedsToSync(feedId, feedTag, staleTime = staleTime)
+                        // Sync with a feed server, when it is on, goes first: it brings the
+                        // subscriptions and the articles of every feed the server has, so those
+                        // are not fetched from their sites below. A failure there is one line
+                        // on the pull, under the server's name, like a feed that failed.
+                        val serverFailure = serverSync.syncNow(keepReadPerFeed = maxFeedItemCount)
+                        if (serverFailure != null) {
+                            failed.incrementAndGet()
+                            failedTitles.add(serverFailure.title)
+                            failures.add(serverFailure)
+                        }
+                        val serverFeeds = serverSync.serverFeedIds()
+                        val allCandidates = feedsToSync(feedId, feedTag, staleTime = staleTime)
+                        val candidates = allCandidates.filterNot { it.id in serverFeeds }
                         // The saved pages have no feed to fetch -- but they do want the
                         // whole article, and a page saved with no network is fetched by
                         // the full text pass this sync chains. So they count for that.
-                        needFullTextSync = candidates.any { it.fullTextByDefault }
+                        needFullTextSync = allCandidates.any { it.fullTextByDefault }
                         val feedsToFetch = candidates.filterNot { it.isSavedPages }
-                        tried.set(feedsToFetch.size)
+                        tried.set(feedsToFetch.size + if (serverSync.isOn) 1 else 0)
 
                         logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 

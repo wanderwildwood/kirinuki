@@ -4,7 +4,7 @@ Version 0.5.14. Last reviewed 29 October 2026.
 
 ## The short version
 
-The developer collects nothing about you. There is no account, no sign-up, no analytics, no advertising and no crash reporting, and no server belonging to the developer that the app talks to. What the app stores, it stores on your phone. The app contacts the servers of the feeds, podcasts, pages and capsules you add, directly, and nothing else; the hosts are listed below.
+The developer collects nothing about you. There is no account with the developer, no sign-up, no analytics, no advertising and no crash reporting, and no server belonging to the developer that the app talks to. What the app stores, it stores on your phone. The app contacts the servers of the feeds, podcasts, pages and capsules you add, directly, and, only if you sign in to one in Settings, the one feed server whose address you typed; nothing else. The hosts are listed below.
 
 ## Who is responsible
 
@@ -16,7 +16,7 @@ Because no personal data is transmitted to or held by the developer, there is no
 
 ## What the app stores, and where
 
-In the app's own private storage on the phone: the feeds and capsules you subscribe to (their addresses, and the folder name you file a feed under), read and saved state, downloaded article text and pages you saved, podcast listening positions, the certificate fingerprint of each Gemini capsule you have visited (shown in Settings, Capsule certificates, where you can forget one), and settings. Downloaded podcast episodes are kept in the app's own external files folder, fetched by Android's download service.
+In the app's own private storage on the phone: the feeds and capsules you subscribe to (their addresses, and the folder name you file a feed under), read and saved state, downloaded article text and pages you saved, podcast listening positions, the feed server's address, your login name and API password if you sign in to one (the password sealed with a key in the phone's Android Keystore, which never leaves the phone), which feeds and articles came from that server, the certificate fingerprint of each Gemini capsule you have visited (shown in Settings, Capsule certificates, where you can forget one), and settings. Downloaded podcast episodes are kept in the app's own external files folder, fetched by Android's download service.
 
 The app allows Android's backup (`allowBackup="true"`) and sets no exclusions of its own, so on a phone with Android or Google backup switched on, Android may copy this storage into that backup. The developer holds no backup and cannot see yours. Uninstalling the app deletes what is in its private storage. OPML import and export read and write only the file you pick.
 
@@ -49,6 +49,8 @@ Settings, About, Licences shows the licence of the app (GNU General Public Licen
 Yes, necessarily. The app fetches each feed, page, episode or capsule directly from the server that publishes it, so those operators see the request: your IP address, the address asked for, and the app's name and version in the user agent. Nothing is routed through the developer, and no analytics, advertising or crash-reporting service is contacted.
 
 Hosts contacted: only the ones you add or follow, and nothing at a fixed address.
+
+- **A feed server, only if you sign in to one** (Settings, Sync with a feed server; off by default): the server at the address you typed, and no other. The app sends it your login name and API password (to sign in), the addresses and folders of your feeds, and which articles you have read or starred; it receives your subscriptions and their articles from it. While sync is on, the feeds that server has are fetched from it instead of from their sites. An `http://` address is accepted only on your own network (private address ranges, `.local`, `.lan`, `.home`, `.home.arpa`, `.internal`, Tailscale); anything else must be `https://`. Stop syncing forgets the address, login and password.
 
 - **Web feeds, saved pages and full article text**: over https or http, from the site you subscribed to or the page you asked to save, or an address you share into the app. When a feed's own page is fetched for its full text, that page's server sees the request.
 - **Podcast episodes**: from the address in the feed, streamed or downloaded.

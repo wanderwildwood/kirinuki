@@ -45,6 +45,8 @@ import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageScreen
 import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageViewModel
 import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
 import com.wanderwildwood.kirinuki.ui.settings.SettingsViewModel
+import com.wanderwildwood.kirinuki.ui.settings.ServerSyncScreen
+import com.wanderwildwood.kirinuki.ui.settings.ServerSyncViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.direct
 import org.kodein.di.instance
@@ -295,6 +297,14 @@ class MainActivity : DIAwareComponentActivity() {
                     onBack = { navController.popBackStack() },
                     onImportOpml = { importLauncher.launch(arrayOf("*/*")) },
                     onExportOpml = { exportLauncher.launch("kirinuki-${LocalDate.now()}.opml") },
+                    onServerSync = { navController.navigate(Route.SERVER_SYNC) },
+                    viewModel = viewModel,
+                )
+            }
+            composable(Route.SERVER_SYNC) { entry ->
+                val viewModel: ServerSyncViewModel = entry.diAwareViewModel()
+                ServerSyncScreen(
+                    onBack = { navController.popBackStack() },
                     viewModel = viewModel,
                 )
             }

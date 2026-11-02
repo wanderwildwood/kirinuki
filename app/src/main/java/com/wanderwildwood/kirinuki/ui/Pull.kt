@@ -136,6 +136,7 @@ fun pulledWords(pulled: Pulled?): String? = when (pulled) {
             FailKind.NO_CONNECTION -> stringResource(R.string.pull_one_no_connection, f.title)
             FailKind.SERVER_ANSWERED -> stringResource(R.string.pull_one_server_answered, f.title, f.code)
             FailKind.NOT_A_FEED -> stringResource(R.string.pull_one_not_a_feed, f.title)
+            FailKind.SIGN_IN_REFUSED -> stringResource(R.string.pull_one_sign_in_refused, f.title)
             FailKind.OTHER -> stringResource(R.string.pull_failed_named, f.title)
         }
     }

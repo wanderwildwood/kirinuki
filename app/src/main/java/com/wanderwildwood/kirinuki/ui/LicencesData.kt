@@ -13,6 +13,7 @@ const val SOURCE_URL = "https://github.com/wanderwildwood/kirinuki"
  */
 val LICENCE_COMPONENTS: List<LicenceComponent> = listOf(
     LicenceComponent("Feeder", "Jonas Kalderstam", "GPL-3.0", "https://gitlab.com/spacecowboy/Feeder"),
+    LicenceComponent("Read You (parts of the Google Reader sync)", "Ashinch and contributors", "GPL-3.0", "https://github.com/Ashinch/ReadYou"),
     LicenceComponent("Mudita Mindful Design (MMD)", "Mudita", "Apache-2.0", "https://github.com/mudita/MMD"),
     LicenceComponent("AndroidX: Core, AppCompat, Lifecycle, Navigation, Room, Paging, Preference, Browser, Emoji2, Activity", "Google", "Apache-2.0", "https://developer.android.com/jetpack/androidx"),
     LicenceComponent("Jetpack Compose and Glance", "Google", "Apache-2.0", "https://developer.android.com/jetpack/compose"),
