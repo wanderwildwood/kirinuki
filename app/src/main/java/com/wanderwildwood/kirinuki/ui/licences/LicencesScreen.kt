@@ -16,8 +16,8 @@ import com.wanderwildwood.kirinuki.ui.rememberLicencesData
 import com.wanderwildwood.kirinuki.ui.rememberLicencesLabels
 
 /**
- * The licences page: this screen's own top bar over the shared page (source, licence, what
- * the app is built with, and a screen for each licence's full text).
+ * The licences page: this screen's own top bar over the shared list (the app first, then one
+ * row per library, each opening its own page with the full licence text).
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
