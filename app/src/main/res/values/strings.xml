@@ -446,17 +446,17 @@
   <string name="about_what">A reader for feeds and for the smolnet — Gemini, gopher and Spartan. Text on paper, no images, and everything kept on the phone.</string>
   <string name="about_privacy_head">Privacy</string>
   <string name="about_privacy">The app connects only to the feeds, pages and capsules you add, and fetches them directly; that request carries no account and nothing you have written. Some feeds are only served over plain http: those are fetched as the site serves them, with no encryption, so anyone on the network could read the feed text. Only the feed or page you asked for is requested; nothing else is sent. Your feeds and saved articles stay on this phone. Sync with a feed server is off unless you sign in to one in Settings; then the app also talks to that server, and only the one you typed, sending your login, your feeds and what you have read or starred. Its password is kept sealed with the phone\'s keystore. Nothing is sent to the app\'s maker. There are no ads, no analytics and no tracking. Backups and exports go only where you choose to save them. The camera is used only while you scan a QR code, to read it; nothing it sees is kept or sent.</string>
-  <string name="licences_title">Licences</string>
+  <string name="licences_title">Licenses</string>
   <string name="licences_back">Back</string>
   <string name="licences_source_head">Source code</string>
-    <string name="licences_no_text">%s needs no licence text here.</string>
-  <string name="licences_licence">Feeds is free software under the GNU General Public License, version 3. Each library keeps its own licence, on its own page.</string>
+    <string name="licences_no_text">%s needs no license text here.</string>
+  <string name="licences_licence">Feeds is free software under the GNU General Public License, version 3. Each library keeps its own license, on its own page.</string>
   <string name="licences_full_head">Full texts</string>
   <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
   <string name="licences_full_gpl2_cpe">GNU General Public License v2 with the Classpath Exception (full text)</string>
   <string name="licences_full_apache">Apache License 2.0 (full text)</string>
   <string name="licences_full_mpl">Mozilla Public License 2.0 (full text)</string>
-  <string name="licences_full_mit">MIT licence (full text)</string>
+  <string name="licences_full_mit">MIT license (full text)</string>
   <string name="licences_full_unicode">Unicode License v3 (full text)</string>
   <string name="about_built_on">Built on Feeder by Jonas Kalderstam. Full-text extraction by Readability4J.</string>
   <!-- The name of the app's licence -->

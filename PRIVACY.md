@@ -41,9 +41,9 @@ The manifest also lets the app see whether anything on the phone opens web pages
 
 The manifest sets `usesCleartextTraffic="true"`, and Android scanners flag it. It is on on purpose: some feeds, and many older sites, are only served over plain http, and gopher is a bare, unencrypted socket by design. Feeds served over plain http are fetched as the site serves them, with no encryption, so anyone on the same network can read the feed text on its way, and could alter it. Only the feed or page you asked for is requested, with the app's name and version as the user agent; nothing else about you or your phone is sent. An address that starts with https:// is always fetched encrypted, Gemini capsules are encrypted and pinned to the certificate seen on the first visit. Gopher and Spartan, like plain http, are not encrypted.
 
-## Licences
+## Licenses
 
-Settings, About, Licences shows the licence of the app (GNU General Public License, version 3, in full), the open-source libraries it is built on and the licence of each, and a link to the source code. The terms are also in About, in the app, as two short paragraphs.
+Settings, About, Licenses shows the license of the app (GNU General Public License, version 3, in full), the open-source libraries it is built on and the license of each, and a link to the source code. The terms are also in About, in the app, as two short paragraphs.
 
 ## Who else receives anything
 
@@ -79,4 +79,4 @@ The app is suitable for all ages and does not knowingly collect anything from an
 
 ## Changes
 
-If a later version changes what the app stores or which hosts it contacts, this policy is updated in the same release and the change is described in the release notes. The source is public, so any claim here can be checked against the code: <https://github.com/wanderwildwood/kirinuki>. GitHub reports its licence as GPL-3.0.
+If a later version changes what the app stores or which hosts it contacts, this policy is updated in the same release and the change is described in the release notes. The source is public, so any claim here can be checked against the code: <https://github.com/wanderwildwood/kirinuki>. GitHub reports its license as GPL-3.0.
