@@ -32,4 +32,14 @@ object Route {
     const val GEMINI_ROUTE = "$GEMINI/{$GEMINI_ARG}"
 
     fun gemini(url: String): String = "$GEMINI/" + android.net.Uri.encode(url)
+
+    /**
+     * One web page read on its own, from a shared link or a scanned code. Held only by the
+     * screen, never stored, so it leaves nothing in the feed list behind it.
+     */
+    const val WEB_PAGE = "page"
+    const val WEB_PAGE_ARG = "url"
+    const val WEB_PAGE_ROUTE = "$WEB_PAGE/{$WEB_PAGE_ARG}"
+
+    fun webPage(url: String): String = "$WEB_PAGE/" + android.net.Uri.encode(url)
 }

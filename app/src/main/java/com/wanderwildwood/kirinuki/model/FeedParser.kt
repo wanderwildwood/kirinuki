@@ -201,6 +201,45 @@ class FeedParser(
     }
 
     /**
+     * Fetches an address once and says what it is: a feed, a page naming a feed, or a page that
+     * names none. Read off the main thread; the body is cut off at [MAX_LOOK_BYTES], which no
+     * feed or page worth reading on this phone comes near.
+     */
+    suspend fun lookAt(url: URL): Either<FeedParserError, AddressLook> =
+        withContext(IO) {
+            client.curlAndOnResponse(url) { response ->
+                Either.catching<FeedParserError, AddressLook>(
+                    onCatch = { t -> FetchError(url = url.toString(), throwable = t) },
+                ) {
+                    val body = response.body
+                    val bytes =
+                        body.source().use { source ->
+                            val buffer = okio.Buffer()
+                            while (buffer.size <= MAX_LOOK_BYTES) {
+                                if (source.read(buffer, 8_192) == -1L) break
+                            }
+                            buffer.readByteArray()
+                        }
+                    val contentType = body.contentType()
+                    val text = String(bytes, contentType?.charset() ?: Charsets.UTF_8)
+                    // Where the page was fetched from after any redirects, so relative links resolve.
+                    val finalUrl = response.request.url.toUrl()
+                    decideAddress(
+                        contentType = contentType?.toString(),
+                        body = text,
+                        feedTitleIn = {
+                            runCatching {
+                                (parseFeedBytes(finalUrl, bytes) ?: throw IOException("Not a feed")).title
+                            }
+                        },
+                        feedLinksIn = { getAlternateFeedLinksInHtml(it, baseUrl = finalUrl) },
+                        pageTitleIn = { runCatching { Jsoup.parse(it).title() }.getOrNull() },
+                    )
+                }
+            }
+        }
+
+    /**
      * @throws IOException if request fails due to network issue for example
      */
     private suspend fun curl(url: URL) = client.curl(url)
@@ -279,6 +318,7 @@ class FeedParser(
 
     companion object {
         private const val LOG_TAG = "KIRINUKI_FEEDPARSER"
+        const val MAX_LOOK_BYTES = 3L * 1024 * 1024
     }
 }
 

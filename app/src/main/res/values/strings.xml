@@ -383,7 +383,7 @@
   <string name="no_feeds_yet">No feeds yet. Add one, or import an OPML file.</string>
   <string name="nothing_here">Nothing here.</string>
   <string name="summary_only_notice">Only the summary the feed carried. Fetching the whole article does not always work.</string>
-  <string name="add_feed_url">Feed address</string>
+  <string name="add_feed_url">Feed address, or a name</string>
   <string name="add_feed_url_invalid">That does not look like an address the app can read. Use a web address such as example.com/feed.xml, or one that starts with gemini://, gopher:// or spartan://.</string>
   <string name="opml_imported_count">Imported %1$d new feeds</string>
   <string name="opml_exported_count">Saved %1$d feeds to the file</string>
@@ -563,4 +563,21 @@
   <string name="qr_too_long">This address is too long to fit in a QR code.</string>
   <string name="qr_close">Close</string>
   <string name="add_feed_looking">Looking for the site\'s feed…</string>
+  <!-- Under a source suggested on Add feed: %1$s is its site, %2$s its language, e.g. "theguardian.com, en-GB" -->
+  <string name="known_feed_detail">%1$s, %2$s</string>
+  <!-- On Add feed, once a shared, scanned or typed address has been fetched -->
+  <string name="looked_feed">This is a feed.</string>
+  <!-- %1$s is the feed\'s own name -->
+  <string name="looked_feed_named">This is a feed: %1$s</string>
+  <!-- %1$s is the address of the feed the page names -->
+  <string name="looked_page_with_feed">This page names a feed, and Subscribe follows that one: %1$s</string>
+  <string name="looked_story">There is no feed here. It looks like a single story, to read rather than follow.</string>
+  <!-- %1$s is the page\'s own title -->
+  <string name="looked_story_named">There is no feed here. It looks like a single story, to read rather than follow: %1$s</string>
+  <string name="looked_neither">This address answered with neither a page nor a feed.</string>
+  <string name="read_this_page">Read this page</string>
+  <string name="subscribe_anyway">Subscribe anyway</string>
+  <!-- The star on a page read on its own: keeps it under Pages, as Save the page does -->
+  <string name="web_page_keep">Keep this page</string>
+  <string name="web_page_kept">Kept under Pages</string>
 </resources>

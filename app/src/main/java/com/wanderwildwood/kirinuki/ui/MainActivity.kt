@@ -43,6 +43,8 @@ import com.wanderwildwood.kirinuki.ui.feeds.FeedsScreen
 import com.wanderwildwood.kirinuki.ui.feeds.FeedsViewModel
 import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageScreen
 import com.wanderwildwood.kirinuki.ui.gemini.GeminiPageViewModel
+import com.wanderwildwood.kirinuki.ui.webpage.WebPageScreen
+import com.wanderwildwood.kirinuki.ui.webpage.WebPageViewModel
 import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
 import com.wanderwildwood.kirinuki.ui.settings.SettingsViewModel
 import com.wanderwildwood.kirinuki.ui.settings.ServerSyncScreen
@@ -62,6 +64,12 @@ class MainActivity : DIAwareComponentActivity() {
      * there is a nav controller to act with.
      */
     private val pendingCapsule = mutableStateOf<String?>(null)
+
+    /**
+     * A web page to read on its own, handed over by Add feed when it was opened from a share.
+     * Held the same way as a capsule, for the same reason.
+     */
+    private val pendingPage = mutableStateOf<String?>(null)
 
     /**
      * Whether a reader is the screen in front, which is the only time the volume keys are
@@ -158,7 +166,20 @@ class MainActivity : DIAwareComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         capsuleFrom(intent)?.let { pendingCapsule.value = it }
+        pageFrom(intent)?.let { pendingPage.value = it }
     }
+
+    /**
+     * Only http and https, and only with this app's own extra: nothing else on the phone sends
+     * a web address here (the manifest offers none), and a bare view of one is not a request
+     * to read it.
+     */
+    private fun pageFrom(intent: Intent?): String? =
+        intent
+            ?.takeIf { it.action == Intent.ACTION_VIEW && it.getBooleanExtra(EXTRA_READ_PAGE, false) }
+            ?.data
+            ?.takeIf { it.scheme in setOf("http", "https") }
+            ?.toString()
 
     private fun capsuleFrom(intent: Intent?): String? =
         intent
@@ -171,6 +192,7 @@ class MainActivity : DIAwareComponentActivity() {
         super.onCreate(savedInstanceState)
 
         pendingCapsule.value = capsuleFrom(intent)
+        pendingPage.value = pageFrom(intent)
 
         // Until the screen in front is known, stay as the window came up, so a window built again
         // after a turn does not turn back and forth.
@@ -198,7 +220,11 @@ class MainActivity : DIAwareComponentActivity() {
         LaunchedEffect(backStack, turnWithPhone) {
             // Nothing is known until the first screen is up; leave the window as it is until then.
             val route = backStack?.destination?.route ?: return@LaunchedEffect
-            turner.set(on = turnWithPhone && (route == Route.ARTICLE || route == Route.GEMINI_ROUTE))
+            turner.set(
+                on =
+                    turnWithPhone &&
+                        (route == Route.ARTICLE || route == Route.GEMINI_ROUTE || route == Route.WEB_PAGE_ROUTE),
+            )
         }
 
         // Whichever reader is on screen puts its list here while it is, and the volume keys
@@ -217,6 +243,14 @@ class MainActivity : DIAwareComponentActivity() {
             capsule?.let {
                 pendingCapsule.value = null
                 navController.navigate(Route.gemini(it))
+            }
+        }
+
+        val page by pendingPage
+        LaunchedEffect(page) {
+            page?.let {
+                pendingPage.value = null
+                navController.navigate(Route.webPage(it))
             }
         }
 
@@ -330,6 +364,26 @@ class MainActivity : DIAwareComponentActivity() {
                 )
             }
             composable(
+                Route.WEB_PAGE_ROUTE,
+                arguments = listOf(navArgument(Route.WEB_PAGE_ARG) { type = NavType.StringType }),
+            ) { entry ->
+                val viewModel: WebPageViewModel = entry.diAwareViewModel()
+                val pageListState = rememberLazyListState()
+                DisposableEffect(pageListState) {
+                    readerState.value = pageListState
+                    onDispose {
+                        if (readerState.value === pageListState) readerState.value = null
+                    }
+                }
+                WebPageScreen(
+                    url = entry.arguments?.getString(Route.WEB_PAGE_ARG).orEmpty(),
+                    onBack = { navController.popBackStack() },
+                    onFollowCapsule = { navController.navigate(Route.gemini(it)) },
+                    viewModel = viewModel,
+                    listState = pageListState,
+                )
+            }
+            composable(
                 Route.ADD_FEED_ROUTE,
                 arguments =
                     listOf(
@@ -348,6 +402,7 @@ class MainActivity : DIAwareComponentActivity() {
                     onBack = { navController.popBackStack() },
                     onSaved = { navController.popBackStack() },
                     onRead = { navController.navigate(Route.gemini(it)) },
+                    onReadPage = { navController.navigate(Route.webPage(it)) },
                     viewModel = viewModel,
                     initialUrl = entry.arguments?.getString(Route.ADD_FEED_ARG).orEmpty(),
                     feedId = entry.arguments?.getLong(Route.ADD_FEED_FEED_ARG) ?: ID_UNSET,
@@ -356,3 +411,6 @@ class MainActivity : DIAwareComponentActivity() {
         }
     }
 }
+
+/** Set by Add feed on the intent that asks the app to read one web page on its own. */
+const val EXTRA_READ_PAGE = "com.wanderwildwood.kirinuki.READ_PAGE"

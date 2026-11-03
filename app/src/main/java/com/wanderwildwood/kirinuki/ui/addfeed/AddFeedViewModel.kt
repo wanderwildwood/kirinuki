@@ -9,7 +9,9 @@ import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
+import com.wanderwildwood.kirinuki.model.AddressLook
 import com.wanderwildwood.kirinuki.model.FeedParser
+import com.wanderwildwood.kirinuki.model.firstFeedOf
 import com.wanderwildwood.kirinuki.model.SiteMetaData
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
@@ -18,9 +20,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import org.kodein.di.DI
 import org.kodein.di.instance
@@ -35,6 +35,13 @@ class AddFeedViewModel(
     /** True while a site's page is being read for the feed it names, before subscribing. */
     private val _looking = MutableStateFlow(false)
     val looking: StateFlow<Boolean> = _looking
+
+    /**
+     * What the address in the box turned out to be, once it has been fetched: shown on the
+     * screen, so that a story is offered for reading rather than quietly subscribed to.
+     */
+    private val _looked = MutableStateFlow<LookedAt?>(null)
+    val looked: StateFlow<LookedAt?> = _looked
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -66,6 +73,33 @@ class AddFeedViewModel(
         viewModelScope.launch {
             repository.deleteFeeds(listOf(feedId))
             _saved.value = true
+        }
+    }
+
+    /**
+     * Fetches a shared or scanned address once, to say whether it is a feed, a page naming one,
+     * or a single story. Only for an address that arrived whole -- never while one is typed.
+     */
+    fun look(url: String) {
+        val address = addressKey(url) ?: return
+        if (!isWebUrl(address) || _looked.value?.address == address) return
+        viewModelScope.launch {
+            lookAt(address)?.let { _looked.value = LookedAt(address, it) }
+        }
+    }
+
+    private suspend fun lookAt(address: String): AddressLook? {
+        _looking.value = true
+        return try {
+            withTimeoutOrNull(DISCOVERY_MILLIS) {
+                feedParser.lookAt(parseUrlLeniently(address)).getOrNull()
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            null
+        } finally {
+            _looking.value = false
         }
     }
 
@@ -136,24 +170,19 @@ class AddFeedViewModel(
         viewModelScope.launch {
             // A site's own address is what a person finds, types or scans; the feed is a
             // link in its page. Only for a new web subscription, and only once: an address
-            // that is already a feed, a page that names none, or no network at all leaves
-            // the address as it was given, which is what happened before this.
+            // that is already a feed, or no network at all, leaves the address as it was
+            // given, which is what happened before this. A page that names no feed is a
+            // story, and is said to be one instead of becoming a feed that stays empty --
+            // unless it was said already, and Subscribe was pressed again regardless.
             val discovered =
                 if (feedId <= ID_UNSET && isWebUrl(parsed.toString()) && repository.getFeed(parsed) == null) {
-                    _looking.value = true
-                    try {
-                        withTimeoutOrNull(DISCOVERY_MILLIS) {
-                            // The page is read as it arrives, so all of it off the main thread.
-                            withContext(Dispatchers.IO) {
-                                feedParser.getSiteMetaData(parsed).fold(ifLeft = { null }, ifRight = { feedNamedBy(it) })
-                            }
-                        }
-                    } catch (e: CancellationException) {
-                        throw e
-                    } catch (e: Exception) {
-                        null
-                    } finally {
-                        _looking.value = false
+                    val address = parsed.toString()
+                    val shown = _looked.value?.takeIf { it.address == address }?.look
+                    val look = shown ?: lookAt(address)?.also { _looked.value = LookedAt(address, it) }
+                    when (val target = subscribeTarget(look, anyway = shown is AddressLook.Page)) {
+                        SubscribeTarget.Stop -> return@launch
+                        SubscribeTarget.AsGiven -> null
+                        is SubscribeTarget.Feed -> target.url
                     }
                 } else {
                     null
@@ -259,13 +288,7 @@ private const val DISCOVERY_MILLIS = 15_000L
  * The feed a site's page names, if it names one: the first it lists, as a browser's own feed
  * button would take. RSS or Atom ahead of anything else, since a JSON link is as often oEmbed.
  */
-internal fun feedNamedBy(site: SiteMetaData): java.net.URL? {
-    val links = site.alternateFeedLinks
-    return (
-        links.firstOrNull { it.type.contains("rss", ignoreCase = true) || it.type.contains("atom", ignoreCase = true) }
-            ?: links.firstOrNull()
-    )?.link
-}
+internal fun feedNamedBy(site: SiteMetaData): java.net.URL? = firstFeedOf(site.alternateFeedLinks)
 
 /**
  * Whether what was typed can be an address at all. java.net.URL accepts "https://what is this"
@@ -291,3 +314,46 @@ internal fun placeholderTitle(url: java.net.URL): String {
     val named = if (path.isEmpty()) host else host + path
     return if (named.length <= 40) named else named.take(39) + "…"
 }
+
+/** An address and what fetching it showed. */
+data class LookedAt(
+    val address: String,
+    val look: AddressLook,
+)
+
+/**
+ * The address as the box will fetch it: trimmed, and https when no scheme was typed. Null for
+ * an empty box. Used to tell whether what was looked at is still what is in the box.
+ */
+fun addressKey(typed: String): String? {
+    val trimmed = typed.trim()
+    if (trimmed.isEmpty()) return null
+    return if (trimmed.contains("://")) trimmed else "https://$trimmed"
+}
+
+sealed interface SubscribeTarget {
+    /** Subscribe to the address as it was given. */
+    data object AsGiven : SubscribeTarget
+
+    /** Subscribe to the feed the page names. */
+    data class Feed(
+        val url: java.net.URL,
+    ) : SubscribeTarget
+
+    /** Subscribe to nothing yet: the page is a story, and the screen now says so. */
+    data object Stop : SubscribeTarget
+}
+
+/**
+ * What Subscribe does with what the address turned out to be. Not knowing -- no network, a
+ * timeout, an answer that is neither -- subscribes as given, as it always did.
+ */
+fun subscribeTarget(
+    look: AddressLook?,
+    anyway: Boolean,
+): SubscribeTarget =
+    when (look) {
+        is AddressLook.PageWithFeed -> SubscribeTarget.Feed(look.feedUrl)
+        is AddressLook.Page -> if (anyway) SubscribeTarget.AsGiven else SubscribeTarget.Stop
+        is AddressLook.Feed, AddressLook.Neither, null -> SubscribeTarget.AsGiven
+    }

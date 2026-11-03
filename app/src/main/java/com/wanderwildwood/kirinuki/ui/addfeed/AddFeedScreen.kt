@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +40,9 @@ import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.isSavedPages
 import com.wanderwildwood.kirinuki.model.ArticleRuleError
 import com.wanderwildwood.kirinuki.model.ArticleRuleSet
+import com.wanderwildwood.kirinuki.model.AddressLook
+import com.wanderwildwood.kirinuki.model.known.KnownFeed
+import com.wanderwildwood.kirinuki.model.known.knownFeedsMatching
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
@@ -58,6 +62,7 @@ fun AddFeedScreen(
     onBack: () -> Unit,
     onSaved: () -> Unit,
     onRead: (String) -> Unit,
+    onReadPage: (String) -> Unit,
     viewModel: AddFeedViewModel,
     modifier: Modifier = Modifier,
     initialUrl: String = "",
@@ -85,6 +90,11 @@ fun AddFeedScreen(
     // The scanner takes the whole screen while it is open, and hands back only an address the
     // box could have been given by hand; Subscribe, or Save page, is still the reader's press.
     var scanning by rememberSaveable { mutableStateOf(false) }
+    val looked by viewModel.looked.collectAsStateWithLifecycle()
+    // Only while it is still about the address in the box: an edit leaves it behind.
+    val look = looked?.takeIf { it.address == addressKey(url) }?.look
+    // Matched against the list in the app as each letter is typed; nothing leaves the phone.
+    val suggestions = remember(url, editing) { if (editing) emptyList() else knownFeedsMatching(url) }
 
     // Disarms itself after a few seconds, the same as the row it replaces used to.
     var armed by rememberSaveable { mutableStateOf(false) }
@@ -96,6 +106,12 @@ fun AddFeedScreen(
     }
 
     LaunchedEffect(feedId) { viewModel.load(feedId) }
+
+    // A shared link arrives whole, so it is looked at straight away, once: is it a feed, a
+    // site naming one, or a single story? A typed one is looked at when Subscribe is pressed.
+    LaunchedEffect(initialUrl) {
+        if (!editing && initialUrl.isNotBlank()) viewModel.look(initialUrl)
+    }
 
     LaunchedEffect(feed) {
         val loaded = feed
@@ -128,6 +144,7 @@ fun AddFeedScreen(
                 url = scanned
                 viewModel.clearError()
                 scanning = false
+                viewModel.look(scanned)
             },
             onClose = { scanning = false },
             modifier = modifier,
@@ -191,6 +208,18 @@ fun AddFeedScreen(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     )
                 }
+                // A name typed into the box -- "guardian", "low-tech" -- finds the sources in the
+                // app's own short list. A tap puts the feed's address in the box, and the rest of
+                // the form is as it always was.
+                suggestions.forEach { known ->
+                    KnownFeedRow(
+                        feed = known,
+                        onPick = {
+                            url = known.feedUrl
+                            viewModel.clearError()
+                        },
+                    )
+                }
                 // The Kompakt has no browser to find a feed with, so the address is often found
                 // on a computer, and a QR code made there is the short way across.
                 if (!editing) {
@@ -199,6 +228,23 @@ fun AddFeedScreen(
                         onClick = { scanning = true },
                         modifier = Modifier.fillMaxWidth(),
                     )
+                }
+                // What the address turned out to be, said where it was given, with reading the
+                // page on offer beside whatever was found -- rather than guessed at silently.
+                if (!editing && look != null) {
+                    LookedAtNote(look = look)
+                    if (look is AddressLook.Page || look is AddressLook.PageWithFeed) {
+                        val read = { onReadPage(addressKey(url).orEmpty()) }
+                        if (look is AddressLook.Page) {
+                            ButtonMMD(onClick = read, modifier = Modifier.fillMaxWidth()) {
+                                TextMMD(text = stringResource(R.string.read_this_page))
+                            }
+                        } else {
+                            OutlinedButtonMMD(onClick = read, modifier = Modifier.fillMaxWidth()) {
+                                TextMMD(text = stringResource(R.string.read_this_page))
+                            }
+                        }
+                    }
                 }
             }
             TextFieldMMD(
@@ -288,28 +334,40 @@ fun AddFeedScreen(
                 text = stringResource(R.string.article_rules_effect),
                 style = MaterialTheme.typography.bodySmall,
             )
-            ButtonMMD(
-                onClick =
-                    {
-                        viewModel.save(
-                            url = url,
-                            title = title,
-                            folder = folder,
-                            feedId = feedId,
-                            fullTextByDefault = fullText,
-                            blockRules = blockRules,
-                            allowRules = allowRules,
-                        )
-                    },
-                enabled = url.isNotBlank() && !looking,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                TextMMD(
-                    text =
-                        stringResource(
-                            if (editing) R.string.save else R.string.subscribe,
-                        ),
+            val subscribe = {
+                viewModel.save(
+                    url = url,
+                    title = title,
+                    folder = folder,
+                    feedId = feedId,
+                    fullTextByDefault = fullText,
+                    blockRules = blockRules,
+                    allowRules = allowRules,
                 )
+            }
+            // A story has Read this page as its first button, at the top; subscribing to it
+            // is still allowed, but it is the second thing, and says so.
+            if (!editing && look is AddressLook.Page) {
+                OutlinedButtonMMD(
+                    onClick = subscribe,
+                    enabled = !looking,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextMMD(text = stringResource(R.string.subscribe_anyway))
+                }
+            } else {
+                ButtonMMD(
+                    onClick = subscribe,
+                    enabled = url.isNotBlank() && !looking,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    TextMMD(
+                        text =
+                            stringResource(
+                                if (editing) R.string.save else R.string.subscribe,
+                            ),
+                    )
+                }
             }
 
             // A site's address is looked at for the feed it names before it is saved, which
@@ -363,6 +421,49 @@ fun AddFeedScreen(
             }
         }
     }
+}
+
+/**
+ * One source from the app's own list, under the box a name was typed into: its name, and the
+ * site and language under it, so two papers with one word in common are told apart. A row of
+ * text and not a button, as the folder names are; 48 dp to press.
+ */
+@Composable
+private fun KnownFeedRow(
+    feed: KnownFeed,
+    onPick: () -> Unit,
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp)
+                .clickable(onClick = onPick),
+    ) {
+        TextMMD(text = feed.name)
+        TextMMD(
+            text = stringResource(R.string.known_feed_detail, feed.site.substringAfter("://").removePrefix("www."), feed.language),
+            style = MaterialTheme.typography.bodySmall,
+        )
+    }
+}
+
+/** What fetching the address showed, in a sentence. */
+@Composable
+private fun LookedAtNote(look: AddressLook) {
+    val text =
+        when (look) {
+            is AddressLook.Feed ->
+                look.title?.let { stringResource(R.string.looked_feed_named, it) }
+                    ?: stringResource(R.string.looked_feed)
+            is AddressLook.PageWithFeed -> stringResource(R.string.looked_page_with_feed, look.feedUrl.toString())
+            is AddressLook.Page ->
+                look.pageTitle?.let { stringResource(R.string.looked_story_named, it) }
+                    ?: stringResource(R.string.looked_story)
+            AddressLook.Neither -> stringResource(R.string.looked_neither)
+        }
+    TextMMD(text = text, modifier = Modifier.fillMaxWidth())
 }
 
 /** Long enough to mean it, short enough not to leave a live delete under a thumb. */

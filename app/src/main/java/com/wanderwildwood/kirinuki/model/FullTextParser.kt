@@ -75,9 +75,43 @@ class FullTextParser(
             logDebug(LOG_TAG, "Fetching full page ${feedItem.link}, ${feedItem.id}")
             val url = feedItem.link ?: return@withContext Either.Left(NoUrl())
 
+            fetchReadable(url).map { (article, pageTitle) ->
+                logDebug(LOG_TAG, "Writing article ${feedItem.link}")
+                withContext(Dispatchers.IO) {
+                    article?.let { articleContent ->
+                        filePathProvider.fullArticleDir.mkdirs()
+                        blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
+                            .bufferedWriter()
+                            .use { writer ->
+                                writer.write(articleContent)
+                            }
+
+                        // Update word count on item
+                        val converter = HtmlToPlainTextConverter()
+                        val plainText = converter.convert(articleContent)
+                        val wordCount = estimateWordCount(plainText)
+
+                        repository.updateWordCountFull(feedItem.id, wordCount)
+                    }
+                    // A saved page arrived with only its address for a title.
+                    pageTitle?.trim()?.takeIf { it.isNotEmpty() }?.let { title ->
+                        repository.replaceAddressTitle(feedItem.id, title.take(MAX_TITLE_LENGTH))
+                    }
+                }
+                Unit
+            }
+        }
+
+    /**
+     * One page fetched and put through Readability: the article as HTML, and what the page calls
+     * itself. Nothing is stored -- the feed pipeline above keeps what it gets, and a page read
+     * straight from a shared link or a scanned code is only shown.
+     */
+    suspend fun fetchReadable(url: String): Either<FeedParserError, Pair<String?, String?>> =
+        withContext(Dispatchers.Default) {
             okHttpClient
                 .curlAndOnResponse(URL(url)) { response ->
-                    Either.catching(
+                    Either.catching<FeedParserError, Either<FeedParserError, Pair<String?, String?>>>(
                         onCatch = { t ->
                             FullTextDecodingFailure(url, t)
                         },
@@ -139,33 +173,8 @@ class FullTextParser(
                         logDebug(LOG_TAG, "Full article charset: $charset")
 
                         val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
-                        logDebug(LOG_TAG, "Parsing article ${feedItem.link}")
-                        val (article, pageTitle) = parseFullArticleAndTitle(url, html)
-
-                        logDebug(LOG_TAG, "Writing article ${feedItem.link}")
-                        withContext(Dispatchers.IO) {
-                            article?.let { articleContent ->
-                                filePathProvider.fullArticleDir.mkdirs()
-                                blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
-                                    .bufferedWriter()
-                                    .use { writer ->
-                                        writer.write(articleContent)
-                                    }
-
-                                // Update word count on item
-                                val converter = HtmlToPlainTextConverter()
-                                val plainText = converter.convert(articleContent)
-                                val wordCount = estimateWordCount(plainText)
-
-                                repository.updateWordCountFull(feedItem.id, wordCount)
-                            }
-                            // A saved page arrived with only its address for a title.
-                            pageTitle?.trim()?.takeIf { it.isNotEmpty() }?.let { title ->
-                                repository.replaceAddressTitle(feedItem.id, title.take(MAX_TITLE_LENGTH))
-                            }
-                        }
-
-                        Either.Right(Unit)
+                        logDebug(LOG_TAG, "Parsing article $url")
+                        Either.Right(parseFullArticleAndTitle(url, html))
                     }
                 }.flatten()
         }

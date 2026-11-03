@@ -37,6 +37,15 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                         )
                         finish()
                     },
+                    // The same hand-over for a web page read on its own, flagged so the app
+                    // knows it was asked to read it and not merely shown an address.
+                    onReadPage = { url ->
+                        startActivity(
+                            Intent(Intent.ACTION_VIEW, url.toUri(), this, MainActivity::class.java)
+                                .putExtra(EXTRA_READ_PAGE, true),
+                        )
+                        finish()
+                    },
                     viewModel = diAwareViewModel(),
                     initialUrl = initialFeedUrl,
                 )
