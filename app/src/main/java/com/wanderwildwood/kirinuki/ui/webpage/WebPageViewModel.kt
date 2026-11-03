@@ -7,6 +7,7 @@ import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.model.FeedParserError
+import com.wanderwildwood.kirinuki.model.FetchedPage
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.FullTextTooLarge
 import com.wanderwildwood.kirinuki.model.UnsupportedContentType
@@ -28,6 +29,16 @@ sealed interface WebPageState {
     data class Page(
         val title: String?,
         val article: LinearArticle,
+    ) : WebPageState
+
+    /**
+     * A plain text file, shown as it was sent, in the fixed-width block a gopher text file
+     * gets; [cut] when only its start was fetched.
+     */
+    data class Text(
+        val title: String?,
+        val text: String,
+        val cut: Boolean,
     ) : WebPageState
 
     /** Said in words, because an empty screen is not an answer. */
@@ -58,7 +69,7 @@ class WebPageViewModel(
     private var url = ""
 
     fun load(address: String) {
-        if (url == address && _state.value is WebPageState.Page) return
+        if (url == address && (_state.value is WebPageState.Page || _state.value is WebPageState.Text)) return
         url = address
         _state.value = WebPageState.Loading
         viewModelScope.launch { _state.value = fetch(address) }
@@ -89,9 +100,13 @@ class WebPageViewModel(
     private suspend fun fetch(address: String): WebPageState {
         val app = getApplication<Application>()
         return try {
-            fullTextParser.fetchReadable(address).fold(
+            fullTextParser.fetchPage(address).fold(
                 ifLeft = { WebPageState.Problem(app.getString(messageFor(it))) },
-                ifRight = { (html, title) ->
+                ifRight = { page ->
+                    if (page is FetchedPage.PlainText) {
+                        return@fold WebPageState.Text(title = fileNameOf(address), text = page.text, cut = page.cut)
+                    }
+                    val (html, title) = page as FetchedPage.Article
                     if (html.isNullOrBlank()) {
                         WebPageState.Problem(app.getString(R.string.failed_to_fetch_full_article_missing_body))
                     } else {
@@ -118,4 +133,14 @@ class WebPageViewModel(
             is FullTextTooLarge -> R.string.failed_to_fetch_full_article_too_large
             else -> R.string.failed_to_fetch_full_article
         }
+}
+
+/** A text file's own name, from the last part of its address, for the title over it. */
+internal fun fileNameOf(address: String): String? {
+    val path = runCatching { java.net.URI(address).rawPath }.getOrNull() ?: return null
+    val last = path.substringAfterLast('/')
+    return runCatching { java.net.URLDecoder.decode(last, "UTF-8") }
+        .getOrDefault(last)
+        .trim()
+        .ifEmpty { null }
 }

@@ -12,6 +12,7 @@ import com.wanderwildwood.kirinuki.db.room.estimateWordCount
 import com.wanderwildwood.kirinuki.ui.text.HtmlToPlainTextConverter
 import com.wanderwildwood.kirinuki.util.Either
 import com.wanderwildwood.kirinuki.util.FilePathProvider
+import com.wanderwildwood.kirinuki.util.flatMap
 import com.wanderwildwood.kirinuki.util.flatten
 import com.wanderwildwood.kirinuki.util.left
 import com.wanderwildwood.kirinuki.util.logDebug
@@ -108,15 +109,63 @@ class FullTextParser(
      * straight from a shared link or a scanned code is only shown.
      */
     suspend fun fetchReadable(url: String): Either<FeedParserError, Pair<String?, String?>> =
+        fetchPage(url).flatMap { page ->
+            when (page) {
+                is FetchedPage.Article -> Either.Right(page.html to page.title)
+                is FetchedPage.PlainText -> Either.Left(UnsupportedContentType(url = url, mimeType = "text/plain"))
+            }
+        }
+
+    /**
+     * One address fetched for the page reader: an HTML page put through Readability, or a plain
+     * text file kept as it is (its first [MAX_PLAIN_TEXT_BYTES], cut at a line end). Anything
+     * else is [UnsupportedContentType], as it always was.
+     */
+    suspend fun fetchPage(url: String): Either<FeedParserError, FetchedPage> =
         withContext(Dispatchers.Default) {
             okHttpClient
                 .curlAndOnResponse(URL(url)) { response ->
-                    Either.catching<FeedParserError, Either<FeedParserError, Pair<String?, String?>>>(
+                    Either.catching<FeedParserError, Either<FeedParserError, FetchedPage>>(
                         onCatch = { t ->
                             FullTextDecodingFailure(url, t)
                         },
                     ) {
                         val body = response.body
+                        val contentType = body.contentType()
+
+                        when (pageKindOf(contentType?.toString(), url)) {
+                            PageKind.OTHER ->
+                                return@catching UnsupportedContentType(
+                                    url = url,
+                                    mimeType = contentType?.toString() ?: "null",
+                                ).left()
+
+                            PageKind.TEXT -> {
+                                // A text file is shown, not parsed, so a long one is cut rather
+                                // than refused: the start of it is still worth reading.
+                                val buffer = okio.Buffer()
+                                body.use {
+                                    val source = body.source()
+                                    while (buffer.size <= MAX_PLAIN_TEXT_BYTES) {
+                                        if (source.read(buffer, 8_192) == -1L) break
+                                    }
+                                }
+                                val bytes = buffer.readByteArray()
+                                val charset =
+                                    contentType?.charset()
+                                        ?: detectCharset(bytes)?.let { runCatching { toJavaCharset(it) }.getOrNull() }
+                                        ?: java.nio.charset.StandardCharsets.UTF_8
+                                val text =
+                                    plainTextShown(String(bytes, charset), cut = bytes.size > MAX_PLAIN_TEXT_BYTES)
+                                        ?: return@catching UnsupportedContentType(
+                                            url = url,
+                                            mimeType = contentType?.toString() ?: "null",
+                                        ).left()
+                                return@catching Either.Right(text)
+                            }
+
+                            PageKind.HTML -> Unit
+                        }
 
                         val contentLength = body.contentLength()
                         logDebug(LOG_TAG, "contentLength: $contentLength")
@@ -144,21 +193,7 @@ class FullTextParser(
 
                         val bytes = buffer.readByteArray()
 
-                        val contentType =
-                            body.contentType()
-                                ?: return@catching UnsupportedContentType(
-                                    url = url,
-                                    mimeType = "null",
-                                ).left()
-
-                        if (contentType.type != "text" || contentType.subtype != "html") {
-                            return@catching UnsupportedContentType(
-                                url = url,
-                                mimeType = contentType.toString(),
-                            ).left()
-                        }
-
-                        var charset: Charset? = contentType.charset()
+                        var charset: Charset? = contentType?.charset()
 
                         if (charset == null) {
                             charset = findMetaCharset(bytes)?.let { toJavaCharset(it) }
@@ -174,7 +209,8 @@ class FullTextParser(
 
                         val html = String(bytes, charset ?: java.nio.charset.StandardCharsets.UTF_8)
                         logDebug(LOG_TAG, "Parsing article $url")
-                        Either.Right(parseFullArticleAndTitle(url, html))
+                        val (article, title) = parseFullArticleAndTitle(url, html)
+                        Either.Right(FetchedPage.Article(html = article, title = title))
                     }
                 }.flatten()
         }
@@ -186,7 +222,65 @@ class FullTextParser(
         // but this is way higher than is possible to render if actual HTML.
         // It will be truncated by HtmlLinearizer in that case.
         const val MAX_FULL_TEXT_BYTES = 3 * 1024 * 1024
+
+        // A plain text file is laid out whole, in one block, on a phone; 256 KB is a long
+        // program or a short book, and about as much as the Kompakt lays out without a wait.
+        const val MAX_PLAIN_TEXT_BYTES = 256 * 1024
     }
+}
+
+/** What the page reader got from an address. */
+sealed interface FetchedPage {
+    data class Article(
+        val html: String?,
+        val title: String?,
+    ) : FetchedPage
+
+    /** A text file as it was sent; [cut] when only its start is here. */
+    data class PlainText(
+        val text: String,
+        val cut: Boolean,
+    ) : FetchedPage
+}
+
+enum class PageKind { HTML, TEXT, OTHER }
+
+/**
+ * Whether a response is a page to put through Readability, a text file to show as it is, or
+ * something this app does not read. A text file is text/plain; a server that sends a generic
+ * type (octet-stream, or none at all) for an address ending in .txt is taken at the address's
+ * word.
+ */
+fun pageKindOf(
+    contentType: String?,
+    url: String,
+): PageKind {
+    val type = contentType?.substringBefore(';')?.trim()?.lowercase().orEmpty()
+    val path =
+        url.substringBefore('#').substringBefore('?').lowercase()
+    return when {
+        type == "text/html" -> PageKind.HTML
+        type == "text/plain" -> PageKind.TEXT
+        type in GENERIC_TYPES && path.endsWith(".txt") -> PageKind.TEXT
+        else -> PageKind.OTHER
+    }
+}
+
+private val GENERIC_TYPES = setOf("", "application/octet-stream", "binary/octet-stream", "application/unknown")
+
+/**
+ * The text as it will be shown, or null when it is not text after all (a NUL byte is the sign
+ * of a binary file sent as text). When the fetch was [cut], the last, partial line is dropped
+ * so the page ends on a whole one. Line ends are made plain \n.
+ */
+fun plainTextShown(
+    decoded: String,
+    cut: Boolean,
+): FetchedPage.PlainText? {
+    if (decoded.contains('\u0000')) return null
+    val text = decoded.replace("\r\n", "\n").replace('\r', '\n')
+    val whole = if (cut && text.contains('\n')) text.substringBeforeLast('\n') else text
+    return FetchedPage.PlainText(text = whole.trimEnd(), cut = cut)
 }
 
 fun parseFullArticle(

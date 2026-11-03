@@ -577,4 +577,6 @@
   <!-- The star on a page read on its own: keeps it under Pages, as Save the page does -->
   <string name="web_page_keep">Keep this page</string>
   <string name="web_page_kept">Kept under Pages</string>
+  <!-- Under a long text file read on its own; 256 KB matches MAX_PLAIN_TEXT_BYTES -->
+  <string name="web_page_text_cut">That is the first 256 KB of this file. The QR code below opens the whole of it elsewhere.</string>
 </resources>

@@ -44,6 +44,7 @@ import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
 import com.wanderwildwood.kirinuki.ui.compose.utils.textActions
+import com.wanderwildwood.kirinuki.ui.gemini.FittedPreformattedText
 import com.wanderwildwood.kirinuki.ui.qr.QrLinkDialog
 import java.net.URI
 
@@ -136,6 +137,31 @@ fun WebPageScreen(
                                 item {
                                     TextMMD(text = current.message, modifier = Modifier.fillMaxWidth())
                                 }
+
+                            // A text file, in the fixed-width block a gopher text file gets:
+                            // fitted to the width while its lines allow, wrapped when they don't.
+                            is WebPageState.Text -> {
+                                current.title?.let { title ->
+                                    item {
+                                        ProvideScaledText(style = MaterialTheme.typography.bodyLarge) {
+                                            TextMMD(
+                                                text = title,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier.fillMaxWidth(),
+                                            )
+                                        }
+                                    }
+                                }
+                                item { FittedPreformattedText(text = current.text) }
+                                if (current.cut) {
+                                    item {
+                                        TextMMD(
+                                            text = stringResource(R.string.web_page_text_cut),
+                                            modifier = Modifier.fillMaxWidth(),
+                                        )
+                                    }
+                                }
+                            }
 
                             is WebPageState.Page -> {
                                 current.title?.let { title ->
