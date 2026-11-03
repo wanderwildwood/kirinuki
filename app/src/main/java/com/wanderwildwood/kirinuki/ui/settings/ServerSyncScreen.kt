@@ -31,6 +31,7 @@ import com.mudita.mmd.components.text_field.TextFieldMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.sync.ServerCheck
+import com.wanderwildwood.kirinuki.sync.ServerKind
 import com.wanderwildwood.kirinuki.sync.ServerProblem
 import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
@@ -43,8 +44,9 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 /**
- * Sync with a feed server, its own screen because it holds a form. Signed out, it asks for
- * the three things a Google Reader-style server needs, typed: no browser, nothing to register.
+ * Sync with a feed server, its own screen because it holds a form. Signed out, it asks which
+ * kind of server (Google Reader API or Nextcloud News) and the three things either needs,
+ * typed: no browser, nothing to register.
  * Signed in, it says where and as whom, when it last synced, what went wrong if something did,
  * and offers Sync now and Stop syncing.
  */
@@ -59,6 +61,8 @@ fun ServerSyncScreen(
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val check by viewModel.check.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
+    // Chosen above the form, and read by the result line too, so it lives here.
+    var kind by rememberSaveable { mutableStateOf(ServerKind.GOOGLE_READER) }
     // What Test or Sign in came to is said at the top, above the fields it is about: the
     // buttons are at the foot of a form taller than the panel, and a line under them was
     // off the screen when it appeared.
@@ -92,6 +96,16 @@ fun ServerSyncScreen(
                 // Keyed: the result line comes and goes above the form, and without keys the
                 // form would take the result's slot and lose what was typed into it.
                 item(key = "intro") { TextMMD(text = stringResource(R.string.server_sync_intro)) }
+                item(key = "kind") {
+                    KindChoice(
+                        kind = kind,
+                        enabled = !busy,
+                        onKind = {
+                            kind = it
+                            viewModel.clearCheck()
+                        },
+                    )
+                }
                 val result = check
                 if (busy || result != null) {
                     item(key = "result") {
@@ -99,12 +113,13 @@ fun ServerSyncScreen(
                             busy -> TextMMD(text = stringResource(R.string.server_sync_checking))
                             result is ServerCheck.Works ->
                                 TextMMD(text = stringResource(R.string.server_sync_works, displayHost(result.apiUrl)))
-                            result is ServerCheck.Failed -> TextMMD(text = problemWords(result.problem, result.code))
+                            result is ServerCheck.Failed -> TextMMD(text = problemWords(result.problem, result.code, kind))
                         }
                     }
                 }
                 item(key = "form") {
                     SignInForm(
+                        kind = kind,
                         busy = busy,
                         onEdit = viewModel::clearCheck,
                         onTest = viewModel::test,
@@ -114,6 +129,7 @@ fun ServerSyncScreen(
             } else {
                 item {
                     Column {
+                        TextMMD(text = stringResource(kindName(account.kind)))
                         TextMMD(
                             text =
                                 stringResource(
@@ -132,7 +148,7 @@ fun ServerSyncScreen(
                     }
                 }
                 state.problem?.let { problem ->
-                    item { TextMMD(text = problemWords(problem, state.problemCode)) }
+                    item { TextMMD(text = problemWords(problem, state.problemCode, account.kind)) }
                 }
                 item {
                     HouseButton(
@@ -147,13 +163,45 @@ fun ServerSyncScreen(
     }
 }
 
+/** The two kinds of server, side by side; the chosen one is drawn filled. */
+@Composable
+private fun KindChoice(
+    kind: ServerKind,
+    enabled: Boolean,
+    onKind: (ServerKind) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        TextMMD(text = stringResource(R.string.server_sync_kind), style = MaterialTheme.typography.bodySmall)
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
+            ServerKind.entries.forEach { k ->
+                HouseButton(
+                    label = stringResource(kindName(k)),
+                    onClick = { onKind(k) },
+                    enabled = enabled,
+                    on = k == kind,
+                    maxLines = 2,
+                    modifier = Modifier.weight(1f),
+                )
+            }
+        }
+    }
+}
+
+private fun kindName(kind: ServerKind): Int =
+    when (kind) {
+        ServerKind.GOOGLE_READER -> R.string.server_sync_kind_greader
+        ServerKind.NEXTCLOUD_NEWS -> R.string.server_sync_kind_nextcloud
+    }
+
 @Composable
 private fun SignInForm(
+    kind: ServerKind,
     busy: Boolean,
     onEdit: () -> Unit,
-    onTest: (String, String, String) -> Unit,
-    onSignIn: (String, String, String) -> Unit,
+    onTest: (ServerKind, String, String, String) -> Unit,
+    onSignIn: (ServerKind, String, String, String) -> Unit,
 ) {
+    val nextcloud = kind == ServerKind.NEXTCLOUD_NEWS
     var address by rememberSaveable { mutableStateOf("") }
     var login by rememberSaveable { mutableStateOf("") }
     // Held only while the screen is open; never saved with the screen's state.
@@ -190,7 +238,7 @@ private fun SignInForm(
                 password = it
                 onEdit()
             },
-            label = { TextMMD(text = stringResource(R.string.server_sync_password)) },
+            label = { TextMMD(text = stringResource(if (nextcloud) R.string.server_sync_app_password else R.string.server_sync_password)) },
             singleLine = true,
             visualTransformation = if (shown) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done, autoCorrectEnabled = false),
@@ -205,19 +253,19 @@ private fun SignInForm(
             modifier = Modifier.fillMaxWidth(),
         )
         TextMMD(
-            text = stringResource(R.string.server_sync_password_note),
+            text = stringResource(if (nextcloud) R.string.server_sync_nextcloud_note else R.string.server_sync_password_note),
             style = MaterialTheme.typography.bodySmall,
         )
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             HouseButton(
                 label = stringResource(R.string.server_sync_test),
-                onClick = { onTest(address, login, password) },
+                onClick = { onTest(kind, address, login, password) },
                 enabled = ready,
                 modifier = Modifier.weight(1f),
             )
             HouseButton(
                 label = stringResource(R.string.server_sync_sign_in),
-                onClick = { onSignIn(address, login, password) },
+                onClick = { onSignIn(kind, address, login, password) },
                 enabled = ready,
                 on = true,
                 modifier = Modifier.weight(1f),
@@ -262,11 +310,18 @@ private fun StopButton(onStop: () -> Unit) {
 private fun problemWords(
     problem: ServerProblem,
     code: Int,
+    kind: ServerKind,
 ): String =
     when (problem) {
         ServerProblem.UNREACHABLE -> stringResource(R.string.server_sync_unreachable)
-        ServerProblem.WRONG_PASSWORD -> stringResource(R.string.server_sync_wrong_password)
-        ServerProblem.NOT_GOOGLE_READER -> stringResource(R.string.server_sync_not_greader)
+        ServerProblem.WRONG_PASSWORD ->
+            stringResource(
+                if (kind == ServerKind.NEXTCLOUD_NEWS) R.string.server_sync_wrong_app_password else R.string.server_sync_wrong_password,
+            )
+        ServerProblem.NOT_GOOGLE_READER ->
+            stringResource(
+                if (kind == ServerKind.NEXTCLOUD_NEWS) R.string.server_sync_not_nextcloud_news else R.string.server_sync_not_greader,
+            )
         ServerProblem.INSECURE -> stringResource(R.string.server_sync_insecure)
         ServerProblem.SERVER_ERROR -> stringResource(R.string.server_sync_server_error, code)
         ServerProblem.PASSWORD_LOST -> stringResource(R.string.server_sync_password_lost)

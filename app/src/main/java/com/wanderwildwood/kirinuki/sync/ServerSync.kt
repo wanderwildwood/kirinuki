@@ -12,6 +12,7 @@ import com.wanderwildwood.kirinuki.sync.greader.GReaderCredentials
 import com.wanderwildwood.kirinuki.sync.greader.GReaderException
 import com.wanderwildwood.kirinuki.sync.greader.GReaderSync
 import com.wanderwildwood.kirinuki.sync.greader.RoomGReaderStore
+import com.wanderwildwood.kirinuki.sync.nextcloud.NextcloudNewsApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,10 +28,20 @@ import java.util.concurrent.TimeUnit
 /** Why the feed server could not be used, one sentence each in Settings. */
 enum class ServerProblem { UNREACHABLE, WRONG_PASSWORD, NOT_GOOGLE_READER, INSECURE, SERVER_ERROR, PASSWORD_LOST }
 
+/** The kinds of feed server Feeds syncs with. The name is what is stored. */
+enum class ServerKind {
+    /** The Google Reader API: FreshRSS, Miniflux and others (sync/greader). */
+    GOOGLE_READER,
+
+    /** Nextcloud News' own API (sync/nextcloud). */
+    NEXTCLOUD_NEWS,
+}
+
 data class ServerAccount(
     /** The API address that answered, which may be longer than what was typed. */
     val apiUrl: String,
     val login: String,
+    val kind: ServerKind = ServerKind.GOOGLE_READER,
 )
 
 data class ServerSyncState(
@@ -42,7 +53,7 @@ data class ServerSyncState(
 
 /** What a Test or Sign in came to. */
 sealed class ServerCheck {
-    data class Works(val apiUrl: String) : ServerCheck()
+    data class Works(val apiUrl: String, val kind: ServerKind = ServerKind.GOOGLE_READER) : ServerCheck()
 
     data class Failed(val problem: ServerProblem, val code: Int = 0) : ServerCheck()
 }
@@ -64,8 +75,8 @@ fun GReaderException.code(): Int =
     }
 
 /**
- * Sync with a feed server: off until someone signs in, in Settings, with an address, a
- * login name and an API password. Then every refresh (pull, button, background) first syncs
+ * Sync with a feed server: off until someone signs in, in Settings, with the kind of server
+ * (Google Reader API or Nextcloud News), an address, a login name and an API or app password. Then every refresh (pull, button, background) first syncs
  * with that server, and the feeds that are on it are no longer fetched from their sites.
  * Stopping forgets the server and keeps every feed and article where it is.
  *
@@ -97,21 +108,29 @@ class ServerSync(
     private fun load(): ServerSyncState {
         val url = prefs.getString(KEY_URL, null) ?: return ServerSyncState()
         val login = prefs.getString(KEY_LOGIN, null) ?: return ServerSyncState()
+        // Accounts made before there was a choice are Google Reader ones.
+        val kind = ServerKind.entries.firstOrNull { it.name == prefs.getString(KEY_KIND, null) } ?: ServerKind.GOOGLE_READER
         return ServerSyncState(
-            account = ServerAccount(url, login),
+            account = ServerAccount(url, login, kind),
             lastSync = prefs.getLong(KEY_LAST_SYNC, 0L).takeIf { it > 0 }?.let { Instant.ofEpochSecond(it) },
         )
     }
 
     /** Tries the address, login name and password, and says what happened; stores nothing. */
     suspend fun test(
+        kind: ServerKind,
         address: String,
         login: String,
         password: String,
     ): ServerCheck =
         withContext(Dispatchers.IO) {
             try {
-                ServerCheck.Works(GReaderApi.resolve(client, address, login.trim(), password))
+                val apiUrl =
+                    when (kind) {
+                        ServerKind.GOOGLE_READER -> GReaderApi.resolve(client, address, login.trim(), password)
+                        ServerKind.NEXTCLOUD_NEWS -> NextcloudNewsApi.resolve(client, address, login.trim(), password)
+                    }
+                ServerCheck.Works(apiUrl, kind)
             } catch (e: GReaderException) {
                 ServerCheck.Failed(e.toProblem(), e.code())
             }
@@ -119,20 +138,23 @@ class ServerSync(
 
     /** [test], and if it works, keeps the account (the password sealed) and turns sync on. */
     suspend fun signIn(
+        kind: ServerKind,
         address: String,
         login: String,
         password: String,
     ): ServerCheck {
-        val check = test(address, login, password)
+        val check = test(kind, address, login, password)
         if (check is ServerCheck.Works) {
             val sealed = Secrets.seal(password) ?: return ServerCheck.Failed(ServerProblem.PASSWORD_LOST)
             prefs.edit()
                 .putString(KEY_URL, check.apiUrl)
                 .putString(KEY_LOGIN, login.trim())
                 .putString(KEY_PASSWORD, sealed)
+                .putString(KEY_KIND, kind.name)
                 .remove(KEY_LAST_SYNC)
+                .remove(KEY_LAST_FULL)
                 .apply()
-            _state.value = ServerSyncState(account = ServerAccount(check.apiUrl, login.trim()))
+            _state.value = ServerSyncState(account = ServerAccount(check.apiUrl, login.trim(), kind))
         }
         return check
     }
@@ -166,10 +188,20 @@ class ServerSync(
         val started = Instant.now().epochSecond
         val since = (prefs.getLong(KEY_LAST_SYNC, 0L).takeIf { it > 0 } ?: (started - FIRST_SYNC_SECONDS)) - OVERLAP_SECONDS
         return try {
-            val api = GReaderApi(client, GReaderCredentials(account.apiUrl, account.login, password))
+            val credentials = GReaderCredentials(account.apiUrl, account.login, password)
+            // Nextcloud News sends unread articles with their text, so its whole unread list
+            // is read once a day; between those, only what changed (NextcloudNewsApi).
+            val full = started - prefs.getLong(KEY_LAST_FULL, 0L) >= FULL_LIST_SECONDS
+            val api =
+                when (account.kind) {
+                    ServerKind.GOOGLE_READER -> GReaderApi(client, credentials)
+                    ServerKind.NEXTCLOUD_NEWS -> NextcloudNewsApi(client, credentials, fullUnread = full)
+                }
             val report = GReaderSync(api, store, keepReadPerFeed = keepReadPerFeed).sync(since)
             Log.i(LOG_TAG, "Synced with the feed server: $report")
-            prefs.edit().putLong(KEY_LAST_SYNC, started).apply()
+            val edit = prefs.edit().putLong(KEY_LAST_SYNC, started)
+            if (full) edit.putLong(KEY_LAST_FULL, started)
+            edit.apply()
             _state.value = _state.value.copy(lastSync = Instant.ofEpochSecond(started), problem = null, problemCode = 0)
             null
         } catch (e: GReaderException) {
@@ -196,6 +228,11 @@ class ServerSync(
         private const val KEY_LOGIN = "login"
         private const val KEY_PASSWORD = "password"
         private const val KEY_LAST_SYNC = "last_sync"
+        private const val KEY_KIND = "kind"
+        private const val KEY_LAST_FULL = "last_full_list"
+
+        /** How often a Nextcloud News sync reads the whole unread list rather than the changes. */
+        private const val FULL_LIST_SECONDS = 24L * 3600
 
         /** How far back the first sync looks for articles already read (unread ones all come). */
         private const val FIRST_SYNC_SECONDS = 14L * 24 * 3600

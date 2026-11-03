@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.sync.ServerCheck
+import com.wanderwildwood.kirinuki.sync.ServerKind
 import com.wanderwildwood.kirinuki.sync.ServerSync
 import com.wanderwildwood.kirinuki.sync.ServerSyncState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,17 +35,19 @@ class ServerSyncViewModel(
     }
 
     fun test(
+        kind: ServerKind,
         address: String,
         login: String,
         password: String,
-    ) = run { serverSync.test(address, login, password) }
+    ) = run { serverSync.test(kind, address, login, password) }
 
     fun signIn(
+        kind: ServerKind,
         address: String,
         login: String,
         password: String,
     ) = run {
-        serverSync.signIn(address, login, password).also {
+        serverSync.signIn(kind, address, login, password).also {
             // The first sync starts straight away, the same as pulling the feed list.
             if (it is ServerCheck.Works) runOnceRssSync(di = di, forceNetwork = true, triggeredByUser = true)
         }

@@ -522,7 +522,14 @@
   <string name="server_sync_title">Sync with a feed server</string>
   <string name="server_sync_off">Off</string>
   <string name="server_sync_on">On: %1$s</string>
-  <string name="server_sync_intro">Keeps your feeds, folders, read and starred articles the same here and on a feed server that speaks the Google Reader API, such as FreshRSS or Miniflux. While it is on, articles come from the server instead of from each site.</string>
+  <string name="server_sync_intro">Keeps your feeds, folders, read and starred articles the same here and on a feed server: one that speaks the Google Reader API, such as FreshRSS or Miniflux, or Nextcloud News. While it is on, articles come from the server instead of from each site.</string>
+  <string name="server_sync_kind">Kind of server</string>
+  <string name="server_sync_kind_greader">Google Reader API</string>
+  <string name="server_sync_kind_nextcloud">Nextcloud News</string>
+  <string name="server_sync_app_password">App password</string>
+  <string name="server_sync_nextcloud_note">The address you open Nextcloud at, your Nextcloud login name, and an app password: in Nextcloud, Personal settings, Security, Devices and sessions, Create new app password. The News app must be installed on that Nextcloud.</string>
+  <string name="server_sync_wrong_app_password">Nextcloud refused the login name or password. Use an app password from Personal settings, Security.</string>
+  <string name="server_sync_not_nextcloud_news">Something answered, but not as Nextcloud News. Check the address is the one you open Nextcloud at, and that the News app is installed there.</string>
   <string name="server_sync_address">Server address</string>
   <string name="server_sync_login">Login name</string>
   <string name="server_sync_password">API password</string>

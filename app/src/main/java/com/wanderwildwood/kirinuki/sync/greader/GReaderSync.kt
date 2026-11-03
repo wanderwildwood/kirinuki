@@ -85,7 +85,7 @@ data class GReaderReport(
 )
 
 /**
- * One sync with a Google Reader-style server, in the order that keeps both sides whole:
+ * One sync with a feed server (Google Reader-style or Nextcloud News), in the order that keeps both sides whole:
  *
  * 1. Feeds deleted on the phone are unsubscribed; folders changed on the phone are sent.
  * 2. The server's subscription list is taken as it is (the server wins for subscriptions):
@@ -101,12 +101,16 @@ data class GReaderReport(
  * (https://github.com/Ashinch/ReadYou, GPL-3.0), which takes it from Reeder's strategy.
  */
 class GReaderSync(
-    private val api: GReaderApi,
+    private val api: FeedServerApi,
     private val store: GReaderStore,
     private val keepReadPerFeed: Int = 100,
     private val maxNewUnread: Int = 1000,
 ) {
+    /** Feeds linked in this sync: the server may hold older articles of theirs the phone never saw. */
+    private val newStreams = mutableSetOf<String>()
+
     suspend fun sync(sinceEpochSeconds: Long): GReaderReport {
+        newStreams.clear()
         api.login()
         var report = syncFeeds()
         report = syncItems(report, sinceEpochSeconds)
@@ -171,6 +175,7 @@ class GReaderSync(
                     }
                 val newLink = FeedLink(feedId, sub.streamId, sub.label)
                 store.setFeedLink(newLink)
+                newStreams += sub.streamId
                 links[feedId] = newLink
             }
         }
@@ -203,6 +208,7 @@ class GReaderSync(
             } else {
                 if (feed.tag.isNotBlank()) tolerant { api.setLabel(stream, feed.tag, "") }
                 store.setFeedLink(FeedLink(feed.id, stream, feed.tag))
+                newStreams += stream
                 sent++
             }
         }
@@ -226,12 +232,10 @@ class GReaderSync(
         val sentCount = push.markRead.size + push.markUnread.size + push.star.size + push.unstar.size
 
         // 5. Then the server's.
-        val unread = api.itemIds(GReaderIds.READING_LIST, exclude = GReaderIds.READ)
-        val starred = api.itemIds(GReaderIds.STARRED)
-        val recent = api.itemIds(GReaderIds.READING_LIST, since = sinceEpochSeconds)
+        val known = GReaderMerge.afterPush(before)
+        val (unread, starred, recent) = api.serverItems(known, sinceEpochSeconds, newStreams)
         val unreadSet = unread.toSet()
         val starredSet = starred.toSet()
-        val known = GReaderMerge.afterPush(before)
         val changes = GReaderMerge.pull(known, unreadSet, starredSet)
         if (changes.isNotEmpty()) store.apply(changes)
 

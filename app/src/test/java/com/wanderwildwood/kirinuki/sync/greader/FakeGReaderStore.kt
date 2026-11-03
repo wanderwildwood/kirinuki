@@ -42,6 +42,12 @@ class FakeGReaderStore : GReaderStore {
         return articles.first { it.id == itemId }
     }
 
+    /** The article the server knows as [remoteId], as stored (Nextcloud News: its decimal id). */
+    fun articleByRemote(remoteId: String): Article? {
+        val itemId = itemLinks.entries.firstOrNull { it.value.first == remoteId }?.key ?: return null
+        return articles.first { it.id == itemId }
+    }
+
     override suspend fun localFeeds(): List<LocalFeed> = feeds.map { LocalFeed(it.id, it.url, it.title, it.tag, it.syncable) }
 
     override suspend fun feedLinks(): List<FeedLink> = feedLinks.values.toList()

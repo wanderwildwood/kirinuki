@@ -60,6 +60,41 @@ Streams: `user/-/state/com.google/reading-list` (everything), `…/read`, `…/s
 short signed decimal. ids answer short, contents answer long, edit-tag takes either. Feeds
 stores the long form. Conversion and its table come from Read You (GReaderIds.kt).
 
+## Nextcloud News: its own API, the second kind
+
+Nextcloud News does not speak the Google Reader API. Checked on 3 Nov 2026 against
+Nextcloud 31.0.14 with News 27.2.0: `accounts/ClientLogin` answers 404 at the server root,
+under `index.php/apps/news/api/`, and anywhere else; News' own REST API (v1.3, github.com/nextcloud/news,
+docs/api/api-v1-3.md) is the only way in. So "Sync with a feed server" asks which kind of
+server first (Google Reader API, or Nextcloud News), and Nextcloud News has its own client,
+`sync/nextcloud/NextcloudNewsApi.kt`, behind the same `FeedServerApi` the sync runs against.
+The sync itself (`GReaderSync`, the order above, the merge, the offline queue, the link
+tables, the pull line) is the same code for both, so the guarantees are the same.
+
+**Address and sign-in.** The address the person opens Nextcloud at; Feeds tries
+`<address>/index.php/apps/news/api/v1-3/` and then `<address>/apps/news/api/v1-3/` (pretty
+addresses). A page address pasted from the browser is cut back to the Nextcloud. HTTP Basic
+with the login name and an app password (Personal settings, Security, Devices and sessions);
+nothing to register, no browser. The first request is `GET folders`: 401 is a wrong password,
+anything that is not News' JSON is "not Nextcloud News".
+
+**Mapping.** A feed is the stream `feed/<id>`, a folder is its name (`folderId` null for none),
+an article is its decimal id. Subscribe `POST feeds {url, folderId}` (409: already there, the
+phone links to it; 404 or 422: the server could not read it, it stays on the phone only),
+unsubscribe `DELETE feeds/<id>`, move `POST feeds/<id>/move {folderId}` (a folder is made with
+`POST folders {name}` when it is new; News 27 does not refuse a second folder of the same name,
+so Feeds looks for it by name first), read and starred `POST items/{read,unread,star,unstar}/multiple
+{itemIds}` (PUT on servers older than v1.3).
+
+**What it costs.** News has no way to list only ids, so unread articles come with their text.
+The whole unread list (newest first, 500 a page, at most 5000) is read on the first sync and
+then once a day; in between, a sync reads `items/updated?lastModified=<last sync - 1 h>`
+(seconds) and applies it to the state both sides last agreed on, plus the unread articles of
+feeds linked in that sync. The starred list is read in full every time. The daily full list is
+what catches an article News read and then purged between two syncs (its change would never be
+listed). When the full list is capped, older unread articles keep their agreed state rather than
+being taken as read.
+
 ## Inoreader: left out
 
 Inoreader's API requires a registered application. Its own pages say so: "Before you can use
@@ -90,7 +125,7 @@ as they are.
 
 ## Design
 
-Code: `sync/greader/` (API, ids, merge, the sync itself, the Room-backed store),
+Code: `sync/greader/` (API, ids, merge, the sync itself, the Room-backed store; `FeedServerApi`, what the sync needs from either kind), `sync/nextcloud/` (Nextcloud News),
 `sync/ServerSync.kt` (account, sealed password, the hook the refresh calls),
 `ui/settings/ServerSyncScreen.kt`. Two new tables (migration 40 to 41): `greader_feeds`
 (feed id, server stream id, last agreed folder) and `greader_items` (article id, server item

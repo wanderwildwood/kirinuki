@@ -50,7 +50,7 @@ data class GReaderCredentials(
 class GReaderApi(
     private val client: OkHttpClient,
     private val credentials: GReaderCredentials,
-) {
+) : FeedServerApi {
     private var auth: String? = null
     private var actionToken: String? = null
 
@@ -58,12 +58,12 @@ class GReaderApi(
         credentials.baseUrl.toHttpUrlOrNull() ?: throw GReaderException.NotGoogleReader(0)
 
     /** Logs in if not already in. Throws [GReaderException]. */
-    fun login() {
+    override fun login() {
         if (auth != null) return
         auth = clientLogin(client, base, credentials.login, credentials.password)
     }
 
-    fun subscriptions(): List<RemoteFeed> =
+    override fun subscriptions(): List<RemoteFeed> =
         get<GrSubscriptionList>("reader/api/0/subscription/list")
             .subscriptions.orEmpty()
             .mapNotNull { it.toRemoteFeed() }
@@ -104,8 +104,20 @@ class GReaderApi(
         return ids.distinct().take(max)
     }
 
+    /** Ids are cheap here, so the whole unread and starred lists are read every time. */
+    override fun serverItems(
+        known: List<GReaderMerge.ItemState>,
+        since: Long,
+        newStreams: Set<String>,
+    ): ServerItems =
+        ServerItems(
+            unread = itemIds(GReaderIds.READING_LIST, exclude = GReaderIds.READ),
+            starred = itemIds(GReaderIds.STARRED),
+            recent = itemIds(GReaderIds.READING_LIST, since = since),
+        )
+
     /** The articles for [ids], a hundred to a request. */
-    fun contents(ids: List<String>): List<RemoteItem> =
+    override fun contents(ids: List<String>): List<RemoteItem> =
         ids.chunked(CONTENTS_CHUNK).flatMap { chunk ->
             post<GrContents>(
                 "reader/api/0/stream/items/contents",
@@ -114,7 +126,7 @@ class GReaderApi(
         }
 
     /** Adds [tag] to (or with [add] false, takes it from) every one of [ids]. */
-    fun editTag(
+    override fun editTag(
         ids: List<String>,
         tag: String,
         add: Boolean,
@@ -128,14 +140,14 @@ class GReaderApi(
     }
 
     /** Subscribes to [url]; the server's stream id for it, or null if it could not. */
-    fun quickAdd(url: String): String? =
+    override fun quickAdd(url: String): String? =
         post<GrQuickAdd>(
             "reader/api/0/subscription/quickadd",
             listOf("quickadd" to url),
         ).streamId?.takeIf { it.isNotBlank() }
 
     /** Files [streamId] under [label] (blank for none), taking it out of [oldLabel]. */
-    fun setLabel(
+    override fun setLabel(
         streamId: String,
         label: String,
         oldLabel: String,
@@ -150,7 +162,7 @@ class GReaderApi(
         postText("reader/api/0/subscription/edit", form)
     }
 
-    fun unsubscribe(streamId: String) {
+    override fun unsubscribe(streamId: String) {
         postText("reader/api/0/subscription/edit", listOf("ac" to "unsubscribe", "s" to streamId))
     }
 
