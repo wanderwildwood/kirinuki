@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -41,8 +40,6 @@ import com.wanderwildwood.kirinuki.db.room.isSavedPages
 import com.wanderwildwood.kirinuki.model.ArticleRuleError
 import com.wanderwildwood.kirinuki.model.ArticleRuleSet
 import com.wanderwildwood.kirinuki.model.AddressLook
-import com.wanderwildwood.kirinuki.model.known.KnownFeed
-import com.wanderwildwood.kirinuki.model.known.knownFeedsMatching
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
@@ -93,8 +90,6 @@ fun AddFeedScreen(
     val looked by viewModel.looked.collectAsStateWithLifecycle()
     // Only while it is still about the address in the box: an edit leaves it behind.
     val look = looked?.takeIf { it.address == addressKey(url) }?.look
-    // Matched against the list in the app as each letter is typed; nothing leaves the phone.
-    val suggestions = remember(url, editing) { if (editing) emptyList() else knownFeedsMatching(url) }
 
     // Disarms itself after a few seconds, the same as the row it replaces used to.
     var armed by rememberSaveable { mutableStateOf(false) }
@@ -206,18 +201,6 @@ fun AddFeedScreen(
                         text = stringResource(R.string.add_feed_url_invalid),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                    )
-                }
-                // A name typed into the box -- "guardian", "low-tech" -- finds the sources in the
-                // app's own short list. A tap puts the feed's address in the box, and the rest of
-                // the form is as it always was.
-                suggestions.forEach { known ->
-                    KnownFeedRow(
-                        feed = known,
-                        onPick = {
-                            url = known.feedUrl
-                            viewModel.clearError()
-                        },
                     )
                 }
                 // The Kompakt has no browser to find a feed with, so the address is often found
@@ -420,32 +403,6 @@ fun AddFeedScreen(
                 }
             }
         }
-    }
-}
-
-/**
- * One source from the app's own list, under the box a name was typed into: its name, and the
- * site and language under it, so two papers with one word in common are told apart. A row of
- * text and not a button, as the folder names are; 48 dp to press.
- */
-@Composable
-private fun KnownFeedRow(
-    feed: KnownFeed,
-    onPick: () -> Unit,
-) {
-    Column(
-        verticalArrangement = Arrangement.Center,
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .heightIn(min = 48.dp)
-                .clickable(onClick = onPick),
-    ) {
-        TextMMD(text = feed.name)
-        TextMMD(
-            text = stringResource(R.string.known_feed_detail, feed.site.substringAfter("://").removePrefix("www."), feed.language),
-            style = MaterialTheme.typography.bodySmall,
-        )
     }
 }
 
