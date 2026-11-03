@@ -35,4 +35,14 @@ class GReaderIdsTest {
         assertEquals("Blogs", GReaderIds.labelName("user/1005921515/label/Blogs"))
         assertNull(GReaderIds.labelName("user/-/state/com.google/starred"))
     }
+
+    @Test
+    fun aServersDefaultCategoryIsNoFolder() {
+        fun label(vararg c: GrCategory) =
+            GrSubscription(id = "feed/1", url = "https://example.org/feed", categories = c.toList()).toRemoteFeed()!!.label
+        assertEquals("", label(GrCategory(id = "user/-/label/Uncategorized", label = "Uncategorized")))
+        assertEquals("", label(GrCategory(id = "user/1/label/All", label = "All")))
+        assertEquals("Nature", label(GrCategory(id = "user/-/label/Nature", label = "Nature")))
+        assertEquals("Nature", label(GrCategory(label = "Uncategorized"), GrCategory(id = "user/-/label/Nature")))
+    }
 }

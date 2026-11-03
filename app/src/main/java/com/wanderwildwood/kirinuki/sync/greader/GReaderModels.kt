@@ -123,7 +123,7 @@ fun GrSubscription.toRemoteFeed(): RemoteFeed? {
         streamId = streamId,
         url = address,
         title = title.orEmpty(),
-        label = categories?.firstNotNullOfOrNull { it.label ?: GReaderIds.labelName(it.id) }.orEmpty(),
+        label = categories?.firstNotNullOfOrNull { c -> (c.label ?: GReaderIds.labelName(c.id))?.takeUnless(GReaderIds::isDefaultCategory) }.orEmpty(),
     )
 }
 

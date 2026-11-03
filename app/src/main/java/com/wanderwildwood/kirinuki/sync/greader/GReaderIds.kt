@@ -52,4 +52,12 @@ object GReaderIds {
         streamId?.takeIf { labelStream.containsMatchIn(it) }?.replace(labelStream, "")
 
     fun labelStream(name: String): String = LABEL_PREFIX + name
+
+    /**
+     * The folder a server files a feed under when it was given none: "Uncategorized" on FreshRSS,
+     * "All" on Miniflux. Feeds holds such a feed in no folder, as it does feeds of its own.
+     */
+    private val defaultCategories = setOf("uncategorized", "all")
+
+    fun isDefaultCategory(name: String): Boolean = name.trim().lowercase() in defaultCategories
 }
