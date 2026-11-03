@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.mudita.mmd.components.divider.HorizontalDividerMMD
+import com.wanderwildwood.kirinuki.ui.compose.components.DottedRule
 import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.wanderwildwood.kirinuki.ui.pulledWords
 import com.wanderwildwood.kirinuki.ui.rememberPull
@@ -126,7 +126,7 @@ fun FeedsScreen(
                             style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
                         )
-                        HorizontalDividerMMD()
+                        DottedRule(start = 20.dp)
                     }
         Box(Modifier.weight(1f)) {
             PagedColumn(
@@ -167,7 +167,7 @@ fun FeedsScreen(
                                 else -> null
                             },
                     )
-                    HorizontalDividerMMD()
+                    DottedRule(start = 16.dp)
                 }
             }
         }
