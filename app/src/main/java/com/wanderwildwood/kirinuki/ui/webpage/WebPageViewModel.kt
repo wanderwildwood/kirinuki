@@ -8,7 +8,7 @@ import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.model.FeedParserError
 import com.wanderwildwood.kirinuki.model.FetchedPage
-import com.wanderwildwood.kirinuki.model.textBlocks
+import com.wanderwildwood.kirinuki.model.textLines
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.FullTextTooLarge
 import com.wanderwildwood.kirinuki.model.UnsupportedContentType
@@ -41,8 +41,8 @@ sealed interface WebPageState {
         val text: String,
         val cut: Boolean,
     ) : WebPageState {
-        /** The text in runs of whole lines, for the reader's list to page through. */
-        val blocks: List<String> by lazy { textBlocks(text) }
+        /** The text a line to an item, for the reader's list to page through. */
+        val lines: List<String> by lazy { textLines(text) }
 
         /** One size for every block: the widest line in the whole file decides it. */
         val widestLine: Int by lazy { text.lineSequence().maxOfOrNull { it.length } ?: 0 }

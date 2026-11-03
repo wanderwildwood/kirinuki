@@ -120,7 +120,9 @@ fun WebPageScreen(
                     ReaderColumn(
                         state = listState,
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        // A text file's lines are items of their own and must not be spaced
+                        // apart; everything else keeps the reader's gap between blocks.
+                        verticalArrangement = Arrangement.spacedBy(if (state is WebPageState.Text) 0.dp else 8.dp),
                         modifier = Modifier.fillMaxSize(),
                         rowStep = { lineFence.stepToCut() },
                     ) {
@@ -147,17 +149,19 @@ fun WebPageScreen(
                                             TextMMD(
                                                 text = title,
                                                 fontWeight = FontWeight.Bold,
-                                                modifier = Modifier.fillMaxWidth(),
+                                                // The lines below have no gap of their own, so the title keeps one.
+                                                modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                                             )
                                         }
                                     }
                                 }
-                                // In runs of whole lines rather than one block: a block taller
-                                // than the screen is pushed whole to the next page, leaving the
-                                // first one blank under the title.
-                                items(current.blocks.size) { index ->
+                                // A line to an item rather than one block: the list pages by whole
+                                // items, and a block taller than the screen was pushed whole to the
+                                // next page. The lines sit with no gap between them (see the
+                                // arrangement above), so the file reads as it was written.
+                                items(current.lines.size) { index ->
                                     FittedPreformattedText(
-                                        text = current.blocks[index],
+                                        text = current.lines[index],
                                         widestLineOfAll = current.widestLine,
                                     )
                                 }

@@ -64,12 +64,8 @@ class PlainTextPageTest {
     }
 
     @Test
-    fun `text is split at blank lines and never into a run longer than the cap`() {
-        assertEquals(listOf("a\nb", "c"), textBlocks("a\nb\n\n\nc\n"))
-        val long = (1..30).joinToString("\n") { "line $it" }
-        val blocks = textBlocks(long, maxLines = 12)
-        assertEquals(listOf(12, 12, 6), blocks.map { it.lines().size })
-        assertEquals(long, blocks.joinToString("\n"))
-        assertEquals(emptyList(), textBlocks(""))
+    fun `text is one item per line, a blank line kept as a space`() {
+        assertEquals(listOf("a", "b", " ", " ", "c"), textLines("a\nb\n\n  \nc"))
+        assertEquals(emptyList(), textLines(""))
     }
 }

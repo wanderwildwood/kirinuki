@@ -230,34 +230,12 @@ class FullTextParser(
 }
 
 /**
- * A text file in pieces for the reader's list: runs of lines split at blank lines, and no run
- * longer than [maxLines], so the text starts under the title on the first page and every page
- * ends on a whole line. The space between list items stands in for the blank line.
+ * A text file as the reader's list holds it: one item per line, so a page fills to its foot
+ * and ends on a whole line. A blank line is kept as a single space, so it takes a line's height
+ * in the same type rather than collapsing to nothing.
  */
-fun textBlocks(
-    text: String,
-    maxLines: Int = TEXT_BLOCK_LINES,
-): List<String> {
-    val blocks = mutableListOf<String>()
-    val run = mutableListOf<String>()
-    fun close() {
-        if (run.isNotEmpty()) blocks += run.joinToString("\n")
-        run.clear()
-    }
-    text.lines().forEach { line ->
-        when {
-            line.isBlank() -> close()
-            else -> {
-                run += line
-                if (run.size >= maxLines) close()
-            }
-        }
-    }
-    close()
-    return blocks
-}
-
-const val TEXT_BLOCK_LINES = 12
+fun textLines(text: String): List<String> =
+    if (text.isEmpty()) emptyList() else text.lines().map { it.ifBlank { " " } }
 
 /** What the page reader got from an address. */
 sealed interface FetchedPage {
