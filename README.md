@@ -25,7 +25,7 @@ Three screens. The feeds, what is in one, and the thing itself.
   publish them. Nothing is registered and nothing phones home.
 - **Read with the radio off.** Everything is fetched on wifi and stored; the reading
   afterwards needs nothing.
-- **Text only.** No images, no embedded web view. A photograph at sixteen greys costs a
+- **Text only.** No images, no embedded web view. A photograph at sixteen grays costs a
   redraw to say less than the headline did, and a page that drags in a site's own CSS is
   unreadable on this screen.
 - **Pull down to fetch again.** A swipe down at the top of a feed list or a feed's articles
@@ -161,6 +161,6 @@ reason this exists at all.
 
 Privacy: what the app stores and what it sends is set out in [PRIVACY.md](PRIVACY.md).
 
-## Licence
+## License
 
 GPL-3.0, the same as upstream Feeder. See [LICENSE](LICENSE).
