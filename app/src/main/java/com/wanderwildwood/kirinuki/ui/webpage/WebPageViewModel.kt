@@ -8,6 +8,7 @@ import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.model.FeedParserError
 import com.wanderwildwood.kirinuki.model.FetchedPage
+import com.wanderwildwood.kirinuki.model.textBlocks
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.FullTextTooLarge
 import com.wanderwildwood.kirinuki.model.UnsupportedContentType
@@ -39,7 +40,13 @@ sealed interface WebPageState {
         val title: String?,
         val text: String,
         val cut: Boolean,
-    ) : WebPageState
+    ) : WebPageState {
+        /** The text in runs of whole lines, for the reader's list to page through. */
+        val blocks: List<String> by lazy { textBlocks(text) }
+
+        /** One size for every block: the widest line in the whole file decides it. */
+        val widestLine: Int by lazy { text.lineSequence().maxOfOrNull { it.length } ?: 0 }
+    }
 
     /** Said in words, because an empty screen is not an answer. */
     data class Problem(

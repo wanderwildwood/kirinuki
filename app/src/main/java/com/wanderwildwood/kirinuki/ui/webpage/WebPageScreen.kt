@@ -152,7 +152,15 @@ fun WebPageScreen(
                                         }
                                     }
                                 }
-                                item { FittedPreformattedText(text = current.text) }
+                                // In runs of whole lines rather than one block: a block taller
+                                // than the screen is pushed whole to the next page, leaving the
+                                // first one blank under the title.
+                                items(current.blocks.size) { index ->
+                                    FittedPreformattedText(
+                                        text = current.blocks[index],
+                                        widestLineOfAll = current.widestLine,
+                                    )
+                                }
                                 if (current.cut) {
                                     item {
                                         TextMMD(

@@ -30,8 +30,12 @@ import kotlin.math.min
 fun FittedPreformattedText(
     text: String,
     modifier: Modifier = Modifier,
+    // A file shown in several blocks passes its own widest line, so every block of it is set
+    // at the one size rather than each fitting itself.
+    widestLineOfAll: Int? = null,
 ) {
-    val widestLine = remember(text) { text.lineSequence().maxOfOrNull { it.length } ?: 0 }
+    val widestLine =
+        widestLineOfAll ?: remember(text) { text.lineSequence().maxOfOrNull { it.length } ?: 0 }
 
     BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
         val availableSp = with(LocalDensity.current) { maxWidth.toSp().value }

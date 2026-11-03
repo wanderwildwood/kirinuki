@@ -229,6 +229,36 @@ class FullTextParser(
     }
 }
 
+/**
+ * A text file in pieces for the reader's list: runs of lines split at blank lines, and no run
+ * longer than [maxLines], so the text starts under the title on the first page and every page
+ * ends on a whole line. The space between list items stands in for the blank line.
+ */
+fun textBlocks(
+    text: String,
+    maxLines: Int = TEXT_BLOCK_LINES,
+): List<String> {
+    val blocks = mutableListOf<String>()
+    val run = mutableListOf<String>()
+    fun close() {
+        if (run.isNotEmpty()) blocks += run.joinToString("\n")
+        run.clear()
+    }
+    text.lines().forEach { line ->
+        when {
+            line.isBlank() -> close()
+            else -> {
+                run += line
+                if (run.size >= maxLines) close()
+            }
+        }
+    }
+    close()
+    return blocks
+}
+
+const val TEXT_BLOCK_LINES = 12
+
 /** What the page reader got from an address. */
 sealed interface FetchedPage {
     data class Article(
@@ -247,9 +277,10 @@ enum class PageKind { HTML, TEXT, OTHER }
 
 /**
  * Whether a response is a page to put through Readability, a text file to show as it is, or
- * something this app does not read. A text file is text/plain; a server that sends a generic
- * type (octet-stream, or none at all) for an address ending in .txt is taken at the address's
- * word.
+ * something this app does not read. A text file is text/plain, Markdown, CSV or a text/x-*
+ * source type; a server that sends a generic type (octet-stream, or none at all) for an
+ * address ending in one of [TEXT_EXTENSIONS] is taken at the address's word. A NUL byte in
+ * what arrives still turns it away (see [plainTextShown]).
  */
 fun pageKindOf(
     contentType: String?,
@@ -260,13 +291,24 @@ fun pageKindOf(
         url.substringBefore('#').substringBefore('?').lowercase()
     return when {
         type == "text/html" -> PageKind.HTML
-        type == "text/plain" -> PageKind.TEXT
-        type in GENERIC_TYPES && path.endsWith(".txt") -> PageKind.TEXT
+        type in TEXT_TYPES || type.startsWith("text/x-") -> PageKind.TEXT
+        type in GENERIC_TYPES && TEXT_EXTENSIONS.any { path.endsWith(".$it") } -> PageKind.TEXT
         else -> PageKind.OTHER
     }
 }
 
 private val GENERIC_TYPES = setOf("", "application/octet-stream", "binary/octet-stream", "application/unknown")
+
+/** Text meant to be read as it is: prose, tables of values, and source code. */
+private val TEXT_TYPES = setOf("text/plain", "text/markdown", "text/x-markdown", "text/csv")
+
+/** Extensions believed when a server sends only a generic type. */
+private val TEXT_EXTENSIONS =
+    setOf(
+        "txt", "text", "md", "markdown", "csv", "log",
+        "c", "h", "cc", "cpp", "hpp", "py", "rb", "sh", "rs", "go", "java", "kt", "lua", "pl",
+        "hs", "ml", "lisp", "scm", "el", "tal", "diff", "patch",
+    )
 
 /**
  * The text as it will be shown, or null when it is not text after all (a NUL byte is the sign

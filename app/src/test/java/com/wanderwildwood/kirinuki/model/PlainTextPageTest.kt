@@ -50,4 +50,26 @@ class PlainTextPageTest {
     fun `a binary file sent as text is not shown`() {
         assertNull(plainTextShown("PK\u0003\u0004\u0000\u0000", cut = false))
     }
+
+    @Test
+    fun `markdown, csv and source types are text too`() {
+        assertEquals(PageKind.TEXT, pageKindOf("text/markdown; charset=utf-8", "https://example.org/a"))
+        assertEquals(PageKind.TEXT, pageKindOf("text/csv", "https://example.org/a"))
+        assertEquals(PageKind.TEXT, pageKindOf("text/x-c", "https://example.org/a"))
+        assertEquals(PageKind.TEXT, pageKindOf("text/x-python", "https://example.org/a"))
+        assertEquals(PageKind.TEXT, pageKindOf("application/octet-stream", "https://example.org/notes.md"))
+        assertEquals(PageKind.TEXT, pageKindOf(null, "https://example.org/rain.csv"))
+        assertEquals(PageKind.TEXT, pageKindOf("application/octet-stream", "https://example.org/uxnmin.c"))
+        assertEquals(PageKind.OTHER, pageKindOf("application/octet-stream", "https://example.org/a.exe"))
+    }
+
+    @Test
+    fun `text is split at blank lines and never into a run longer than the cap`() {
+        assertEquals(listOf("a\nb", "c"), textBlocks("a\nb\n\n\nc\n"))
+        val long = (1..30).joinToString("\n") { "line $it" }
+        val blocks = textBlocks(long, maxLines = 12)
+        assertEquals(listOf(12, 12, 6), blocks.map { it.lines().size })
+        assertEquals(long, blocks.joinToString("\n"))
+        assertEquals(emptyList(), textBlocks(""))
+    }
 }
