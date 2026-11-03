@@ -846,7 +846,6 @@ class OPMLTest : DIAware {
                         UserSettings.SETTING_BLOCKLIST_APPLY_TO_SUMMARIES -> "true"
                         UserSettings.SETTING_BLOCKLIST_APPLY_TO_LINKS -> "true"
                         UserSettings.SETTING_PREFERRED_TRANSLATION_LANGUAGE -> "sv"
-                        UserSettings.SETTING_TRANSLATION_API_KEY -> "test-translation-api-key"
                         UserSettings.SETTING_TRANSLATION_API_MODEL_ID -> ""
                         UserSettings.SETTING_TRANSLATION_API_URL -> "https://api.deepl.com"
                         UserSettings.SETTING_TRANSLATION_API_AZURE_VERSION -> "2024-02-01"
