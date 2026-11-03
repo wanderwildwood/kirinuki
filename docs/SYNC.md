@@ -159,11 +159,30 @@ article stays; from the next refresh the feeds are fetched from their sites agai
 - Recipes (same author): `Secrets` (Keystore-sealed password).
 - No code from Feeder's own sync.
 
+## Live check, 2 Nov 2026
+
+FreshRSS 1.30.4 and Miniflux 2.3.5 (official images, on the build box, bound to it only), a
+made-up user, made-up feeds served by a local nginx, the debug build on an API 31 emulator
+signing in with typed credentials over the home-network http rule (10.0.2.2). Seen on both:
+sign-in, first sync (feeds, folders, articles, read and starred), read and starred from the
+phone reaching the server and from the server (its own API or web API) reaching the phone, a
+feed added on the server appearing on the phone, a feed removed on the server leaving it, a
+feed added on the phone subscribed on the server in its folder, a feed removed on the phone
+unsubscribed there, and switching servers (Stop syncing, sign in to the other): the phone's
+read and starred articles were taken over by link and sent. Seen on FreshRSS: the wrong
+password and nothing-answering messages. Miniflux answers a wrong password with 401 as well.
+
+Server set-up notes, for whoever repeats it: FreshRSS and Miniflux both refuse to fetch feeds
+on private addresses by default (FreshRSS `internal_host_allowlist` with `host:port` entries,
+Miniflux `FETCHER_ALLOW_PRIVATE_NETWORKS=1`). Miniflux does not answer stream/contents (only
+ids plus items/contents, which is what Feeds uses).
+
 ## Not done / open
 
-- Tested against a fake server in unit tests (`app/src/test/.../sync/greader/`). A live
-  FreshRSS and Miniflux run was planned on the build box but could not be done this round
-  (see the round report).
+- Every feed on these servers sits in a category, so the phone shows the server's default one
+  as a folder: "Uncategorized" on FreshRSS, "All" on Miniflux. Server wins, so it stays.
+- The Room migration 40 to 41 was checked against the generated schema, not run on a phone
+  holding a version 40 database.
 - Renaming or deleting a folder as a whole is not sent (a folder exists on the phone only as
   a word feeds share; moving each feed is sent).
 - A feed renamed on the phone keeps its name on the phone only (Feeds' own custom title).

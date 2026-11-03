@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -57,6 +58,13 @@ fun ServerSyncScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val check by viewModel.check.collectAsStateWithLifecycle()
+    val listState = rememberLazyListState()
+    // What Test or Sign in came to is said at the top, above the fields it is about: the
+    // buttons are at the foot of a form taller than the panel, and a line under them was
+    // off the screen when it appeared.
+    LaunchedEffect(busy, check) {
+        if (state.account == null && (busy || check != null)) listState.scrollToItem(1)
+    }
 
     Scaffold(
         modifier = modifier,
@@ -74,17 +82,30 @@ fun ServerSyncScreen(
         },
     ) { padding ->
         PagedColumn(
+            state = listState,
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(start = 20.dp, end = 12.dp, top = 8.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             val account = state.account
             if (account == null) {
-                item { TextMMD(text = stringResource(R.string.server_sync_intro)) }
-                item {
+                // Keyed: the result line comes and goes above the form, and without keys the
+                // form would take the result's slot and lose what was typed into it.
+                item(key = "intro") { TextMMD(text = stringResource(R.string.server_sync_intro)) }
+                val result = check
+                if (busy || result != null) {
+                    item(key = "result") {
+                        when {
+                            busy -> TextMMD(text = stringResource(R.string.server_sync_checking))
+                            result is ServerCheck.Works ->
+                                TextMMD(text = stringResource(R.string.server_sync_works, displayHost(result.apiUrl)))
+                            result is ServerCheck.Failed -> TextMMD(text = problemWords(result.problem, result.code))
+                        }
+                    }
+                }
+                item(key = "form") {
                     SignInForm(
                         busy = busy,
-                        check = check,
                         onEdit = viewModel::clearCheck,
                         onTest = viewModel::test,
                         onSignIn = viewModel::signIn,
@@ -97,7 +118,7 @@ fun ServerSyncScreen(
                             text =
                                 stringResource(
                                     R.string.server_sync_signed_in_as,
-                                    account.apiUrl.toHttpUrlOrNull()?.host ?: account.apiUrl,
+                                    displayHost(account.apiUrl),
                                     account.login,
                                 ),
                         )
@@ -129,7 +150,6 @@ fun ServerSyncScreen(
 @Composable
 private fun SignInForm(
     busy: Boolean,
-    check: ServerCheck?,
     onEdit: () -> Unit,
     onTest: (String, String, String) -> Unit,
     onSignIn: (String, String, String) -> Unit,
@@ -203,12 +223,6 @@ private fun SignInForm(
                 modifier = Modifier.weight(1f),
             )
         }
-        when {
-            busy -> TextMMD(text = stringResource(R.string.server_sync_checking))
-            check is ServerCheck.Works ->
-                TextMMD(text = stringResource(R.string.server_sync_works, check.apiUrl.toHttpUrlOrNull()?.host ?: check.apiUrl))
-            check is ServerCheck.Failed -> TextMMD(text = problemWords(check.problem, check.code))
-        }
         TextMMD(
             text = stringResource(R.string.server_sync_first_time),
             style = MaterialTheme.typography.bodySmall,
@@ -257,6 +271,13 @@ private fun problemWords(
         ServerProblem.SERVER_ERROR -> stringResource(R.string.server_sync_server_error, code)
         ServerProblem.PASSWORD_LOST -> stringResource(R.string.server_sync_password_lost)
     }
+
+/** The server's host, with its port when it is not the usual one for the scheme. */
+internal fun displayHost(url: String): String {
+    val parsed = url.toHttpUrlOrNull() ?: return url
+    val usual = okhttp3.HttpUrl.defaultPort(parsed.scheme)
+    return if (parsed.port == usual) parsed.host else "${parsed.host}:${parsed.port}"
+}
 
 private val lastSyncFormat: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
 

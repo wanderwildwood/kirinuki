@@ -42,7 +42,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import kotlinx.coroutines.delay
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -218,7 +217,7 @@ fun SettingsScreen(
                         serverSync.account?.let { account ->
                             stringResource(
                                 R.string.server_sync_on,
-                                account.apiUrl.toHttpUrlOrNull()?.host ?: account.apiUrl,
+                                displayHost(account.apiUrl),
                             )
                         } ?: stringResource(R.string.server_sync_off),
                     onClick = onServerSync,
