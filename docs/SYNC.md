@@ -212,6 +212,18 @@ on private addresses by default (FreshRSS `internal_host_allowlist` with `host:p
 Miniflux `FETCHER_ALLOW_PRIVATE_NETWORKS=1`). Miniflux does not answer stream/contents (only
 ids plus items/contents, which is what Feeds uses).
 
+## Live check, 3 Nov 2026 (Nextcloud News)
+
+Nextcloud 31.0.14 with News 27.2.0 (official image, on the build box, bound to it only), a
+made-up user with an app password, made-up feeds served locally. Through the sync code on the
+JVM: sign-in, first sync (feeds, folder, articles, read and starred), a phone-only feed
+subscribed on the server in its folder, a starred change sent. On the API 31 emulator, debug
+build, typed sign-in over the home-network http rule: a wrong app password said so; sign-in and
+first sync; read and starred on the server reached the phone; an article read on the phone
+reached the server; a feed added on the server appeared, one removed there left. That last step
+showed the removed feed's starred articles losing their star on the next sync (both kinds of
+server); fixed the same day (articles in no feed leave the sync) and seen fixed.
+
 ## Not done / open
 
 - Every feed on these servers sits in a category, so the phone shows the server's default one
