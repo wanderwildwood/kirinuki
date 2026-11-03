@@ -82,6 +82,8 @@ class FakeGReaderStore : GReaderStore {
         val gone = articles.filter { it.feedId == feedId && !it.starred }.map { it.id }.toSet()
         articles.removeAll { it.id in gone }
         gone.forEach { itemLinks.remove(it) }
+        // Kept ones stay, belonging to no feed, and leave the sync (itemStates skips them).
+        articles.filter { it.feedId == feedId }.forEach { itemLinks.remove(it.id) }
     }
 
     override suspend fun itemStates(): List<GReaderMerge.ItemState> =

@@ -44,7 +44,11 @@ interface GReaderStore {
         tag: String,
     )
 
-    /** The feed and everything in it, gone (the server no longer has it). */
+    /**
+     * The feed and everything in it, gone (the server no longer has it). Starred articles
+     * stay on the phone, belonging to no feed, and leave the sync: the server has dropped
+     * them with the feed, and its silence about them must not unstar them here.
+     */
     suspend fun deleteFeed(feedId: Long)
 
     suspend fun itemStates(): List<GReaderMerge.ItemState>

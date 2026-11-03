@@ -159,6 +159,19 @@ class NextcloudNewsSyncTest {
     }
 
     @Test
+    fun aStarredArticleOutlivesItsFeedGoingFromTheServer() {
+        val (_, herons, _) = serverWithTwoFeeds()
+        sync()
+        fake.feeds.remove(pond)
+        fake.items.removeAll { it.feedId == pond.id }
+        sync(full = false)
+        sync(full = true)
+        val kept = store.articles.single { it.title == "Herons" }
+        assertTrue(kept.starred)
+        assertNull(store.articleByRemote(herons.toString()))
+    }
+
+    @Test
     fun aFeedNewOnTheServerBringsItsOlderUnreadArticles() {
         serverWithTwoFeeds()
         sync()

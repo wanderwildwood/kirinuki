@@ -85,6 +85,7 @@ interface GReaderDao {
         SELECT g.item_id, g.remote_id, g.synced_read, g.synced_starred,
                (fi.read_time IS NOT NULL) AS is_read, fi.bookmarked AS bookmarked
         FROM greader_items g JOIN feed_items fi ON fi.id = g.item_id
+        WHERE fi.feed_id IS NOT NULL
         """,
     )
     suspend fun itemStates(): List<GReaderItemState>
