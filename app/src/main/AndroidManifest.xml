@@ -124,9 +124,16 @@
       </intent-filter>
     </activity>
 
+    <!-- A task of its own, so that leaving it never leaves the app's own screens sitting in a
+         task whose root is a share: Android brings such a task to the front for the next share
+         (the intents compare equal, the address being an extra) and drops the new address
+         unseen. singleTask, so a share that arrives while one is open replaces it. -->
     <activity
       android:name=".ui.AddFeedFromShareActivity"
       android:exported="true"
+      android:taskAffinity="${applicationId}.share"
+      android:launchMode="singleTask"
+      android:autoRemoveFromRecents="true"
       android:parentActivityName=".ui.MainActivity">
       <!-- URLs with feed mimetype can be opened -->
       <intent-filter>
