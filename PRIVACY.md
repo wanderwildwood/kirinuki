@@ -18,7 +18,7 @@ Because no personal data is transmitted to or held by the developer, there is no
 
 In the app's own private storage on the phone: the feeds and capsules you subscribe to (their addresses, and the folder name you file a feed under), read and saved state, downloaded article text and pages you saved, podcast listening positions, the feed server's address, your login name and API password if you sign in to one (the password sealed with a key in the phone's Android Keystore, which never leaves the phone), which feeds and articles came from that server, the certificate fingerprint of each Gemini capsule you have visited (shown in Settings, Capsule certificates, where you can forget one), and settings. Downloaded podcast episodes are kept in the app's own external files folder, fetched by Android's download service.
 
-The app allows Android's backup (`allowBackup="true"`) and sets no exclusions of its own, so on a phone with Android or Google backup switched on, Android may copy this storage into that backup. The developer holds no backup and cannot see yours. Uninstalling the app deletes what is in its private storage. OPML import and export read and write only the file you pick.
+The app turns Android's backup off (`allowBackup="false"`, with rules that exclude everything from cloud backup and from moving to a new phone), so nothing it stores leaves the phone that way: feed addresses can hold a login. To move your feeds, export them as OPML. The developer holds no backup and cannot see yours. Uninstalling the app deletes what is in its private storage. OPML import and export read and write only the file you pick.
 
 ## Permissions, and what each is for
 
