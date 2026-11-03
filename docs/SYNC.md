@@ -70,7 +70,7 @@ available apps; other uses need a paid plan. Rate limits are 100 requests a day 
 (reads, writes) on the Pro plan default (inoreader.com/developers/rate-limiting), which a
 phone syncing on every refresh would exhaust.
 
-David's decision (2 Nov): no developer registration of any kind, so no App ID or App Key
+Decided 2 Nov: no developer registration of any kind, so no App ID or App Key
 fields and no OAuth client. **Feeds does not support Inoreader.** A user who wants their
 Inoreader subscriptions on the phone can export OPML from Inoreader and import it in Feeds
 (feeds only, not read state), or move to a server that takes typed credentials.

@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
  *
  * @param start where the row's text starts; the rule begins there.
  * @param end how far short of the right edge it stops; by default where the text ends, the same
- *   inset as [start], as the Kompakt's contacts list does (David, 3 Nov 2026).
+ *   inset as [start], as the Kompakt's contacts list does (house rule, 3 Nov 2026).
  */
 @Composable
 fun DottedRule(
