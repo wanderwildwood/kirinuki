@@ -23,13 +23,14 @@ import androidx.compose.ui.unit.dp
  * (never more than 1.5 px, so it stays a hairline on the panel).
  *
  * @param start where the row's text starts; the rule begins there.
- * @param end how far short of the right edge it stops; by default it runs to the edge.
+ * @param end how far short of the right edge it stops; by default where the text ends, the same
+ *   inset as [start], as the Kompakt's contacts list does (David, 3 Nov 2026).
  */
 @Composable
 fun DottedRule(
     modifier: Modifier = Modifier,
     start: Dp = 16.dp,
-    end: Dp = 0.dp,
+    end: Dp = start,
 ) {
     val ink = MaterialTheme.colorScheme.onSurface
     Canvas(
