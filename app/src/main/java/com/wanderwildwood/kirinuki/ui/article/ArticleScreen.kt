@@ -42,6 +42,9 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.TextToDisplay
 import com.wanderwildwood.kirinuki.archmodel.isAudio
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
+import com.wanderwildwood.kirinuki.net.isWebUrl
+import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
+import com.wanderwildwood.kirinuki.ui.qr.QrLinkDialog
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.components.rememberLineFence
 import com.wanderwildwood.kirinuki.ui.compose.components.LineFenceCover
@@ -77,6 +80,7 @@ fun ArticleScreen(
     val openTitleInBrowser by viewModel.openTitleInBrowser.collectAsStateWithLifecycle()
     val onlyOnWifi by viewModel.onlyOnWifi.collectAsStateWithLifecycle()
     var scaleOpen by remember { mutableStateOf(false) }
+    var qrOpen by remember { mutableStateOf(false) }
     val lineFence = rememberLineFence(listState)
 
     val readAloudOpen by viewModel.readAloudOpen.collectAsStateWithLifecycle()
@@ -270,6 +274,20 @@ fun ArticleScreen(
                                     )
                                 }
                         }
+
+                        // The story's address as a QR code, to finish it on a computer or another
+                        // phone, since a stock Kompakt has no browser. At the foot, where a story
+                        // is done with, rather than one more icon in a bar that already has to
+                        // leave room for the feed's name.
+                        if (articleLink != null && (isWebUrl(articleLink) || isSmolnetUrl(articleLink))) {
+                            item {
+                                HouseButton(
+                                    label = stringResource(R.string.qr_show_link),
+                                    onClick = { qrOpen = true },
+                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                )
+                            }
+                        }
                     }
                     }
                 }
@@ -316,6 +334,10 @@ fun ArticleScreen(
                 )
             }
         }
+    }
+
+    if (qrOpen && articleLink != null) {
+        QrLinkDialog(link = articleLink, onDismiss = { qrOpen = false })
     }
 
     if (scaleOpen) {

@@ -9,13 +9,19 @@ import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
+import com.wanderwildwood.kirinuki.model.FeedParser
+import com.wanderwildwood.kirinuki.model.SiteMetaData
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.net.parseUrlLeniently
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.net.MalformedURLException
@@ -24,6 +30,11 @@ class AddFeedViewModel(
     di: DI,
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
+    private val feedParser: FeedParser by instance()
+
+    /** True while a site's page is being read for the feed it names, before subscribing. */
+    private val _looking = MutableStateFlow(false)
+    val looking: StateFlow<Boolean> = _looking
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error
@@ -123,18 +134,43 @@ class AddFeedViewModel(
             }
 
         viewModelScope.launch {
+            // A site's own address is what a person finds, types or scans; the feed is a
+            // link in its page. Only for a new web subscription, and only once: an address
+            // that is already a feed, a page that names none, or no network at all leaves
+            // the address as it was given, which is what happened before this.
+            val discovered =
+                if (feedId <= ID_UNSET && isWebUrl(parsed.toString()) && repository.getFeed(parsed) == null) {
+                    _looking.value = true
+                    try {
+                        withTimeoutOrNull(DISCOVERY_MILLIS) {
+                            // The page is read as it arrives, so all of it off the main thread.
+                            withContext(Dispatchers.IO) {
+                                feedParser.getSiteMetaData(parsed).fold(ifLeft = { null }, ifRight = { feedNamedBy(it) })
+                            }
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        null
+                    } finally {
+                        _looking.value = false
+                    }
+                } else {
+                    null
+                }
+            val feedUrl = discovered ?: parsed
             // Editing knows which row it is editing. Adding has only the address to go on,
             // and the address may already be here -- in which case this is that feed, not
             // a second copy of it.
             val existing =
                 when {
                     feedId > ID_UNSET -> repository.getFeed(feedId)
-                    else -> repository.getFeed(parsed)
+                    else -> repository.getFeed(feedUrl)
                 }
             // A feed with no title yet is a blank row in the list, and it stays blank if
             // the first fetch fails. Stand the host in until the feed says its own name:
             // this is `title`, not `customTitle`, so the sync overwrites it.
-            val placeholder = placeholderTitle(parsed)
+            val placeholder = placeholderTitle(feedUrl)
             // A blank box means two different things in the two screens. Editing loaded
             // the boxes from the feed, so emptying one is how a rename or a move is taken
             // back -- the feed's own title returns, and it leaves the folder. Adding never
@@ -180,7 +216,7 @@ class AddFeedViewModel(
             val savedId =
                 repository.saveFeed(
                     existing?.copy(
-                        url = parsed,
+                        url = feedUrl,
                         customTitle = newCustomTitle,
                         tag = newTag,
                         fullTextByDefault = newFullText,
@@ -188,7 +224,7 @@ class AddFeedViewModel(
                         allowRules = newAllowRules,
                     )
                         ?: Feed(
-                            url = parsed,
+                            url = feedUrl,
                             title = placeholder,
                             customTitle = newCustomTitle,
                             tag = newTag,
@@ -201,7 +237,7 @@ class AddFeedViewModel(
             // so is one whose address just changed, because nothing here came from it.
             // ⚠ Compared as text: java.net.URL.equals resolves both hosts, and this runs
             // on the main dispatcher.
-            if (existing == null || existing.url.toString() != parsed.toString()) {
+            if (existing == null || existing.url.toString() != feedUrl.toString()) {
                 // A sync of a feed that wants the whole article chains the full text pass
                 // itself, so this covers the new feed too.
                 runOnceRssSync(di = di, feedId = savedId, forceNetwork = true, triggeredByUser = true)
@@ -214,6 +250,21 @@ class AddFeedViewModel(
             _saved.value = true
         }
     }
+}
+
+/** Long enough for a slow page, short enough that a dead one does not hold the screen. */
+private const val DISCOVERY_MILLIS = 15_000L
+
+/**
+ * The feed a site's page names, if it names one: the first it lists, as a browser's own feed
+ * button would take. RSS or Atom ahead of anything else, since a JSON link is as often oEmbed.
+ */
+internal fun feedNamedBy(site: SiteMetaData): java.net.URL? {
+    val links = site.alternateFeedLinks
+    return (
+        links.firstOrNull { it.type.contains("rss", ignoreCase = true) || it.type.contains("atom", ignoreCase = true) }
+            ?: links.firstOrNull()
+    )?.link
 }
 
 /**

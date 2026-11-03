@@ -446,7 +446,7 @@
   <string name="about_title">Feeds %1$s</string>
   <string name="about_what">A reader for feeds and for the smolnet — Gemini, gopher and Spartan. Text on paper, no images, and everything kept on the phone.</string>
   <string name="about_privacy_head">Privacy</string>
-  <string name="about_privacy">The app connects only to the feeds, pages and capsules you add, and fetches them directly; that request carries no account and nothing you have written. Some feeds are only served over plain http: those are fetched as the site serves them, with no encryption, so anyone on the network could read the feed text. Only the feed or page you asked for is requested; nothing else is sent. Your feeds and saved articles stay on this phone. Sync with a feed server is off unless you sign in to one in Settings; then the app also talks to that server, and only the one you typed, sending your login, your feeds and what you have read or starred. Its password is kept sealed with the phone\'s keystore. Nothing is sent to the app\'s maker. There are no ads, no analytics and no tracking. Backups and exports go only where you choose to save them.</string>
+  <string name="about_privacy">The app connects only to the feeds, pages and capsules you add, and fetches them directly; that request carries no account and nothing you have written. Some feeds are only served over plain http: those are fetched as the site serves them, with no encryption, so anyone on the network could read the feed text. Only the feed or page you asked for is requested; nothing else is sent. Your feeds and saved articles stay on this phone. Sync with a feed server is off unless you sign in to one in Settings; then the app also talks to that server, and only the one you typed, sending your login, your feeds and what you have read or starred. Its password is kept sealed with the phone\'s keystore. Nothing is sent to the app\'s maker. There are no ads, no analytics and no tracking. Backups and exports go only where you choose to save them. The camera is used only while you scan a QR code, to read it; nothing it sees is kept or sent.</string>
   <string name="licences_title">Licences</string>
   <string name="licences_back">Back</string>
   <string name="licences_source_head">Source code</string>
@@ -547,4 +547,20 @@
   <string name="server_sync_now">Sync now</string>
   <string name="server_sync_stop">Stop syncing</string>
   <string name="server_sync_stop_armed">Tap again to stop. Feeds and articles stay on the phone.</string>
+  <!-- QR codes: a feed's address scanned in, and a story's address shown for another device. -->
+  <string name="qr_scan">Scan a QR code</string>
+  <string name="qr_scan_title">Scan a QR code</string>
+  <string name="qr_scan_hold">Hold the code in front of the camera. Make one on a computer from the address of a site, a feed or a story.</string>
+  <string name="qr_not_address">That code does not hold a web or capsule address.</string>
+  <string name="qr_camera_why">The camera is used only while this screen is open, to read the code. Nothing it sees is kept or sent.</string>
+  <string name="qr_camera_allow">Allow the camera</string>
+  <string name="qr_camera_refused">The camera was not allowed, so no code can be read. Type the address instead, or allow the camera in the phone\'s settings for Feeds.</string>
+  <string name="qr_camera_settings">Open the phone\'s settings for Feeds</string>
+  <string name="qr_camera_failed">The camera could not be opened. Another app may be using it. Type the address instead.</string>
+  <string name="qr_no_camera">This phone has no camera to scan with. Type the address instead.</string>
+  <string name="qr_show_link">Show the link as a QR code</string>
+  <string name="qr_show_link_hint">Scan this with a computer or another phone to open the story there.</string>
+  <string name="qr_too_long">This address is too long to fit in a QR code.</string>
+  <string name="qr_close">Close</string>
+  <string name="add_feed_looking">Looking for the site\'s feed…</string>
 </resources>

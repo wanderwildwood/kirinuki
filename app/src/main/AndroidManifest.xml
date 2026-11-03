@@ -21,6 +21,12 @@
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
   <uses-permission android:name="android.permission.WAKE_LOCK" />
+  <!-- Asked for only when Scan a QR code is pressed, and used only while the scanner is open. -->
+  <uses-permission android:name="android.permission.CAMERA" />
+  <!-- A phone with no camera still installs the app; the scanner says so instead. -->
+  <uses-feature android:name="android.hardware.camera.any" android:required="false" />
+  <uses-feature android:name="android.hardware.camera" android:required="false" />
+  <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
   <queries>
     <!-- Package visibility: without this the reader cannot tell whether anything on the
@@ -31,8 +37,6 @@
       <action android:name="android.intent.action.VIEW" />
       <data android:scheme="https" />
     </intent>
-    <!-- So a barcode scanner can be invoked -->
-    <package android:name="com.google.zxing.client.android" />
     <intent>
       <action android:name="android.intent.action.TTS_SERVICE" />
     </intent>

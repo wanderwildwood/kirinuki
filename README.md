@@ -36,6 +36,11 @@ Three screens. The feeds, what is in one, and the thing itself.
   and choose **Save the page**. The whole article is fetched and kept under **Pages** and
   in Saved articles, to read offline like anything else. With no network it is fetched on
   the next sync.
+- **QR codes, both ways.** Make a QR code of a site's or a feed's address on a computer and
+  press **Scan a QR code** in Add feed: the address lands in the box, and a site's address
+  is followed to the feed it names when you subscribe. At the foot of a story,
+  **Show the link as a QR code** puts its address on the screen for a computer or another
+  phone to open. The camera is asked for only when you scan, and nothing it sees is kept.
 - **Downloaded articles stay until you say.** Whole articles are kept in the app's own
   storage, not a cache the phone can empty when it is short of space. Settings has
   **Remove downloaded articles** (after 7, 30 or 90 days, or never; 30 to begin with) and

@@ -42,7 +42,9 @@ import com.wanderwildwood.kirinuki.model.ArticleRuleSet
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import com.wanderwildwood.kirinuki.ui.qr.QrScanScreen
 import kotlinx.coroutines.delay
 
 /**
@@ -79,6 +81,10 @@ fun AddFeedScreen(
     val feed by viewModel.feed.collectAsStateWithLifecycle()
     val folders by viewModel.folders.collectAsStateWithLifecycle(initialValue = emptyList())
     val editing = feedId > ID_UNSET
+    val looking by viewModel.looking.collectAsStateWithLifecycle()
+    // The scanner takes the whole screen while it is open, and hands back only an address the
+    // box could have been given by hand; Subscribe, or Save page, is still the reader's press.
+    var scanning by rememberSaveable { mutableStateOf(false) }
 
     // Disarms itself after a few seconds, the same as the row it replaces used to.
     var armed by rememberSaveable { mutableStateOf(false) }
@@ -114,6 +120,19 @@ fun AddFeedScreen(
             viewModel.savedHandled()
             onSaved()
         }
+    }
+
+    if (scanning) {
+        QrScanScreen(
+            onScanned = { scanned ->
+                url = scanned
+                viewModel.clearError()
+                scanning = false
+            },
+            onClose = { scanning = false },
+            modifier = modifier,
+        )
+        return
     }
 
     Scaffold(
@@ -170,6 +189,15 @@ fun AddFeedScreen(
                         text = stringResource(R.string.add_feed_url_invalid),
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                    )
+                }
+                // The Kompakt has no browser to find a feed with, so the address is often found
+                // on a computer, and a QR code made there is the short way across.
+                if (!editing) {
+                    HouseButton(
+                        label = stringResource(R.string.qr_scan),
+                        onClick = { scanning = true },
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
@@ -273,7 +301,7 @@ fun AddFeedScreen(
                             allowRules = allowRules,
                         )
                     },
-                enabled = url.isNotBlank(),
+                enabled = url.isNotBlank() && !looking,
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 TextMMD(
@@ -281,6 +309,15 @@ fun AddFeedScreen(
                         stringResource(
                             if (editing) R.string.save else R.string.subscribe,
                         ),
+                )
+            }
+
+            // A site's address is looked at for the feed it names before it is saved, which
+            // takes a moment on a slow network; said, so the press does not look ignored.
+            if (looking) {
+                TextMMD(
+                    text = stringResource(R.string.add_feed_looking),
+                    style = MaterialTheme.typography.bodySmall,
                 )
             }
 

@@ -249,6 +249,11 @@ dependencies {
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.session)
 
+    // The camera, only while a feed's QR code is being scanned.
+    implementation(libs.camera.camera2)
+    implementation(libs.camera.lifecycle)
+    implementation(libs.camera.view)
+
     // Tests
     testImplementation(libs.bundles.kotlin)
     testImplementation(libs.bundles.test)

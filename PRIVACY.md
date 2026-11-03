@@ -30,11 +30,12 @@ From `app/src/main/AndroidManifest.xml`:
 - `RECEIVE_BOOT_COMPLETED` and `RUN_USER_INITIATED_JOBS`: to keep the sync schedule across a restart and run a sync you start.
 - `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK`: so a podcast keeps playing with the screen off.
 - `WAKE_LOCK`: so a sync or a podcast is not cut off while the screen is dark.
+- `CAMERA`: to read a QR code holding a feed's, site's or story's address, and for nothing else. It is asked for only when you press Scan a QR code, and the camera is held only while the scanner is open. The picture is read on the phone (with ZXing) for the code and nothing else: no frame is kept, saved or sent anywhere, and the camera is let go when the scanner closes. Refusing it leaves everything else in the app as it was; the address can still be typed.
 - `READ_EXTERNAL_STORAGE` (Android 9 and below) and `WRITE_EXTERNAL_STORAGE` (Android 10 and below): for OPML import and export. The Kompakt runs Android 12, so on it neither is ever asked for.
 
 The store also lists `com.wanderwildwood.kirinuki.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` because it reads the APK. AndroidX declares it for its own internal receivers; it is signature-level and namespaced to this app, so nothing else can hold it and it grants no access to anything on the phone.
 
-The manifest also lets the app see whether anything on the phone opens web pages, a barcode scanner, a text-to-speech engine, or other apps' text actions, so it can offer them. It reads nothing from them. Read aloud hands the article's text, a sentence at a time, to the phone's own text-to-speech engine, which speaks it; Feeds sends it nowhere else, and what the engine does with it is that engine's to say. Plain http is permitted; see "Plain http (cleartext traffic)" below.
+The manifest also lets the app see whether anything on the phone opens web pages, a text-to-speech engine, or other apps' text actions, so it can offer them. It reads nothing from them. Read aloud hands the article's text, a sentence at a time, to the phone's own text-to-speech engine, which speaks it; Feeds sends it nowhere else, and what the engine does with it is that engine's to say. Plain http is permitted; see "Plain http (cleartext traffic)" below.
 
 ### Plain http (cleartext traffic)
 
@@ -55,6 +56,7 @@ Hosts contacted: only the ones you add or follow, and nothing at a fixed address
 - **Web feeds, saved pages and full article text**: over https or http, from the site you subscribed to or the page you asked to save, or an address you share into the app. When a feed's own page is fetched for its full text, that page's server sees the request.
 - **Podcast episodes**: from the address in the feed, streamed or downloaded.
 - **Gemini, gopher and Spartan capsules**: by direct connection to the capsule's host and port, for an address you open or a gemlog you subscribe to. Gemini connections are checked against the certificate fingerprint the app remembered from the first visit.
+- **A site's page, when you subscribe by its address**: if the address you add (typed, shared or scanned) is a web page rather than a feed, that page is fetched once to find the feed it links to, and the feed is then fetched like any other.
 - **YouTube**: only when the address you add is a YouTube channel page. That page is fetched to find the channel's public feed (`www.youtube.com/feeds/videos.xml`), which is then fetched like any other feed.
 
 In About, "feed the llamas" opens a donation page (square.link) and wanderthe.dev opens the author's website, in your browser and only when you press them. The app does not fetch either page and learns nothing about whether you went.
