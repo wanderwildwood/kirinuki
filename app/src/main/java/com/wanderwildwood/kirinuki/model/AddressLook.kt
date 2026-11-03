@@ -26,9 +26,16 @@ sealed interface AddressLook {
         val pageTitle: String?,
     ) : AddressLook
 
-    /** It answered with something that is neither a page nor a feed. */
+    /** A plain text file: nothing to follow, but something to read. */
+    data object TextFile : AddressLook
+
+    /** It answered with something that is neither a page, a text file nor a feed. */
     data object Neither : AddressLook
 }
+
+/** Something to read rather than follow: Read this page goes first, and Subscribe asks twice. */
+val AddressLook.isToRead: Boolean
+    get() = this is AddressLook.Page || this is AddressLook.TextFile
 
 /**
  * The decision itself, kept apart from the network so that it can be tested.
@@ -43,11 +50,19 @@ fun decideAddress(
     feedTitleIn: (String) -> Result<String?>,
     feedLinksIn: (String) -> List<AlternateLink>,
     pageTitleIn: (String) -> String?,
+    url: String = "",
 ): AddressLook {
     if (!looksLikeHtml(contentType, body)) {
         return feedTitleIn(body).fold(
             onSuccess = { AddressLook.Feed(title = it?.trim()?.ifEmpty { null }) },
-            onFailure = { AddressLook.Neither },
+            // Not a feed: a text file is still worth reading, in the page reader's text view.
+            onFailure = {
+                if (pageKindOf(contentType, url) == PageKind.TEXT && !body.contains('\u0000')) {
+                    AddressLook.TextFile
+                } else {
+                    AddressLook.Neither
+                }
+            },
         )
     }
     val title = pageTitleIn(body)?.trim()?.ifEmpty { null }

@@ -35,4 +35,10 @@ class SubscribeTargetTest {
         assertEquals("http://example.org/", addressKey("http://example.org/"))
         assertNull(addressKey("   "))
     }
+
+    @Test
+    fun `a text file stops Subscribe like a story`() {
+        assertEquals(SubscribeTarget.Stop, subscribeTarget(AddressLook.TextFile, anyway = false))
+        assertEquals(SubscribeTarget.AsGiven, subscribeTarget(AddressLook.TextFile, anyway = true))
+    }
 }

@@ -114,4 +114,31 @@ class AddressLookTest {
         )
         assertEquals(null, firstFeedOf(emptyList()))
     }
+
+    @Test
+    fun `a text file is something to read`() {
+        val text = "int main(void) { return 0; }\n"
+        assertEquals(
+            AddressLook.TextFile,
+            decideAddress("text/plain; charset=utf-8", text, parses, noLinks, titleOf, url = "https://example.org/a.c.txt"),
+        )
+        assertEquals(
+            AddressLook.TextFile,
+            decideAddress("application/octet-stream", text, parses, noLinks, titleOf, url = "https://example.org/a.c.txt"),
+        )
+        assertTrue(AddressLook.TextFile.isToRead)
+        assertFalse(AddressLook.Neither.isToRead)
+    }
+
+    @Test
+    fun `a binary file or an unknown type is still neither`() {
+        assertEquals(
+            AddressLook.Neither,
+            decideAddress("text/plain", "PK\u0003\u0000", parses, noLinks, titleOf, url = "https://example.org/a.txt"),
+        )
+        assertEquals(
+            AddressLook.Neither,
+            decideAddress("application/octet-stream", "x", parses, noLinks, titleOf, url = "https://example.org/a.bin"),
+        )
+    }
 }

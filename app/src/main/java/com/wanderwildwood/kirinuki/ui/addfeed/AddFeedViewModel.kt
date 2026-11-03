@@ -10,6 +10,7 @@ import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.AddressLook
+import com.wanderwildwood.kirinuki.model.isToRead
 import com.wanderwildwood.kirinuki.model.FeedParser
 import com.wanderwildwood.kirinuki.model.firstFeedOf
 import com.wanderwildwood.kirinuki.model.SiteMetaData
@@ -179,7 +180,7 @@ class AddFeedViewModel(
                     val address = parsed.toString()
                     val shown = _looked.value?.takeIf { it.address == address }?.look
                     val look = shown ?: lookAt(address)?.also { _looked.value = LookedAt(address, it) }
-                    when (val target = subscribeTarget(look, anyway = shown is AddressLook.Page)) {
+                    when (val target = subscribeTarget(look, anyway = shown?.isToRead == true)) {
                         SubscribeTarget.Stop -> return@launch
                         SubscribeTarget.AsGiven -> null
                         is SubscribeTarget.Feed -> target.url
@@ -354,6 +355,6 @@ fun subscribeTarget(
 ): SubscribeTarget =
     when (look) {
         is AddressLook.PageWithFeed -> SubscribeTarget.Feed(look.feedUrl)
-        is AddressLook.Page -> if (anyway) SubscribeTarget.AsGiven else SubscribeTarget.Stop
+        is AddressLook.Page, AddressLook.TextFile -> if (anyway) SubscribeTarget.AsGiven else SubscribeTarget.Stop
         is AddressLook.Feed, AddressLook.Neither, null -> SubscribeTarget.AsGiven
     }

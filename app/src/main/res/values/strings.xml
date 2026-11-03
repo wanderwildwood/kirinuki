@@ -571,6 +571,7 @@
   <string name="looked_story">There is no feed here. It looks like a single story, to read rather than follow.</string>
   <!-- %1$s is the page\'s own title -->
   <string name="looked_story_named">There is no feed here. It looks like a single story, to read rather than follow: %1$s</string>
+  <string name="looked_text_file">This is a text file, to read rather than follow.</string>
   <string name="looked_neither">This address answered with neither a page nor a feed.</string>
   <string name="read_this_page">Read this page</string>
   <string name="subscribe_anyway">Subscribe anyway</string>

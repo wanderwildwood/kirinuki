@@ -234,6 +234,7 @@ class FeedParser(
                         },
                         feedLinksIn = { getAlternateFeedLinksInHtml(it, baseUrl = finalUrl) },
                         pageTitleIn = { runCatching { Jsoup.parse(it).title() }.getOrNull() },
+                        url = finalUrl.toString(),
                     )
                 }
             }

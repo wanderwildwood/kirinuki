@@ -40,6 +40,7 @@ import com.wanderwildwood.kirinuki.db.room.isSavedPages
 import com.wanderwildwood.kirinuki.model.ArticleRuleError
 import com.wanderwildwood.kirinuki.model.ArticleRuleSet
 import com.wanderwildwood.kirinuki.model.AddressLook
+import com.wanderwildwood.kirinuki.model.isToRead
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
@@ -216,9 +217,9 @@ fun AddFeedScreen(
                 // page on offer beside whatever was found -- rather than guessed at silently.
                 if (!editing && look != null) {
                     LookedAtNote(look = look)
-                    if (look is AddressLook.Page || look is AddressLook.PageWithFeed) {
+                    if (look.isToRead || look is AddressLook.PageWithFeed) {
                         val read = { onReadPage(addressKey(url).orEmpty()) }
-                        if (look is AddressLook.Page) {
+                        if (look.isToRead) {
                             ButtonMMD(onClick = read, modifier = Modifier.fillMaxWidth()) {
                                 TextMMD(text = stringResource(R.string.read_this_page))
                             }
@@ -330,7 +331,7 @@ fun AddFeedScreen(
             }
             // A story has Read this page as its first button, at the top; subscribing to it
             // is still allowed, but it is the second thing, and says so.
-            if (!editing && look is AddressLook.Page) {
+            if (!editing && look?.isToRead == true) {
                 OutlinedButtonMMD(
                     onClick = subscribe,
                     enabled = !looking,
@@ -418,6 +419,7 @@ private fun LookedAtNote(look: AddressLook) {
             is AddressLook.Page ->
                 look.pageTitle?.let { stringResource(R.string.looked_story_named, it) }
                     ?: stringResource(R.string.looked_story)
+            AddressLook.TextFile -> stringResource(R.string.looked_text_file)
             AddressLook.Neither -> stringResource(R.string.looked_neither)
         }
     TextMMD(text = text, modifier = Modifier.fillMaxWidth())
