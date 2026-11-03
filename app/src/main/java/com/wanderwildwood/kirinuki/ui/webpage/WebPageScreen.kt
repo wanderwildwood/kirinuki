@@ -18,7 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,12 +31,14 @@ import com.mudita.mmd.components.text.TextMMD
 import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
+import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.ReaderColumn
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.components.LineFenceCover
 import com.wanderwildwood.kirinuki.ui.compose.components.LocalLineFence
 import com.wanderwildwood.kirinuki.ui.compose.components.ReaderEdges
 import com.wanderwildwood.kirinuki.ui.compose.components.rememberLineFence
+import com.wanderwildwood.kirinuki.ui.compose.html.LocalFollowsWebLinks
 import com.wanderwildwood.kirinuki.ui.compose.html.linearArticleContent
 import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
@@ -54,6 +58,7 @@ fun WebPageScreen(
     url: String,
     onBack: () -> Unit,
     onFollowCapsule: (String) -> Unit,
+    onFollowPage: (String) -> Unit,
     viewModel: WebPageViewModel,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
@@ -62,6 +67,7 @@ fun WebPageScreen(
     val kept by viewModel.kept.collectAsStateWithLifecycle()
     val lineFence = rememberLineFence(listState)
     var qrOpen by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(url) { viewModel.load(url) }
 
@@ -106,7 +112,9 @@ fun WebPageScreen(
                     .fillMaxSize()
                     .padding(padding),
         ) {
-            CompositionLocalProvider(LocalLineFence provides lineFence) {
+            // Web links are live here, and only here: each opens the next page in this same
+            // reader, and Back comes back to this one.
+            CompositionLocalProvider(LocalLineFence provides lineFence, LocalFollowsWebLinks provides true) {
                 SelectionContainer(modifier = Modifier.textActions()) {
                     ReaderColumn(
                         state = listState,
@@ -143,10 +151,18 @@ fun WebPageScreen(
                                 }
                                 linearArticleContent(
                                     articleContent = current.article,
-                                    // As in the article reader: only a capsule link is followed;
-                                    // the web is not something this phone can open.
-                                    onLinkClick = { target, _ ->
-                                        if (isSmolnetUrl(target)) onFollowCapsule(target)
+                                    // A capsule link goes to the capsule reader, as from an article.
+                                    // A web link is the next page, read here the same way; one into
+                                    // this same page (a footnote) moves to it instead.
+                                    onLinkClick = { target, index ->
+                                        when {
+                                            isSmolnetUrl(target) -> onFollowCapsule(target)
+                                            index != null && samePage(target, url) ->
+                                                scope.launch {
+                                                    listState.scrollToItem(index + if (current.title != null) 1 else 0)
+                                                }
+                                            isWebUrl(target) -> onFollowPage(target)
+                                        }
                                     },
                                 )
                             }
@@ -179,6 +195,12 @@ fun WebPageScreen(
         QrLinkDialog(link = url, onDismiss = { qrOpen = false })
     }
 }
+
+/** The same page whatever fragment follows it: a link to a footnote, not to another page. */
+internal fun samePage(
+    link: String,
+    page: String,
+): Boolean = link.substringBefore('#') == page.substringBefore('#')
 
 private fun hostOf(url: String): String =
     try {

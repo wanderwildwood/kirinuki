@@ -379,6 +379,7 @@ class MainActivity : DIAwareComponentActivity() {
                     url = entry.arguments?.getString(Route.WEB_PAGE_ARG).orEmpty(),
                     onBack = { navController.popBackStack() },
                     onFollowCapsule = { navController.navigate(Route.gemini(it)) },
+                    onFollowPage = { navController.navigate(Route.webPage(it)) },
                     viewModel = viewModel,
                     listState = pageListState,
                 )

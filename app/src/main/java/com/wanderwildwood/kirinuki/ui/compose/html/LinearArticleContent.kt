@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
+import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.model.html.Coordinate
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
 import com.wanderwildwood.kirinuki.model.html.LinearAudio
@@ -468,6 +469,13 @@ internal fun AnnotatedString.underlined(range: IntRange?): AnnotatedString {
  */
 val LocalSpoken = staticCompositionLocalOf<State<Spoken?>> { mutableStateOf(null) }
 
+/**
+ * Whether web links are drawn as links. Only the reader for a single page sets it, because only
+ * that screen has somewhere to take one: the next page, read the same way. Everywhere else a web
+ * address stays as plain words (see the link annotation below).
+ */
+val LocalFollowsWebLinks = staticCompositionLocalOf { false }
+
 @Composable
 fun LinearBlockQuoteContent(
     blockQuote: LinearBlockQuote,
@@ -749,6 +757,7 @@ fun LinearText.toAnnotatedString(
     idToIndex: Map<String, Int>,
     onLinkClick: (url: String, index: Int?) -> Unit,
 ): AnnotatedString {
+    val followsWeb = LocalFollowsWebLinks.current
     val builder = AnnotatedString.Builder()
     builder.append(text)
     annotations.forEach { annotation ->
@@ -796,7 +805,7 @@ fun LinearText.toAnnotatedString(
                 // has nowhere to go on this phone -- the only handler registered for http
                 // is the AOSP WebView test shell -- so it stays as the words it was, rather
                 // than as something that looks tappable and then is not.
-                if (!isSmolnetUrl(data.href)) {
+                if (!isSmolnetUrl(data.href) && !(followsWeb && isWebUrl(data.href))) {
                     return@forEach
                 }
                 builder.addLink(
