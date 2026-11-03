@@ -243,7 +243,6 @@
   <string name="saved_article">Saved article</string>
   <string name="save_article">Save article</string>
   <string name="unsave_article">Stop saving article</string>
-  <string name="mark_as_read_on_scroll">Mark as read on scroll</string>
   <string name="no_feeds">No feeds</string>
   <string name="zero_feeds">%1$s feeds</string>
   <string name="one_feed">%1$s feed</string>

@@ -820,7 +820,6 @@ class OPMLTest : DIAware {
                         UserSettings.SETTING_IMG_SHOW_THUMBNAILS -> "false"
                         UserSettings.SETTING_DEFAULT_OPEN_ITEM_WITH -> PREF_VAL_OPEN_WITH_CUSTOM_TAB
                         UserSettings.SETTING_TEXT_SCALE -> "1.6"
-                        UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> "true"
                         UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> "true"
                         UserSettings.SETTING_SYNC_ONLY_CHARGING -> "true"
                         UserSettings.SETTING_SYNC_FREQ -> "720"

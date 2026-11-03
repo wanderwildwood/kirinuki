@@ -94,7 +94,6 @@ open class OPMLImporter(
                 value.toIntOrNull()?.takeIf { it in DownloadedArticles.REMOVE_AFTER_DAYS }?.let {
                     settingsStore.setRemoveDownloadedAfterDays(it)
                 }
-            UserSettings.SETTING_IS_MARK_AS_READ_ON_SCROLL -> settingsStore.setIsMarkAsReadOnScroll(value.toBoolean())
             UserSettings.SETTING_READALOUD_USE_DETECT_LANGUAGE -> settingsStore.setUseDetectLanguage(value.toBoolean())
             UserSettings.SETTING_MAX_LINES -> settingsStore.setMaxLines((value.toIntOrNull() ?: 1).coerceAtLeast(1))
             UserSettings.SETTINGS_FILTER_SAVED -> settingsStore.setFeedListFilterSaved(value.toBoolean())

@@ -139,16 +139,6 @@ class SettingsStore(
         sp.edit().putBoolean(PREF_IS_ARTICLE_OPEN, open).apply()
     }
 
-    private val _isMarkAsReadOnScroll =
-        MutableStateFlow(
-            sp.getBoolean(PREF_IS_MARK_AS_READ_ON_SCROLL, false),
-        )
-    val isMarkAsReadOnScroll: StateFlow<Boolean> = _isMarkAsReadOnScroll.asStateFlow()
-
-    fun setIsMarkAsReadOnScroll(open: Boolean) {
-        _isMarkAsReadOnScroll.update { open }
-        sp.edit().putBoolean(PREF_IS_MARK_AS_READ_ON_SCROLL, open).apply()
-    }
 
     private val _maxLines =
         MutableStateFlow(
@@ -746,7 +736,9 @@ const val PREF_TEXT_SCALE = "pref_body_text_scale"
 const val PREF_OPEN_TITLE_IN_BROWSER = "pref_open_title_in_browser"
 const val PREF_REMOVE_DOWNLOADED_AFTER_DAYS = "pref_remove_downloaded_after_days"
 
-const val PREF_IS_MARK_AS_READ_ON_SCROLL = "pref_is_mark_as_read_on_scroll"
+// "pref_is_mark_as_read_on_scroll" is gone: nothing had read it since the list was rebuilt. A
+// value left in a phone's preferences is never read, and an OPML carrying it is told apart as an
+// unrecognised setting and skipped (see OPMLImporter.saveSetting).
 
 const val PREF_MAX_LINES = "pref_max_lines"
 
@@ -826,9 +818,6 @@ enum class UserSettings(
     SETTING_TEXT_SCALE(key = PREF_TEXT_SCALE),
     SETTING_OPEN_TITLE_IN_BROWSER(key = PREF_OPEN_TITLE_IN_BROWSER),
     SETTING_REMOVE_DOWNLOADED_AFTER_DAYS(key = PREF_REMOVE_DOWNLOADED_AFTER_DAYS),
-    SETTING_IS_MARK_AS_READ_ON_SCROLL(
-        key = PREF_IS_MARK_AS_READ_ON_SCROLL,
-    ),
     SETTING_READALOUD_USE_DETECT_LANGUAGE(
         key = PREF_READALOUD_USE_DETECT_LANGUAGE,
     ),

@@ -131,12 +131,6 @@ class Repository(
         settingsStore.setIsArticleOpen(open)
     }
 
-    val isMarkAsReadOnScroll: StateFlow<Boolean> = settingsStore.isMarkAsReadOnScroll
-
-    fun setIsMarkAsReadOnScroll(value: Boolean) {
-        settingsStore.setIsMarkAsReadOnScroll(value)
-    }
-
     val maxLines: StateFlow<Int> = settingsStore.maxLines
 
     fun setMaxLines(value: Int) {
