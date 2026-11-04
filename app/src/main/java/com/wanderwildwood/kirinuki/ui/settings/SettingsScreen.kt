@@ -18,7 +18,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,7 +40,7 @@ import com.wanderwildwood.kirinuki.util.hasWebBrowser
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
-import kotlinx.coroutines.delay
+import com.wanderwildwood.kirinuki.ui.compose.theme.rememberArmedFlag
 
 /**
  * Everything worth deciding, on one screen. What is not here is not a setting:
@@ -279,13 +278,7 @@ private fun ClearDownloadedRow(
     onClear: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var armed by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(ARMED_MILLIS)
-            armed = false
-        }
-    }
+    var armed by rememberArmedFlag()
     Column(
         modifier =
             modifier
@@ -389,7 +382,7 @@ private val certificateDate: DateTimeFormatter = DateTimeFormatter.ofLocalizedDa
 
 /**
  * One capsule's remembered certificate. The first tap only says what the second will do,
- * and it lets go on its own after a few seconds, like removing a feed: forgetting means the
+ * and it stays armed until the next other touch, Back or leaving, like removing a feed: forgetting means the
  * next visit trusts whatever it is shown, which is the one moment this whole check exists for.
  */
 @Composable
@@ -399,13 +392,7 @@ private fun CertificateRow(
     onForget: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var armed by rememberSaveable(host) { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(ARMED_MILLIS)
-            armed = false
-        }
-    }
+    var armed by rememberArmedFlag(host)
     Column(
         modifier =
             modifier
@@ -426,8 +413,6 @@ private fun CertificateRow(
     }
 }
 
-/** Long enough to mean it, short enough not to leave a live forget under a thumb. */
-private const val ARMED_MILLIS = 6000L
 
 @Composable
 private fun ValueRow(

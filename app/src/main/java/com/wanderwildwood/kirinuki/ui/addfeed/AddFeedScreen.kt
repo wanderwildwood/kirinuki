@@ -47,7 +47,7 @@ import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.qr.QrScanScreen
-import kotlinx.coroutines.delay
+import com.wanderwildwood.kirinuki.ui.compose.theme.rememberArmedFlag
 
 /**
  * One screen for subscribing and for changing a feed afterwards, because the two hold the
@@ -92,14 +92,8 @@ fun AddFeedScreen(
     // Only while it is still about the address in the box: an edit leaves it behind.
     val look = looked?.takeIf { it.address == addressKey(url) }?.look
 
-    // Disarms itself after a few seconds, the same as the row it replaces used to.
-    var armed by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(ARMED_MILLIS)
-            armed = false
-        }
-    }
+    // Stays armed until the next other touch, Back or leaving the screen.
+    var armed by rememberArmedFlag()
 
     LaunchedEffect(feedId) { viewModel.load(feedId) }
 
@@ -425,8 +419,6 @@ private fun LookedAtNote(look: AddressLook) {
     TextMMD(text = text, modifier = Modifier.fillMaxWidth())
 }
 
-/** Long enough to mean it, short enough not to leave a live delete under a thumb. */
-private const val ARMED_MILLIS = 6000L
 
 /**
  * The parse errors for one rule box, a line each.

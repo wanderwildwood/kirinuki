@@ -37,7 +37,7 @@ import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
-import kotlinx.coroutines.delay
+import com.wanderwildwood.kirinuki.ui.compose.theme.rememberArmedFlag
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -279,18 +279,12 @@ private fun SignInForm(
 }
 
 /**
- * The armed-row pattern: the first press only says what the second will do, and lets go by
- * itself after a few seconds.
+ * The armed-row pattern: the first press only says what the second will do; it stays armed
+ * until the next other touch, Back or leaving the screen.
  */
 @Composable
 private fun StopButton(onStop: () -> Unit) {
-    var armed by rememberSaveable { mutableStateOf(false) }
-    LaunchedEffect(armed) {
-        if (armed) {
-            delay(ARMED_MILLIS)
-            armed = false
-        }
-    }
+    var armed by rememberArmedFlag()
     HouseButton(
         label = stringResource(if (armed) R.string.server_sync_stop_armed else R.string.server_sync_stop),
         onClick = {
@@ -336,4 +330,3 @@ internal fun displayHost(url: String): String {
 
 private val lastSyncFormat: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
 
-private const val ARMED_MILLIS = 6000L

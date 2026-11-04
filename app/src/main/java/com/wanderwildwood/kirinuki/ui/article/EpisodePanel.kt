@@ -50,6 +50,7 @@ import com.wanderwildwood.kirinuki.podcast.EpisodeStore
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import kotlinx.coroutines.delay
 import java.util.Locale
+import com.wanderwildwood.kirinuki.ui.compose.theme.rememberArmedFlag
 
 /** What an episode is, as far as the panel needs to know. */
 data class Episode(
@@ -90,7 +91,7 @@ fun EpisodePanel(
     var sleepAt by remember { mutableStateOf(0L) }
     var sleepChoice by remember { mutableIntStateOf(0) }
     var download by remember { mutableStateOf(store.downloadState(episode.itemId)) }
-    var removeArmed by remember { mutableStateOf(false) }
+    var removeArmed by rememberArmedFlag()
 
     LaunchedEffect(controller, episode.itemId) {
         while (true) {
@@ -118,12 +119,6 @@ fun EpisodePanel(
         }
     }
 
-    LaunchedEffect(removeArmed) {
-        if (removeArmed) {
-            delay(ARMED_MILLIS)
-            removeArmed = false
-        }
-    }
 
     fun playOrPause() {
         val c = controller ?: return
@@ -361,4 +356,3 @@ private fun Long.asClock(): String {
 private val SPEEDS = listOf(1f, 1.25f, 1.5f, 1.75f, 2f)
 private val SLEEP_MINUTES = listOf(0, 15, 30, 45, 60)
 private const val TICK_MS = 1000L
-private const val ARMED_MILLIS = 6000L

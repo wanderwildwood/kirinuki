@@ -21,7 +21,7 @@ import com.mudita.mmd.ThemeMMD
  */
 @Composable
 fun KirinukiTheme(content: @Composable () -> Unit) {
-    ThemeMMD(colorScheme = monochrome, content = content)
+    ThemeMMD(colorScheme = monochrome) { ArmedScope(content = content) }
 }
 
 @Immutable
