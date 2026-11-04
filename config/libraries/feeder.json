@@ -1,0 +1,14 @@
+{
+  "uniqueId": "feeder-upstream",
+  "name": "Feeder",
+  "description": "The feed reader this app started from, reduced to a reader and rebuilt on MMD.",
+  "developers": [
+    {
+      "name": "Jonas Kalderstam"
+    }
+  ],
+  "website": "https://gitlab.com/spacecowboy/Feeder",
+  "licenses": [
+    "GPL-3.0"
+  ]
+}

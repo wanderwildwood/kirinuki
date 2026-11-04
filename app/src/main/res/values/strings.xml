@@ -453,11 +453,10 @@
   <string name="licences_licence">Feeds is free software under the GNU General Public License, version 3. Each library keeps its own license, on its own page.</string>
   <string name="licences_full_head">Full texts</string>
   <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
-  <string name="licences_full_gpl2_cpe">GNU General Public License v2 with the Classpath Exception (full text)</string>
   <string name="licences_full_apache">Apache License 2.0 (full text)</string>
   <string name="licences_full_mpl">Mozilla Public License 2.0 (full text)</string>
-  <string name="licences_full_mit">MIT license (full text)</string>
   <string name="licences_full_unicode">Unicode License v3 (full text)</string>
+  <string name="licences_full_ofl">SIL Open Font License 1.1 (full text)</string>
   <string name="about_built_on">Built on Feeder by Jonas Kalderstam. Full-text extraction by Readability4J.</string>
   <!-- The name of the app's licence -->
   <string name="about_terms_head">Terms</string>

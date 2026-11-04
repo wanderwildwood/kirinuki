@@ -1,0 +1,14 @@
+{
+  "uniqueId": "bergamot-translator",
+  "name": "Bergamot translator (bundled web files)",
+  "description": "The web files of the Bergamot translator, bundled in the app's assets.",
+  "developers": [
+    {
+      "name": "Mozilla and contributors"
+    }
+  ],
+  "website": "https://github.com/browsermt/bergamot-translator",
+  "licenses": [
+    "MPL-2.0"
+  ]
+}

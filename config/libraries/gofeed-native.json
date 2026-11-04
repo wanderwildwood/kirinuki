@@ -1,0 +1,19 @@
+{
+  "uniqueId": "gofeed-native",
+  "name": "gofeed (native feed parser inside gofeed-android)",
+  "description": "The Go code compiled into gofeed-android's native library: gofeed and goxpp by mmcdole, golang.org/x/net, x/text and x/mobile, and the Go runtime and standard library.",
+  "developers": [
+    {
+      "name": "mmcdole"
+    },
+    {
+      "name": "The Go Authors"
+    }
+  ],
+  "website": "https://github.com/mmcdole/gofeed",
+  "licenses": [
+    "gofeed-mit",
+    "goxpp-mit",
+    "go-bsd"
+  ]
+}

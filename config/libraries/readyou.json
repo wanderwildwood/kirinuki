@@ -1,0 +1,14 @@
+{
+  "uniqueId": "readyou-greader",
+  "name": "Read You (parts of the Google Reader sync)",
+  "description": "Parts of the Google Reader-style sync with FreshRSS and Miniflux, taken from Read You.",
+  "developers": [
+    {
+      "name": "Ashinch and contributors"
+    }
+  ],
+  "website": "https://github.com/Ashinch/ReadYou",
+  "licenses": [
+    "GPL-3.0"
+  ]
+}
