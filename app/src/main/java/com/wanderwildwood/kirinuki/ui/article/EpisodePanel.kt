@@ -32,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
@@ -303,21 +302,24 @@ private fun PanelButton(
         modifier = Modifier.fillMaxHeight().width(56.dp).clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = description,
-            tint = ink,
-            modifier = Modifier.size(size),
-        )
-        if (label != null) {
-            TextMMD(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                lineHeight = 14.sp,
-                color = ink,
-                softWrap = false,
-                modifier = Modifier.align(Alignment.BottomCenter),
+        // The label sits under the icon at the house floor (16 sp, its own full line height), so
+        // the two stack in the 56 dp row instead of the label being squeezed onto the icon.
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = icon,
+                contentDescription = description,
+                tint = ink,
+                modifier = Modifier.size(size),
             )
+            if (label != null) {
+                TextMMD(
+                    text = label,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = ink,
+                    softWrap = false,
+                    maxLines = 1,
+                )
+            }
         }
     }
 }
