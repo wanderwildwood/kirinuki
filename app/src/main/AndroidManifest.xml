@@ -44,6 +44,11 @@
       <action android:name="android.intent.action.PROCESS_TEXT" />
       <data android:mimeType="text/plain" />
     </intent>
+    <!-- Whether anything takes a shared story's address; without it the Share press stays hidden. -->
+    <intent>
+      <action android:name="android.intent.action.SEND" />
+      <data android:mimeType="text/plain" />
+    </intent>
   </queries>
 
   <application

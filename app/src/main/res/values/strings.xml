@@ -569,6 +569,7 @@
   <string name="qr_camera_failed">The camera could not be opened. Another app may be using it. Type the address instead.</string>
   <string name="qr_no_camera">This phone has no camera to scan with. Type the address instead.</string>
   <string name="qr_show_link">Show the link as a QR code</string>
+  <string name="share_link">Share the link</string>
   <string name="qr_show_link_hint">Scan this with a computer or another phone to open the story there.</string>
   <string name="qr_too_long">This address is too long to fit in a QR code.</string>
   <string name="qr_close">Close</string>

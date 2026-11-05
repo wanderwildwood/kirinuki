@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -44,6 +45,7 @@ import com.wanderwildwood.kirinuki.archmodel.isAudio
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
+import com.wanderwildwood.kirinuki.ui.compose.theme.HOUSE_GAP
 import com.wanderwildwood.kirinuki.ui.qr.QrLinkDialog
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.components.rememberLineFence
@@ -58,6 +60,8 @@ import com.wanderwildwood.kirinuki.ui.compose.theme.TextScaleDialog
 import com.wanderwildwood.kirinuki.ui.compose.utils.ProvideScaledText
 import com.wanderwildwood.kirinuki.util.hasWebBrowser
 import com.wanderwildwood.kirinuki.util.openInBrowser
+import com.wanderwildwood.kirinuki.util.canShareText
+import com.wanderwildwood.kirinuki.util.shareLink
 
 /**
  * The cutting itself. Title, where it came from, and the text -- the summary the feed
@@ -117,6 +121,8 @@ fun ArticleScreen(
         openTitleInBrowser &&
             articleLink != null &&
             remember(context) { context.hasWebBrowser() }
+    val canShare = remember(context) { context.canShareText() }
+    val shareChooserTitle = stringResource(R.string.share_link)
 
     Scaffold(
         modifier = modifier,
@@ -278,14 +284,35 @@ fun ArticleScreen(
                         // The story's address as a QR code, to finish it on a computer or another
                         // phone, since a stock Kompakt has no browser. At the foot, where a story
                         // is done with, rather than one more icon in a bar that already has to
-                        // leave room for the feed's name.
+                        // leave room for the feed's name. Beside it, the same address handed to
+                        // another app (a note, a message), when something other than Feeds takes it.
                         if (articleLink != null && (isWebUrl(articleLink) || isSmolnetUrl(articleLink))) {
                             item {
-                                HouseButton(
-                                    label = stringResource(R.string.qr_show_link),
-                                    onClick = { qrOpen = true },
+                                Row(
                                     modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                                )
+                                    horizontalArrangement = Arrangement.spacedBy(HOUSE_GAP),
+                                ) {
+                                    HouseButton(
+                                        label = stringResource(R.string.qr_show_link),
+                                        onClick = { qrOpen = true },
+                                        modifier = Modifier.weight(1f),
+                                        maxLines = 2,
+                                    )
+                                    if (canShare) {
+                                        HouseButton(
+                                            label = stringResource(R.string.share_link),
+                                            onClick = {
+                                                context.shareLink(
+                                                    title = article?.title.orEmpty(),
+                                                    link = articleLink,
+                                                    chooserTitle = shareChooserTitle,
+                                                )
+                                            },
+                                            modifier = Modifier.weight(1f),
+                                            maxLines = 2,
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
