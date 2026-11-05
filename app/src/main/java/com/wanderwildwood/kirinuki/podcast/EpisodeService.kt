@@ -5,9 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
+import android.view.KeyEvent
+import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
 import androidx.media3.common.C
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.DefaultMediaNotificationProvider
 import androidx.media3.session.MediaSession
@@ -19,8 +23,11 @@ import com.google.common.util.concurrent.ListenableFuture
 import com.wanderwildwood.kirinuki.ApplicationCoroutineScope
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.Repository
+import com.wanderwildwood.kirinuki.db.room.FeedItemWithFeed
 import com.wanderwildwood.kirinuki.ui.MainActivity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.android.closestDI
@@ -29,10 +36,11 @@ import org.kodein.di.instance
 /**
  * Plays an episode, with the screen off and the app closed.
  *
- * The notification, the lock screen, headset buttons, a call arriving and another app wanting
- * the speaker are all MediaSession's and ExoPlayer's to handle. What is this app's own is
- * remembering where the listener stopped -- on every pause, every few seconds while playing,
- * and at the end -- and the sleep timer.
+ * The notification, the lock screen, a call arriving and another app wanting the speaker are
+ * all MediaSession's and ExoPlayer's to handle. What is this app's own is remembering where
+ * the listener stopped -- on every pause, every few seconds while playing, and at the end --
+ * the sleep timer, and what the skip buttons on headphones do ([EpisodePlayer],
+ * [ButtonPresses]).
  *
  * The same shape as mimidoku's player, cut down to what one episode at a time needs.
  */
@@ -44,6 +52,10 @@ class EpisodeService :
     private val appScope: ApplicationCoroutineScope by instance()
 
     private var player: ExoPlayer? = null
+    private var episodePlayer: EpisodePlayer? = null
+    private val presses = ButtonPresses()
+    private val pressTimeout =
+        Runnable { presses.onTimeout().presses.forEach { episodePlayer?.press(it) } }
     private var session: MediaSession? = null
     private lateinit var store: EpisodeStore
 
@@ -116,9 +128,16 @@ class EpisodeService :
         )
 
         player = exoPlayer
+        val forOthers =
+            EpisodePlayer(
+                exoPlayer,
+                mode = { repository.episodeButtons.value },
+                toEpisode = ::stepEpisode,
+            )
+        episodePlayer = forOthers
         session =
             MediaSession
-                .Builder(this, exoPlayer)
+                .Builder(this, forOthers)
                 .setCallback(Commands())
                 .setSessionActivity(
                     PendingIntent.getActivity(
@@ -164,6 +183,84 @@ class EpisodeService :
             setSleep(args.getInt(SLEEP_MINUTES))
             return Futures.immediateFuture(SessionResult(SessionResult.RESULT_SUCCESS))
         }
+
+        /**
+         * Headphones, a car or a Bluetooth remote: told apart here so a long press can do
+         * something other than a press. The notification's own buttons send only a press and
+         * are left to the session, which hands them to [EpisodePlayer] all the same.
+         */
+        @OptIn(UnstableApi::class)
+        override fun onMediaButtonEvent(
+            session: MediaSession,
+            controllerInfo: MediaSession.ControllerInfo,
+            intent: Intent,
+        ): Boolean {
+            if (session.isMediaNotificationController(controllerInfo)) return false
+            val event = keyEventOf(intent) ?: return false
+            val outcome =
+                presses.onKey(
+                    keyCode = event.keyCode,
+                    action = event.action,
+                    repeatCount = event.repeatCount,
+                    longPress = event.isLongPress,
+                    nowMs = SystemClock.uptimeMillis(),
+                )
+            if (!outcome.handled) return false
+            handler.removeCallbacks(pressTimeout)
+            if (outcome.armTimeout) handler.postDelayed(pressTimeout, ButtonPresses.TAP_TIMEOUT_MS)
+            outcome.presses.forEach { episodePlayer?.press(it) }
+            return true
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun keyEventOf(intent: Intent): KeyEvent? =
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT, KeyEvent::class.java)
+        } else {
+            intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT)
+        }
+
+    /**
+     * To the next or previous episode of the same show, from where it was left, and playing
+     * if this one was. At either end of the show nothing happens, except that "previous"
+     * goes back to the start.
+     */
+    private fun stepEpisode(next: Boolean) {
+        val id = currentItemId() ?: return
+        appScope.launch {
+            val target = repository.neighborEpisode(id, next)
+            withContext(Dispatchers.Main) {
+                val current = player ?: return@withContext
+                if (currentItemId() != id) return@withContext
+                if (target == null) {
+                    if (!next) current.seekTo(0L)
+                    return@withContext
+                }
+                load(current, target)
+            }
+        }
+    }
+
+    private fun load(
+        current: ExoPlayer,
+        episode: FeedItemWithFeed,
+    ) {
+        val link = episode.enclosureLink ?: return
+        savePosition()
+        val kept = store.file(episode.id)?.takeIf { store.downloadState(episode.id) == DownloadState.Kept }
+        val playing = current.playWhenReady
+        current.setMediaItem(
+            episodeMediaItem(
+                itemId = episode.id,
+                uri = kept?.toURI()?.toString() ?: link,
+                title = episode.plainTitle,
+                show = episode.feedDisplayTitle,
+            ),
+            store.position(episode.id),
+        )
+        current.prepare()
+        current.playWhenReady = playing
     }
 
     private fun setSleep(minutes: Int) {
@@ -217,6 +314,7 @@ class EpisodeService :
         player?.release()
         session = null
         player = null
+        episodePlayer = null
         super.onDestroy()
     }
 

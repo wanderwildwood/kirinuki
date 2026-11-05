@@ -497,6 +497,11 @@
   <string name="episode_waiting_for_wifi">Waiting for wifi</string>
   <string name="episodes_only_on_wifi">Download episodes only on Wi-Fi</string>
   <string name="episodes_only_on_wifi_summary">Off, a podcast episode can download over mobile data. Playing streams over either.</string>
+  <string name="episode_buttons">Skip buttons on headphones</string>
+  <string name="episode_buttons_skip">Skip ahead and back</string>
+  <string name="episode_buttons_episodes">Next and previous episode</string>
+  <string name="episode_buttons_skip_summary">A press skips %1$d seconds ahead or %2$d back. A long press, where the headphones send one, goes to the next episode or back to the start.</string>
+  <string name="episode_buttons_episodes_summary">A press goes to the next episode of the show, or back to the start of this one. A long press, where the headphones send one, skips %1$d seconds ahead or %2$d back.</string>
   <string name="podcasts_in_all_feeds">Show podcasts in All feeds</string>
   <string name="turn_with_phone">Turn with the phone</string>
   <string name="turn_with_phone_summary">Articles and capsules turn sideways when the phone does. Everything else stays upright.</string>

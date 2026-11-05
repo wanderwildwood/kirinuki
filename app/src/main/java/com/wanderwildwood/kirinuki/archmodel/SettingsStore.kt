@@ -12,6 +12,8 @@ import com.wanderwildwood.kirinuki.db.room.BlocklistDao
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.model.FeedListFilter
+import com.wanderwildwood.kirinuki.podcast.EpisodeButtons
+import com.wanderwildwood.kirinuki.podcast.episodeButtonsFromString
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.PREF_MAX_ITEM_COUNT_PER_FEED
 import com.wanderwildwood.kirinuki.util.getStringNonNull
@@ -259,6 +261,16 @@ class SettingsStore(
     fun setEpisodesOnlyOnWifi(value: Boolean) {
         _episodesOnlyOnWifi.value = value
         sp.edit().putBoolean(PREF_EPISODES_ONLY_WIFI, value).apply()
+    }
+
+    // What the skip buttons on headphones do inside an episode. Skipping, unless asked.
+    private val _episodeButtons =
+        MutableStateFlow(episodeButtonsFromString(sp.getString(PREF_EPISODE_BUTTONS, null)))
+    val episodeButtons = _episodeButtons.asStateFlow()
+
+    fun setEpisodeButtons(value: EpisodeButtons) {
+        _episodeButtons.value = value
+        sp.edit().putString(PREF_EPISODE_BUTTONS, value.name.lowercase()).apply()
     }
 
     // Podcasts have their own row whatever this says. On, All feeds is everything together.
@@ -703,6 +715,7 @@ const val PREF_BLOCKLIST_APPLY_TO_LINKS = "pref_blocklist_apply_to_links"
 const val PREF_SYNC_ONLY_CHARGING = "pref_sync_only_charging"
 const val PREF_SYNC_ONLY_WIFI = "pref_sync_only_wifi"
 const val PREF_EPISODES_ONLY_WIFI = "pref_episodes_only_wifi"
+const val PREF_EPISODE_BUTTONS = "pref_episode_buttons"
 const val PREF_PODCASTS_IN_ALL_FEEDS = "pref_podcasts_in_all_feeds"
 const val PREF_PODCASTS_UNPLAYED_ONLY = "pref_podcasts_unplayed_only"
 const val PREF_TURN_WITH_PHONE = "pref_turn_with_phone"

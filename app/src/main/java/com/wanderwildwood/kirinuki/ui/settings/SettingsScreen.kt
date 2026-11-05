@@ -31,6 +31,8 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.SyncFrequency
 import com.wanderwildwood.kirinuki.model.DownloadedArticles
+import com.wanderwildwood.kirinuki.podcast.EpisodeButtons
+import com.wanderwildwood.kirinuki.podcast.EpisodeService
 import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
@@ -58,6 +60,7 @@ fun SettingsScreen(
 ) {
     val syncOnlyOnWifi by viewModel.syncOnlyOnWifi.collectAsStateWithLifecycle()
     val episodesOnlyOnWifi by viewModel.episodesOnlyOnWifi.collectAsStateWithLifecycle()
+    val episodeButtons by viewModel.episodeButtons.collectAsStateWithLifecycle()
     val podcastsInAllFeeds by viewModel.podcastsInAllFeeds.collectAsStateWithLifecycle()
     val turnWithPhone by viewModel.turnWithPhone.collectAsStateWithLifecycle()
     val syncOnlyWhenCharging by viewModel.syncOnlyWhenCharging.collectAsStateWithLifecycle()
@@ -122,6 +125,36 @@ fun SettingsScreen(
                     subtitle = stringResource(R.string.episodes_only_on_wifi_summary),
                     checked = episodesOnlyOnWifi,
                     onCheckedChange = viewModel::setEpisodesOnlyOnWifi,
+                )
+            }
+            // Two choices, so a tap turns it over; the line under it says what a press and a
+            // long press do in the one chosen.
+            item {
+                val ahead = (EpisodeService.SEEK_FORWARD_MS / 1000).toInt()
+                val back = (EpisodeService.SEEK_BACK_MS / 1000).toInt()
+                ChoiceRow(
+                    title = stringResource(R.string.episode_buttons),
+                    value =
+                        stringResource(
+                            when (episodeButtons) {
+                                EpisodeButtons.SKIP -> R.string.episode_buttons_skip
+                                EpisodeButtons.EPISODES -> R.string.episode_buttons_episodes
+                            },
+                        ),
+                    note =
+                        when (episodeButtons) {
+                            EpisodeButtons.SKIP -> stringResource(R.string.episode_buttons_skip_summary, ahead, back)
+                            EpisodeButtons.EPISODES ->
+                                stringResource(R.string.episode_buttons_episodes_summary, ahead, back)
+                        },
+                    onClick = {
+                        viewModel.setEpisodeButtons(
+                            when (episodeButtons) {
+                                EpisodeButtons.SKIP -> EpisodeButtons.EPISODES
+                                EpisodeButtons.EPISODES -> EpisodeButtons.SKIP
+                            },
+                        )
+                    },
                 )
             }
             item {
@@ -430,6 +463,28 @@ private fun ValueRow(
     ) {
         TextMMD(text = title)
         TextMMD(text = value, style = MaterialTheme.typography.bodySmall)
+    }
+}
+
+/** A setting with a few named choices: the title, the one chosen, and what it means. */
+@Composable
+private fun ChoiceRow(
+    title: String,
+    value: String,
+    note: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+    ) {
+        TextMMD(text = title)
+        TextMMD(text = value)
+        TextMMD(text = note, style = MaterialTheme.typography.bodySmall)
     }
 }
 

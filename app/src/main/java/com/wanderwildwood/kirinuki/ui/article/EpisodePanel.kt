@@ -34,8 +34,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.media3.common.C
-import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionCommand
@@ -46,6 +44,7 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.podcast.DownloadState
 import com.wanderwildwood.kirinuki.podcast.EpisodeService
 import com.wanderwildwood.kirinuki.podcast.EpisodeStore
+import com.wanderwildwood.kirinuki.podcast.episodeMediaItem
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import kotlinx.coroutines.delay
 import java.util.Locale
@@ -129,17 +128,12 @@ fun EpisodePanel(
         }
         val kept = store.file(episode.itemId)?.takeIf { download == DownloadState.Kept }
         val item =
-            MediaItem
-                .Builder()
-                .setMediaId(episode.itemId.toString())
-                .setUri(kept?.toURI()?.toString() ?: episode.url)
-                .setMediaMetadata(
-                    MediaMetadata
-                        .Builder()
-                        .setTitle(episode.title)
-                        .setArtist(episode.show)
-                        .build(),
-                ).build()
+            episodeMediaItem(
+                itemId = episode.itemId,
+                uri = kept?.toURI()?.toString() ?: episode.url,
+                title = episode.title,
+                show = episode.show,
+            )
         c.setMediaItem(item, store.position(episode.itemId))
         c.setPlaybackSpeed(store.speed)
         c.prepare()

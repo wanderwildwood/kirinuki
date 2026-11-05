@@ -30,6 +30,8 @@ import com.wanderwildwood.kirinuki.model.ThumbnailImage
 import com.wanderwildwood.kirinuki.model.FeedListItem
 import com.wanderwildwood.kirinuki.model.FeedListFilter
 import com.wanderwildwood.kirinuki.model.emptyFeedListFilter
+import com.wanderwildwood.kirinuki.podcast.EpisodeButtons
+import com.wanderwildwood.kirinuki.podcast.neighborEpisodeId
 import com.wanderwildwood.kirinuki.util.Either
 import com.wanderwildwood.kirinuki.util.addDynamicShortcutToFeed
 import com.wanderwildwood.kirinuki.util.reportShortcutToFeedUsed
@@ -246,6 +248,35 @@ class Repository(
     val episodesOnlyOnWifi: StateFlow<Boolean> = settingsStore.episodesOnlyOnWifi
 
     fun setEpisodesOnlyOnWifi(value: Boolean) = settingsStore.setEpisodesOnlyOnWifi(value)
+
+    val episodeButtons: StateFlow<EpisodeButtons> = settingsStore.episodeButtons
+
+    fun setEpisodeButtons(value: EpisodeButtons) = settingsStore.setEpisodeButtons(value)
+
+    /**
+     * The episode after or before [itemId] in its show, in the order the show's list has them
+     * and leaving out played ones when the list does. Null at either end.
+     */
+    suspend fun neighborEpisode(
+        itemId: Long,
+        next: Boolean,
+    ): FeedItemWithFeed? {
+        val feedId = feedItemStore.getArticle(itemId)?.feedId ?: return null
+        val ids =
+            feedItemStore.getEpisodeIdsInFeed(
+                feedId = feedId,
+                currentId = itemId,
+                unplayedOnly = settingsStore.podcastsUnplayedOnly.value,
+            )
+        val id =
+            neighborEpisodeId(
+                newestFirstIds = ids,
+                currentId = itemId,
+                next = next,
+                newestFirst = settingsStore.currentSorting.value == SortingOptions.NEWEST_FIRST,
+            ) ?: return null
+        return feedItemStore.getArticle(id)
+    }
 
     fun setSyncOnlyOnWifi(value: Boolean) = settingsStore.setSyncOnlyOnWifi(value)
 

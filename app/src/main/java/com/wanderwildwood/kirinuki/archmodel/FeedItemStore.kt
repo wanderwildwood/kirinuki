@@ -384,6 +384,12 @@ class FeedItemStore(
         )
 
     suspend fun getArticle(id: Long): FeedItemWithFeed? = dao.getFeedItem(id)
+
+    suspend fun getEpisodeIdsInFeed(
+        feedId: Long,
+        currentId: Long,
+        unplayedOnly: Boolean,
+    ): List<Long> = dao.getEpisodeIdsInFeed(feedId = feedId, currentId = currentId, unplayedOnly = unplayedOnly)
 }
 
 private fun PreviewItem.toFeedListItem(context: Context) =

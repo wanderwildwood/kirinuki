@@ -375,6 +375,27 @@ interface FeedItemDao {
         readTime: Instant = Instant.now(),
     )
 
+    /**
+     * A show's episodes, newest first, for the skip buttons on headphones to step through.
+     * With [unplayedOnly], the played ones are left out, as the list leaves them out, except
+     * [currentId], which is where the step starts from.
+     */
+    @Query(
+        """
+        SELECT id FROM feed_items
+        WHERE feed_id IS :feedId
+          AND enclosure_type LIKE 'audio/%'
+          AND block_time IS NULL
+          AND (NOT :unplayedOnly OR read_time IS NULL OR id IS :currentId)
+        ORDER BY $FEED_ITEM_LIST_SORT_ORDER_DESC
+        """,
+    )
+    suspend fun getEpisodeIdsInFeed(
+        feedId: Long,
+        currentId: Long,
+        unplayedOnly: Boolean,
+    ): List<Long>
+
     /** A podcast is a feed with any audio episode, as [PODCAST_FEED_IDS] has it. */
     @Query("SELECT EXISTS(SELECT 1 FROM feed_items WHERE feed_id IS :feedId AND enclosure_type LIKE 'audio/%')")
     fun isPodcastFeed(feedId: Long): Flow<Boolean>

@@ -8,6 +8,7 @@ import com.wanderwildwood.kirinuki.db.room.FeedItemDao
 import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.net.gemini.KnownHost
 import com.wanderwildwood.kirinuki.net.gemini.KnownHosts
+import com.wanderwildwood.kirinuki.podcast.EpisodeButtons
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +45,10 @@ class SettingsViewModel(
     fun setTurnWithPhone(value: Boolean) = repository.setTurnWithPhone(value)
 
     fun setEpisodesOnlyOnWifi(value: Boolean) = repository.setEpisodesOnlyOnWifi(value)
+
+    val episodeButtons: StateFlow<EpisodeButtons> = repository.episodeButtons
+
+    fun setEpisodeButtons(value: EpisodeButtons) = repository.setEpisodeButtons(value)
     val syncOnlyWhenCharging: StateFlow<Boolean> = repository.syncOnlyWhenCharging
     val syncFrequency: StateFlow<SyncFrequency> = repository.syncFrequency
     val textScale: StateFlow<Float> = repository.textScale
