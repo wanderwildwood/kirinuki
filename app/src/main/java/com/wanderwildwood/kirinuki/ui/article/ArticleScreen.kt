@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -288,14 +291,15 @@ fun ArticleScreen(
                         // another app (a note, a message), when something other than Feeds takes it.
                         if (articleLink != null && (isWebUrl(articleLink) || isSmolnetUrl(articleLink))) {
                             item {
+                                // Same height for both, though only the QR label wraps at half width.
                                 Row(
-                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp).height(IntrinsicSize.Min),
                                     horizontalArrangement = Arrangement.spacedBy(HOUSE_GAP),
                                 ) {
                                     HouseButton(
                                         label = stringResource(R.string.qr_show_link),
                                         onClick = { qrOpen = true },
-                                        modifier = Modifier.weight(1f),
+                                        modifier = Modifier.weight(1f).fillMaxHeight(),
                                         maxLines = 2,
                                     )
                                     if (canShare) {
@@ -308,7 +312,7 @@ fun ArticleScreen(
                                                     chooserTitle = shareChooserTitle,
                                                 )
                                             },
-                                            modifier = Modifier.weight(1f),
+                                            modifier = Modifier.weight(1f).fillMaxHeight(),
                                             maxLines = 2,
                                         )
                                     }
