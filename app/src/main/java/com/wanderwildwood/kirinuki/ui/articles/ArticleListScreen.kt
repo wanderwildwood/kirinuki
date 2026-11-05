@@ -145,6 +145,9 @@ fun ArticleListScreen(
                 state = listState,
                 // What was kept lives on this phone; there is nothing to fetch for it.
                 onPullAtTop = if (screenTitle?.type == FeedType.SAVED_ARTICLES) null else pull::pull,
+                // A list of tall rows: the article the foot cuts through shows there, and the next
+                // page opens on it whole, rather than a blank band at the foot (5 Nov 2026).
+                showCutRow = true,
             ) {
                 items(
                     count = items.itemCount,
