@@ -450,7 +450,7 @@
   <string name="licences_back">Back</string>
   <string name="licences_source_head">Source code</string>
     <string name="licences_no_text">%s needs no license text here.</string>
-  <string name="licences_licence">Feeds is free software under the GNU General Public License, version 3. Each library keeps its own license, on its own page.</string>
+  <string name="licences_licence">Feeds is free software under the GNU General Public License, version 3. What it is built on keeps its own licenses, listed below.</string>
   <string name="licences_full_head">Full texts</string>
   <string name="licences_full_gpl">GNU General Public License v3 (full text)</string>
   <string name="licences_full_apache">Apache License 2.0 (full text)</string>
@@ -594,6 +594,11 @@
     <!-- shared-about: contact row + privacy section (edit in /opt/projects/shared-about) -->
     <string name="about_write_to">Write to %1$s</string>
     <string name="about_no_mail_app">No email app is installed. The address is %1$s.</string>
+    <string name="about_no_browser_address">No browser is installed. The address is %1$s.</string>
+    <string name="about_open_drawer">Open %1$s</string>
+    <string name="about_close_drawer">Close %1$s</string>
+    <string name="about_contact_head">Contact</string>
+    <string name="about_links_head">Links</string>
     <string name="privacy_who_title">Who we are</string>
     <string name="privacy_who">This app is made by wander wildwood, an independent developer: one person, not a company. That makes wander wildwood the data controller for anything the app itself handles, and that is very little: what you put in stays on this phone. The only things that go out are the requests described above: to the sites, podcasts and capsules you add, one for each feed, page, episode or capsule, carrying its address and the app\'s name and version; and, only if you sign in to one, to your feed server, carrying your login, your feeds\' addresses and folders, and what you have read or starred. Nothing comes to the developer.</string>
     <string name="privacy_contact_title">How to contact us</string>

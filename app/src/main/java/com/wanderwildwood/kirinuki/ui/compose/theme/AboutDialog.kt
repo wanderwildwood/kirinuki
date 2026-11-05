@@ -9,14 +9,11 @@ import com.wanderwildwood.kirinuki.ui.AboutData
 import com.wanderwildwood.kirinuki.ui.AboutLabels
 import com.wanderwildwood.kirinuki.ui.AboutSection
 import com.wanderwildwood.kirinuki.ui.HouseAboutDialog
-import com.wanderwildwood.kirinuki.ui.LicencesScreen
 import com.wanderwildwood.kirinuki.ui.SOURCE_URL
-import com.wanderwildwood.kirinuki.ui.rememberLicencesData
-import com.wanderwildwood.kirinuki.ui.rememberLicencesLabels
 
 /**
- * This app's About: only the words and the address. The dialog, its one Close button, the
- * Licences row, the links and the llama are the shared HouseAbout.kt, the same in every app.
+ * This app's About: only the words and the address. The dialog, its drawers, its one Close button,
+ * the Licenses drawer, the links and the llama are the shared HouseAbout.kt, the same in every app.
  *
  * An app that goes to the network owes the reader that line, and this one goes to whatever
  * addresses it is given.
@@ -32,8 +29,8 @@ fun AboutDialog(onDismiss: () -> Unit) {
             AboutSection(stringResource(R.string.privacy_who_title), stringResource(R.string.privacy_who)),
             AboutSection(stringResource(R.string.privacy_contact_title), stringResource(R.string.privacy_contact)),
             AboutSection(stringResource(R.string.privacy_rights_title), stringResource(R.string.privacy_rights)),
-            AboutSection(null, stringResource(R.string.about_built_on)),
             AboutSection(stringResource(R.string.about_terms_head), stringResource(R.string.about_licence)),
+            AboutSection(null, stringResource(R.string.about_built_on)),
         ),
         sourceUrl = SOURCE_URL,
     )
@@ -41,11 +38,13 @@ fun AboutDialog(onDismiss: () -> Unit) {
         close = stringResource(R.string.about_close),
         licences = stringResource(R.string.licences_title),
         feedTheLlamas = stringResource(R.string.about_feed_the_llamas),
-        noBrowser = { _ -> context.getString(R.string.about_no_browser) },
+        noBrowser = { address -> context.getString(R.string.about_no_browser_address, address) },
         writeTo = { address -> context.getString(R.string.about_write_to, address) },
         noMailApp = { address -> context.getString(R.string.about_no_mail_app, address) },
+        openDrawer = { heading -> context.getString(R.string.about_open_drawer, heading) },
+        closeDrawer = { heading -> context.getString(R.string.about_close_drawer, heading) },
+        contact = stringResource(R.string.about_contact_head),
+        links = stringResource(R.string.about_links_head),
     )
-    HouseAboutDialog(data, labels, R.drawable.llama, onDismiss) { modifier, back ->
-        LicencesScreen(rememberLicencesData(), rememberLicencesLabels(), onBack = back, modifier = modifier)
-    }
+    HouseAboutDialog(data, labels, R.drawable.llama, onDismiss)
 }
