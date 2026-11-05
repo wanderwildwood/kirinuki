@@ -64,5 +64,5 @@ fun FittedPreformattedText(
 }
 
 private const val DEFAULT_SIZE_SP = 16f
-private const val MIN_SIZE_SP = 14f
+private const val MIN_SIZE_SP = 16f
 private const val MONO_ADVANCE = 0.6f
