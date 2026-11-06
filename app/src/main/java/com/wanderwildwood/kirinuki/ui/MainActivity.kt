@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -255,7 +254,7 @@ class MainActivity : DIAwareComponentActivity() {
         }
 
         val importLauncher =
-            rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            rememberLauncherForActivityResult(FilesOpenDocument(writable = false)) { uri ->
                 uri ?: return@rememberLauncherForActivityResult
                 lifecycleScope.launch {
                     val feedDao = di.direct.instance<FeedDao>()
@@ -270,7 +269,7 @@ class MainActivity : DIAwareComponentActivity() {
             }
         val exportLauncher =
             rememberLauncherForActivityResult(
-                ActivityResultContracts.CreateDocument("text/opml"),
+                FilesCreateDocument("text/opml"),
             ) { uri ->
                 uri ?: return@rememberLauncherForActivityResult
                 lifecycleScope.launch {
