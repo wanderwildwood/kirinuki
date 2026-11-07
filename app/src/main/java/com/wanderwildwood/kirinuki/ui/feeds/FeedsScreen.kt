@@ -132,6 +132,7 @@ fun FeedsScreen(
             PagedColumn(
                 state = listState,
                 onPullAtTop = pull::pull,
+                showCutRow = true,
             ) {
                 items(
                     count = items.itemCount,

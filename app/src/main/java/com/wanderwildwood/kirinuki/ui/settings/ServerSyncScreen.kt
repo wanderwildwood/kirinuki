@@ -90,6 +90,7 @@ fun ServerSyncScreen(
             modifier = Modifier.fillMaxSize().padding(padding),
             contentPadding = PaddingValues(start = 20.dp, end = 12.dp, top = 8.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            showCutRow = true,
         ) {
             val account = state.account
             if (account == null) {
