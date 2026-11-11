@@ -48,8 +48,12 @@ android {
 
         // The Go feed parser ships a native library per ABI, and all of them together
         // make a 140 MB debug APK that an emulator struggles to install and run.
-        // Pass -PabiFilter=x86_64 for an emulator build; release keeps every ABI.
-        (project.findProperty("abiFilter") as String?)?.let { abi ->
+        // Pass -PabiFilter=x86_64 for an emulator build. A release carries arm64 alone, the
+        // only ABI the phone runs: the other three added 25 MB to the APK.
+        val releaseBuild =
+            gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }
+        ((project.findProperty("abiFilter") as String?)
+            ?: if (releaseBuild) "arm64-v8a" else null)?.let { abi ->
             ndk {
                 abiFilters.add(abi)
             }
