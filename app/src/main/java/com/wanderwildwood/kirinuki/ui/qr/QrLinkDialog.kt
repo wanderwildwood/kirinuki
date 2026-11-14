@@ -22,6 +22,7 @@ import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.ui.compose.theme.EInkDialog
 import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
+import com.wanderwildwood.kirinuki.ui.compose.theme.keepColors
 
 /**
  * A story's address as a QR code, for a computer or another phone to open: the Kompakt has no
@@ -50,6 +51,7 @@ fun QrLinkDialog(
                         .padding(vertical = 12.dp)
                         .fillMaxWidth()
                         .aspectRatio(1f)
+                        .keepColors()
                         .semantics { contentDescription = description },
             ) {
                 drawRect(Color.White)

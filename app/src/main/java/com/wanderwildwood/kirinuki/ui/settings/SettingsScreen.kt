@@ -37,6 +37,7 @@ import com.wanderwildwood.kirinuki.ui.PagedColumn
 import com.wanderwildwood.kirinuki.ui.compose.components.BarAction
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
+import com.wanderwildwood.kirinuki.ui.compose.theme.DarkMode
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.util.hasWebBrowser
 import java.time.ZoneId
@@ -194,6 +195,14 @@ fun SettingsScreen(
                     value = stringResource(R.string.text_scale_percent, Math.round(textScale * 100f).toString()),
                     onLess = { viewModel.setTextScale((textScale - 0.1f).coerceAtLeast(0.5f)) },
                     onMore = { viewModel.setTextScale((textScale + 0.1f).coerceAtMost(3.0f)) },
+                )
+            }
+            item {
+                SwitchRow(
+                    title = stringResource(R.string.settings_dark),
+                    subtitle = stringResource(R.string.settings_dark_note),
+                    checked = DarkMode.on,
+                    onCheckedChange = { DarkMode.set(context, it) },
                 )
             }
             item {

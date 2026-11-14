@@ -45,6 +45,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.net.scannedAddress
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.compose.theme.DarkMode
 import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import java.util.concurrent.Executors
@@ -159,6 +160,7 @@ private fun CameraLook(
         modifier = modifier,
         factory = { ctx ->
             val view = PreviewView(ctx).apply { implementationMode = PreviewView.ImplementationMode.COMPATIBLE }
+            DarkMode.keep(view)
             val future =
                 try {
                     ProcessCameraProvider.getInstance(ctx)
