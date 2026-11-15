@@ -48,6 +48,7 @@ import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.qr.QrScanScreen
 import com.wanderwildwood.kirinuki.ui.compose.theme.rememberArmedFlag
+import androidx.compose.foundation.layout.imePadding
 
 /**
  * One screen for subscribing and for changing a feed afterwards, because the two hold the
@@ -173,6 +174,9 @@ fun AddFeedScreen(
                 Modifier
                     .fillMaxSize()
                     .padding(padding)
+                    // The keyboard takes the foot of the panel: the form gives it the room, so
+                    // the box being typed in scrolls up above the keys instead of under them.
+                    .imePadding()
                     .verticalScroll(formScroll)
                     .padding(16.dp),
         ) {

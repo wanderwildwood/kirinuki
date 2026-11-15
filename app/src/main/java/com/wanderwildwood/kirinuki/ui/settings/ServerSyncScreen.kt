@@ -42,6 +42,8 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.text.KeyboardActions
 
 /**
  * Sync with a feed server, its own screen because it holds a form. Signed out, it asks which
@@ -87,7 +89,9 @@ fun ServerSyncScreen(
     ) { padding ->
         PagedColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize().padding(padding),
+            // The keyboard takes the foot of the panel: the list gives it the room, so the field
+            // being typed in stays above the keys instead of under them.
+            modifier = Modifier.fillMaxSize().padding(padding).imePadding(),
             contentPadding = PaddingValues(start = 20.dp, end = 12.dp, top = 8.dp, bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             showCutRow = true,
@@ -243,6 +247,8 @@ private fun SignInForm(
             singleLine = true,
             visualTransformation = if (shown) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done, autoCorrectEnabled = false),
+            // Done on the keyboard is Sign in, once everything it needs is typed.
+            keyboardActions = KeyboardActions(onDone = { if (ready) onSignIn(kind, address, login, password) }),
             trailingIcon = {
                 HouseButton(
                     label = stringResource(if (shown) R.string.server_sync_hide else R.string.server_sync_show),
