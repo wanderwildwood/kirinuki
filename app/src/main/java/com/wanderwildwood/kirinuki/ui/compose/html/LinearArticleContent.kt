@@ -788,7 +788,7 @@ fun LinearText.toAnnotatedString(
                 builder.addStyle(
                     start = annotation.start,
                     end = annotation.endExclusive,
-                    style = MaterialTheme.typography.headlineSmall.toSpanStyle(),
+                    style = MaterialTheme.typography.titleLarge.toSpanStyle(),
                 )
             }
 
