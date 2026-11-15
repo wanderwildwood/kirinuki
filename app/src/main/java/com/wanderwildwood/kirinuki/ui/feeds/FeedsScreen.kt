@@ -40,6 +40,9 @@ import com.wanderwildwood.kirinuki.db.room.PODCASTS_EXPANDED_KEY
 import com.wanderwildwood.kirinuki.model.FeedUnreadCount
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.stateDescription
 
 /**
  * The feeds, and above them the rows that are not feeds: everything, what was kept, and the
@@ -214,8 +217,15 @@ private fun FeedRow(
                 .padding(horizontal = 16.dp, vertical = 14.dp),
     ) {
         if (opens) {
+            val toggleLabel = stringResource(R.string.toggle_tag_expansion)
+            val toggleState = stringResource(if (expanded) R.string.expanded_tag else R.string.contracted_tag)
             Box(
-                modifier = Modifier.clickable(onClick = onToggleTag),
+                modifier = Modifier
+                    .semantics {
+                        contentDescription = toggleLabel
+                        stateDescription = toggleState
+                    }
+                    .clickable(onClick = onToggleTag),
             ) {
                 TextMMD(text = if (expanded) "−" else "+")
             }

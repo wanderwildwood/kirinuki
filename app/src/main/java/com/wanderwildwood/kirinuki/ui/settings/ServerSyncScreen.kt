@@ -44,6 +44,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.selected
 
 /**
  * Sync with a feed server, its own screen because it holds a form. Signed out, it asks which
@@ -185,7 +189,7 @@ private fun KindChoice(
                     enabled = enabled,
                     on = k == kind,
                     maxLines = 2,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).semantics { role = Role.RadioButton; selected = k == kind },
                 )
             }
         }
