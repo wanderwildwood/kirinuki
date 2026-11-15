@@ -33,9 +33,6 @@ suspend fun exportOpml(
             Log.e(LOG_TAG, "Failed to export OPML", it)
             val toastMaker = di.direct.instance<ToastMaker>()
             toastMaker.makeToast(R.string.failed_to_export_OPML)
-            (it.localizedMessage ?: it.message)?.let { message ->
-                toastMaker.makeToast(message)
-            }
 
             OpmlExportUnknownError(it)
         },
@@ -92,9 +89,6 @@ suspend fun importOpml(
         Log.e(LOG_TAG, "Failed to import OPML", e)
         val toastMaker = di.direct.instance<ToastMaker>()
         toastMaker.makeToast(R.string.failed_to_import_OPML)
-        (e.localizedMessage ?: e.message)?.let { message ->
-            toastMaker.makeToast(message)
-        }
     }
 }
 

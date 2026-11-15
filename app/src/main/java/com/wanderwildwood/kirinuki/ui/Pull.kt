@@ -16,7 +16,6 @@ import com.wanderwildwood.kirinuki.archmodel.SyncFailure
 import com.wanderwildwood.kirinuki.archmodel.SyncOutcome
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -25,7 +24,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * What the line above a list says once a swipe down at its top has fetched the feeds again:
- * "Syncing…" while it runs, then "Up to date" or what went wrong, for a few seconds.
+ * "Syncing…" while it runs, then "Up to date" or what went wrong, until the next press.
  */
 sealed interface Pulled {
     data object Syncing : Pulled
@@ -49,9 +48,6 @@ fun pulledAfter(outcome: SyncOutcome?): Pulled = when {
     outcome.failed > 0 -> Pulled.SomeFailed(outcome.failedTitles)
     else -> Pulled.UpToDate
 }
-
-/** How long "Up to date" or the trouble stays above the list after a pull, in milliseconds. */
-const val PULLED_LINE_MS = 6_000L
 
 /** How long a pull waits for the sync to begin, and then to finish, before it gives up on it. */
 /** How many failed feeds the line names before it says "and N more". */
@@ -81,7 +77,9 @@ class PullState internal constructor(
         reported?.cancel()
         reported = scope.launch {
             pulled = pulledAfter(done)
-            delay(PULLED_LINE_MS)
+            // What it came to stays until the next press: on this panel a line on a timer
+            // could be gone before it had been read.
+            NextPress.await()
             pulled = null
         }
     }
@@ -104,8 +102,11 @@ class PullState internal constructor(
             }
             lastReported = done
             pulled = pulledAfter(done)
-            delay(PULLED_LINE_MS)
-            pulled = null
+            // The pull is over; its line waits for the next press, which may be a new pull.
+            reported = scope.launch {
+                NextPress.await()
+                pulled = null
+            }
         }
     }
 }

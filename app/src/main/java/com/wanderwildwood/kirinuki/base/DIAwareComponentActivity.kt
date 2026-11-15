@@ -28,4 +28,26 @@ abstract class DIAwareComponentActivity :
                 )
             }
     }
+
+    // A line that stays until the next press hears of it here; see NextPress.
+    override fun dispatchTouchEvent(ev: android.view.MotionEvent): Boolean {
+        com.wanderwildwood.kirinuki.ui.NextPress.seen(ev)
+        return super.dispatchTouchEvent(ev)
+    }
+
+    override fun dispatchKeyEvent(event: android.view.KeyEvent): Boolean {
+        com.wanderwildwood.kirinuki.ui.NextPress.seen(event)
+        return super.dispatchKeyEvent(event)
+    }
+
+    // A notice from somewhere with no screen of its own (an import, an export) is said on this one.
+    override fun onResume() {
+        super.onResume()
+        com.wanderwildwood.kirinuki.ui.FootNotice.resumed(this)
+    }
+
+    override fun onPause() {
+        com.wanderwildwood.kirinuki.ui.FootNotice.paused(this)
+        super.onPause()
+    }
 }

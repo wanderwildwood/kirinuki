@@ -4,7 +4,7 @@ import android.app.Application
 import android.app.job.JobScheduler
 import android.content.ContentResolver
 import android.content.SharedPreferences
-import android.widget.Toast
+import com.wanderwildwood.kirinuki.ui.FootNotice
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceManager
 import com.nononsenseapps.jsonfeed.cachingHttpClient
@@ -83,12 +83,14 @@ class KirinukiApplication :
                 object : ToastMaker {
                     override suspend fun makeToast(text: String) =
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@KirinukiApplication, text, Toast.LENGTH_SHORT).show()
+                            // Said along the foot of the screen in front until the next press, not in a toast
+                            // that goes by itself: on this panel it could be gone before it was read.
+                            FootNotice.say(this@KirinukiApplication, text)
                         }
 
                     override suspend fun makeToast(resId: Int) =
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(this@KirinukiApplication, resId, Toast.LENGTH_SHORT).show()
+                            FootNotice.say(this@KirinukiApplication, getString(resId))
                         }
                 }
             }

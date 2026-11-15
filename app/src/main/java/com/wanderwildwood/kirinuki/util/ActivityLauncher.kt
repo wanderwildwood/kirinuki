@@ -6,7 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Browser
 import android.util.Log
-import android.widget.Toast
+import com.wanderwildwood.kirinuki.ui.FootNotice
 import androidx.annotation.ColorInt
 import androidx.browser.customtabs.CustomTabsIntent
 import com.wanderwildwood.kirinuki.R
@@ -43,7 +43,7 @@ class ActivityLauncher(
             true
         } catch (e: ActivityNotFoundException) {
             Log.e(LOG_TAG, "Failed to launch", e)
-            Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
+            FootNotice.say(activity, activity.getString(R.string.no_activity_for_link))
             false
         }
 
@@ -116,7 +116,7 @@ class ActivityLauncher(
             return startActivity(openAdjacentIfSuitable, intent)
         } catch (e: ActivityNotFoundException) {
             Log.e(LOG_TAG, "Failed to custom tab", e)
-            Toast.makeText(activity, R.string.no_activity_for_link, Toast.LENGTH_SHORT).show()
+            FootNotice.say(activity, activity.getString(R.string.no_activity_for_link))
             false
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Maybe bad link?", e)

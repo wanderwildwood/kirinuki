@@ -38,9 +38,6 @@ suspend fun exportSavedArticles(
             Log.e(LOG_TAG, "Failed to export saved articles", it)
             val toastMaker = di.direct.instance<ToastMaker>()
             toastMaker.makeToast(R.string.failed_to_export_saved_articles)
-            (it.localizedMessage ?: it.message)?.let { message ->
-                toastMaker.makeToast(message)
-            }
 
             SavedArticleExportUnknownError(it)
         },

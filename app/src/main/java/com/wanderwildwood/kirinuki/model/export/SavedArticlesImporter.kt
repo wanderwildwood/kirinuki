@@ -38,9 +38,6 @@ suspend fun importSavedArticles(
             Log.e(LOG_TAG, "Failed to import saved articles", it)
             val toastMaker = di.direct.instance<ToastMaker>()
             toastMaker.makeToast(R.string.failed_to_import_saved_articles)
-            (it.localizedMessage ?: it.message)?.let { message ->
-                toastMaker.makeToast(message)
-            }
 
             SavedArticleImportUnknownError(it)
         },
