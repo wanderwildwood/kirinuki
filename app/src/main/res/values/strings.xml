@@ -387,6 +387,19 @@
   <string name="opml_imported_count">Imported %1$d new feeds</string>
   <string name="opml_exported_count">Saved %1$d feeds to the file</string>
   <string name="imported_feeds_from_opml">Feeds imported.</string>
+  <string name="opml_import_ask_title">Import %1$s?</string>
+  <plurals name="opml_import_ask_new">
+    <item quantity="one">It adds %1$d new feed.</item>
+    <item quantity="other">It adds %1$d new feeds.</item>
+  </plurals>
+  <string name="opml_import_ask_none_new">It adds no new feeds.</string>
+  <plurals name="opml_import_ask_known">
+    <item quantity="one">%1$d feed in it is already here.</item>
+    <item quantity="other">%1$d feeds in it are already here.</item>
+  </plurals>
+  <string name="opml_import_ask_settings">It also changes the settings saved in it.</string>
+  <string name="opml_import_ask_unreadable">This file cannot be read as a list of feeds, so nothing was imported.</string>
+  <string name="opml_import">Import</string>
   <!-- gemini -->
   <string name="gemini_not_gemtext">This is not a page of text, so there is nothing to read here.</string>
   <string name="gemini_wants_input">This page is asking a question, and Feeds cannot answer one yet.</string>

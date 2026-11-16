@@ -5,6 +5,7 @@ import android.net.Uri
 import android.util.Log
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.SettingsStore
+import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.FeedDao
 import com.wanderwildwood.kirinuki.model.OPMLParserHandler
@@ -56,6 +57,55 @@ suspend fun exportOpml(
                 }
             logDebug(LOG_TAG, "Exported OPML in $time ms on ${Thread.currentThread().name}")
         }
+    }
+
+/** What an OPML file would bring in: feeds not yet followed, feeds already here, and whether it carries settings. */
+data class OpmlPreview(
+    val newFeeds: Int,
+    val knownFeeds: Int,
+    val hasSettings: Boolean,
+)
+
+/**
+ * Reads an OPML file without saving anything, to say what importing it would do. Null when the
+ * file cannot be read as OPML.
+ */
+suspend fun previewOpml(
+    di: DI,
+    uri: Uri,
+): OpmlPreview? =
+    withContext(Dispatchers.IO) {
+        val feedDao: FeedDao by di.instance()
+        val contentResolver: ContentResolver by di.instance()
+        val newUrls = mutableSetOf<String>()
+        val knownUrls = mutableSetOf<String>()
+        var hasSettings = false
+        val counter =
+            object : OPMLParserHandler {
+                override suspend fun saveFeed(feed: Feed) {
+                    val url = feed.url.toString()
+                    if (feedDao.loadFeedWithUrl(feed.url) == null) newUrls += url else knownUrls += url
+                }
+
+                override suspend fun saveSetting(
+                    key: String,
+                    value: String,
+                ) {
+                    hasSettings = true
+                }
+
+                override suspend fun saveBlocklistPatterns(patterns: Iterable<String>) {
+                    if (patterns.any()) hasSettings = true
+                }
+            }
+        val parsed =
+            try {
+                contentResolver.openInputStream(uri)?.use { OpmlPullParser(counter).parseInputStreamWithFallback(it) }
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "Failed to read OPML", e)
+                null
+            }
+        if (parsed == null || parsed.isLeft()) null else OpmlPreview(newUrls.size, knownUrls.size, hasSettings)
     }
 
 /**
