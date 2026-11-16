@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui
 
+import android.content.ContentResolver
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -35,7 +36,9 @@ class ImportOPMLFileActivity : DIAwareComponentActivity() {
 
         enableEdgeToEdgeDarkIcons()
 
-        val uri = intent.data
+        // Content only, as the manifest's filter says: a file:// address sent straight here
+        // could name one of this app's own files.
+        val uri = intent.data?.takeIf { it.scheme == ContentResolver.SCHEME_CONTENT }
         logDebug(LOG_TAG, "Uri: $uri")
 
         setContent {
