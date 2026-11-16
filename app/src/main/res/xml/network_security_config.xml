@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Cleartext http stays permitted, for things the app does not choose: feeds, and the pictures
+    and pages they link to, many of which are offered over http and nothing else, and a reading
+    server on a home network (FreshRSS, Nextcloud News), which often has no certificate to be
+    had for an address like 192.168.1.10. A feed can be anywhere, so Android cannot scope this
+    to a list of domains, and it is permitted app-wide. The app has no fixed server of its own.
+
+    What the app does about it: a sync server's password is never sent over http to an address
+    on the open internet (sync/greader/GReaderApi.kt refuses it). The cost is real: a feed
+    fetched over http can be read, or changed, by whoever else is on the path. Only the system's
+    certificates are trusted, never a user-added one.
+-->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
