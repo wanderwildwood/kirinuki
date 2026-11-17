@@ -161,15 +161,16 @@ class EpisodeService :
         override fun onConnect(
             session: MediaSession,
             controller: MediaSession.ControllerInfo,
-        ): MediaSession.ConnectionResult =
-            MediaSession.ConnectionResult
+        ): MediaSession.ConnectionResult {
+            // The system, a headset or a lock-screen panel get the usual play, pause and seek;
+            // the sleep timer is this app's own, offered to nothing else on the phone.
+            val commands = MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS.buildUpon()
+            if (controller.packageName == packageName) commands.add(SessionCommand(SLEEP, Bundle.EMPTY))
+            return MediaSession.ConnectionResult
                 .AcceptedResultBuilder(session)
-                .setAvailableSessionCommands(
-                    MediaSession.ConnectionResult.DEFAULT_SESSION_COMMANDS
-                        .buildUpon()
-                        .add(SessionCommand(SLEEP, Bundle.EMPTY))
-                        .build(),
-                ).build()
+                .setAvailableSessionCommands(commands.build())
+                .build()
+        }
 
         override fun onCustomCommand(
             session: MediaSession,
@@ -177,7 +178,7 @@ class EpisodeService :
             customCommand: SessionCommand,
             args: Bundle,
         ): ListenableFuture<SessionResult> {
-            if (customCommand.customAction != SLEEP) {
+            if (customCommand.customAction != SLEEP || controller.packageName != packageName) {
                 return Futures.immediateFuture(SessionResult(SessionResult.RESULT_ERROR_NOT_SUPPORTED))
             }
             setSleep(args.getInt(SLEEP_MINUTES))

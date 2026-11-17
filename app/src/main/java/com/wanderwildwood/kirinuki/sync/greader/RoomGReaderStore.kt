@@ -48,7 +48,12 @@ class RoomGReaderStore(
                 url = feed.url.toString(),
                 title = feed.title,
                 tag = feed.tag,
-                syncable = !feed.isSavedPages && !feed.isLocalFolder && feed.url.protocol.lowercase() in setOf("http", "https"),
+                // An address with a login in it (https://name:password@host/...) stays on the phone:
+                // offering it to the server would hand that login over too.
+                syncable =
+                    !feed.isSavedPages && !feed.isLocalFolder &&
+                        feed.url.protocol.lowercase() in setOf("http", "https") &&
+                        feed.url.userInfo.isNullOrEmpty(),
             )
         }
 
