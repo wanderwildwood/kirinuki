@@ -14,6 +14,7 @@ import com.wanderwildwood.kirinuki.db.room.GReaderFeedRow
 import com.wanderwildwood.kirinuki.db.room.GReaderItemRow
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.isSavedPages
+import com.wanderwildwood.kirinuki.podcast.isLocalFolder
 import com.wanderwildwood.kirinuki.db.room.upsertFeedItems
 import com.wanderwildwood.kirinuki.model.ParsedArticle
 import com.wanderwildwood.kirinuki.model.ParsedAuthor
@@ -47,7 +48,7 @@ class RoomGReaderStore(
                 url = feed.url.toString(),
                 title = feed.title,
                 tag = feed.tag,
-                syncable = !feed.isSavedPages && feed.url.protocol.lowercase() in setOf("http", "https"),
+                syncable = !feed.isSavedPages && !feed.isLocalFolder && feed.url.protocol.lowercase() in setOf("http", "https"),
             )
         }
 

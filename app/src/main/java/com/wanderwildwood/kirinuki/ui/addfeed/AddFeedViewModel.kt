@@ -1,6 +1,8 @@
 package com.wanderwildwood.kirinuki.ui.addfeed
 
 import android.app.Application
+import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.Repository
@@ -17,6 +19,11 @@ import com.wanderwildwood.kirinuki.model.SiteMetaData
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.net.parseUrlLeniently
+import com.wanderwildwood.kirinuki.podcast.LocalFolderSync
+import com.wanderwildwood.kirinuki.podcast.keepFolderPermission
+import com.wanderwildwood.kirinuki.podcast.localFolderTree
+import com.wanderwildwood.kirinuki.podcast.localFolderUrl
+import com.wanderwildwood.kirinuki.podcast.releaseFolderPermission
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +39,7 @@ class AddFeedViewModel(
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
     private val feedParser: FeedParser by instance()
+    private val localFolderSync: LocalFolderSync by instance()
 
     /** True while a site's page is being read for the feed it names, before subscribing. */
     private val _looking = MutableStateFlow(false)
@@ -72,7 +80,32 @@ class AddFeedViewModel(
     fun delete(feedId: Long) {
         if (feedId <= ID_UNSET) return
         viewModelScope.launch {
+            val tree = repository.getFeed(feedId)?.localFolderTree
             repository.deleteFeeds(listOf(feedId))
+            tree?.let { releaseFolderPermission(getApplication<Application>(), it) }
+            _saved.value = true
+        }
+    }
+
+    /**
+     * A folder of sound files, followed as one podcast. Read at once, here and not in the
+     * sync job, which waits for a network this does not need.
+     */
+    fun addFolder(tree: Uri) {
+        viewModelScope.launch {
+            val app = getApplication<Application>()
+            try {
+                keepFolderPermission(app, tree)
+            } catch (e: SecurityException) {
+                // A picker that gave no lasting grant: it reads now, and until a restart.
+                Log.w("KIRINUKI_FOLDER", "No lasting permission for the folder", e)
+            }
+            val url = localFolderUrl(tree)
+            val feed =
+                repository.getFeed(url)
+                    ?: repository.saveFeed(Feed(url = url, title = tree.lastPathSegment?.substringAfterLast(':')?.substringAfterLast('/').orEmpty()))
+                        .let { repository.getFeed(it) }
+            if (feed != null) localFolderSync.sync(feed)
             _saved.value = true
         }
     }

@@ -1,5 +1,10 @@
 package com.wanderwildwood.kirinuki.ui.addfeed
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Spacer
@@ -37,6 +42,7 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.isSavedPages
+import com.wanderwildwood.kirinuki.podcast.isLocalFolder
 import com.wanderwildwood.kirinuki.model.ArticleRuleError
 import com.wanderwildwood.kirinuki.model.ArticleRuleSet
 import com.wanderwildwood.kirinuki.model.AddressLook
@@ -44,6 +50,7 @@ import com.wanderwildwood.kirinuki.model.isToRead
 import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
+import com.wanderwildwood.kirinuki.ui.FilesPicker
 import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import com.wanderwildwood.kirinuki.ui.qr.QrScanScreen
@@ -95,6 +102,12 @@ fun AddFeedScreen(
 
     // Stays armed until the next other touch, Back or leaving the screen.
     var armed by rememberArmedFlag()
+    // A folder of sound files is followed as one podcast; the picker's answer is all it needs.
+    val pickFolder =
+        rememberLauncherForActivityResult(OpenAudioFolder()) { uri ->
+            if (uri != null) viewModel.addFolder(uri)
+        }
+    val isFolder = feed?.isLocalFolder == true
 
     LaunchedEffect(feedId) { viewModel.load(feedId) }
 
@@ -182,7 +195,8 @@ fun AddFeedScreen(
         ) {
             // The pages feed has an address nothing answers at, and changing it would only
             // stop it being the pages feed. There is nothing in the box worth reading.
-            if (feed?.isSavedPages != true) {
+            // Nor has a folder on the phone: its address is the one the picker gave.
+            if (feed?.isSavedPages != true && !isFolder) {
                 TextFieldMMD(
                     value = url,
                     onValueChange = {
@@ -209,6 +223,16 @@ fun AddFeedScreen(
                         label = stringResource(R.string.qr_scan),
                         onClick = { scanning = true },
                         modifier = Modifier.fillMaxWidth(),
+                    )
+                    // Sound files already on the phone, for someone with no feed to give.
+                    HouseButton(
+                        label = stringResource(R.string.add_audio_folder),
+                        onClick = { pickFolder.launch(null) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    TextMMD(
+                        text = stringResource(R.string.add_audio_folder_detail),
+                        style = MaterialTheme.typography.bodySmall,
                     )
                 }
                 // What the address turned out to be, said where it was given, with reading the
@@ -261,61 +285,65 @@ fun AddFeedScreen(
                     }
                 }
             }
-            // The answer to a feed that carries only a paragraph. Before this it existed
-            // and was reachable only by hand-editing an OPML file and importing it, which
-            // is not a setting anybody can find.
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .clickable { fullText = !fullText },
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    TextMMD(text = stringResource(R.string.full_text_by_default))
-                    TextMMD(
-                        text = stringResource(R.string.full_text_by_default_detail),
-                        style = MaterialTheme.typography.bodySmall,
-                    )
+            // A folder has no web page behind its files and nothing to filter: only its name
+            // and where it is listed.
+            if (!isFolder) {
+                // The answer to a feed that carries only a paragraph. Before this it existed
+                // and was reachable only by hand-editing an OPML file and importing it, which
+                // is not a setting anybody can find.
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { fullText = !fullText },
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        TextMMD(text = stringResource(R.string.full_text_by_default))
+                        TextMMD(
+                            text = stringResource(R.string.full_text_by_default_detail),
+                            style = MaterialTheme.typography.bodySmall,
+                        )
+                    }
+                    Spacer(Modifier.width(16.dp))
+                    SwitchMMD(checked = fullText, onCheckedChange = { fullText = it })
                 }
-                Spacer(Modifier.width(16.dp))
-                SwitchMMD(checked = fullText, onCheckedChange = { fullText = it })
+                // Two boxes rather than a rule editor: a rule is one line of text, and a
+                // builder for FieldName=pattern would be more screens to walk than the thing
+                // it builds. Invalid lines warn but never block saving -- a regular expression
+                // is invalid for most of the time it is being typed.
+                TextFieldMMD(
+                    value = blockRules,
+                    onValueChange = { blockRules = it },
+                    label = { TextMMD(text = stringResource(R.string.block_rules)) },
+                    placeholder = { TextMMD(text = stringResource(R.string.article_rules_placeholder)) },
+                    singleLine = false,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                TextMMD(
+                    text = stringResource(R.string.block_rules_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                RuleErrors(rules = blockRules)
+                TextFieldMMD(
+                    value = allowRules,
+                    onValueChange = { allowRules = it },
+                    label = { TextMMD(text = stringResource(R.string.allow_rules)) },
+                    placeholder = { TextMMD(text = stringResource(R.string.article_rules_placeholder)) },
+                    singleLine = false,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                TextMMD(
+                    text = stringResource(R.string.allow_rules_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                RuleErrors(rules = allowRules)
+                TextMMD(
+                    text = stringResource(R.string.article_rules_effect),
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
-            // Two boxes rather than a rule editor: a rule is one line of text, and a
-            // builder for FieldName=pattern would be more screens to walk than the thing
-            // it builds. Invalid lines warn but never block saving -- a regular expression
-            // is invalid for most of the time it is being typed.
-            TextFieldMMD(
-                value = blockRules,
-                onValueChange = { blockRules = it },
-                label = { TextMMD(text = stringResource(R.string.block_rules)) },
-                placeholder = { TextMMD(text = stringResource(R.string.article_rules_placeholder)) },
-                singleLine = false,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            TextMMD(
-                text = stringResource(R.string.block_rules_desc),
-                style = MaterialTheme.typography.bodySmall,
-            )
-            RuleErrors(rules = blockRules)
-            TextFieldMMD(
-                value = allowRules,
-                onValueChange = { allowRules = it },
-                label = { TextMMD(text = stringResource(R.string.allow_rules)) },
-                placeholder = { TextMMD(text = stringResource(R.string.article_rules_placeholder)) },
-                singleLine = false,
-                modifier = Modifier.fillMaxWidth(),
-            )
-            TextMMD(
-                text = stringResource(R.string.allow_rules_desc),
-                style = MaterialTheme.typography.bodySmall,
-            )
-            RuleErrors(rules = allowRules)
-            TextMMD(
-                text = stringResource(R.string.article_rules_effect),
-                style = MaterialTheme.typography.bodySmall,
-            )
             val subscribe = {
                 viewModel.save(
                     url = url,
@@ -403,6 +431,23 @@ fun AddFeedScreen(
             }
         }
     }
+}
+
+/**
+ * Choose a folder, kept across restarts: read access, and the grant asked for as one that
+ * lasts. Files answers it when installed, as for every other picker in the app.
+ */
+private class OpenAudioFolder : ActivityResultContracts.OpenDocumentTree() {
+    override fun createIntent(
+        context: Context,
+        input: Uri?,
+    ): Intent =
+        FilesPicker.aim(
+            context,
+            super.createIntent(context, input).addFlags(
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION,
+            ),
+        )
 }
 
 /** What fetching the address showed, in a sentence. */

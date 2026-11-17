@@ -358,6 +358,11 @@ class FeedItemStore(
         dao.deleteFeedItems(ids)
     }
 
+    suspend fun feedItemIdsNotIn(
+        feedId: Long,
+        guids: Set<String>,
+    ): List<Long> = dao.getItemIdsNotIn(feedId = feedId, guids = guids)
+
     suspend fun insertFeedItem(item: FeedItem): Long = dao.insertFeedItem(item)
 
     suspend fun replaceAddressTitle(

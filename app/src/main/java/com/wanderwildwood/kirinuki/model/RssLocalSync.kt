@@ -14,6 +14,8 @@ import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.blob.blobOutputStream
 import com.wanderwildwood.kirinuki.db.room.isSavedPages
+import com.wanderwildwood.kirinuki.podcast.LocalFolderSync
+import com.wanderwildwood.kirinuki.podcast.isLocalFolder
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedItem
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
@@ -70,6 +72,7 @@ class RssLocalSync(
     private val filePathProvider: FilePathProvider by instance()
     private val application: Application by instance()
     private val serverSync: com.wanderwildwood.kirinuki.sync.ServerSync by instance()
+    private val localFolderSync: LocalFolderSync by instance()
 
     suspend fun syncFeeds(
         feedId: Long = ID_UNSET,
@@ -150,8 +153,17 @@ class RssLocalSync(
                         // whole article, and a page saved with no network is fetched by
                         // the full text pass this sync chains. So they count for that.
                         needFullTextSync = allCandidates.any { it.fullTextByDefault }
-                        val feedsToFetch = candidates.filterNot { it.isSavedPages }
-                        tried.set(feedsToFetch.size + if (serverSync.isOn) 1 else 0)
+                        // A folder on the phone is read, not fetched: no network for it.
+                        val folders = candidates.filter { it.isLocalFolder }
+                        val feedsToFetch = candidates.filterNot { it.isSavedPages || it.isLocalFolder }
+                        tried.set(feedsToFetch.size + folders.size + if (serverSync.isOn) 1 else 0)
+                        folders.forEach { folder ->
+                            if (!localFolderSync.sync(folder)) {
+                                failed.incrementAndGet()
+                                failedTitles.add(folder.displayTitle)
+                                failures.add(SyncFailure(folder.displayTitle, FailKind.OTHER))
+                            }
+                        }
 
                         logDebug(LOG_TAG, "Syncing ${feedsToFetch.size} feeds")
 

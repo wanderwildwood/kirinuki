@@ -157,49 +157,52 @@ fun EpisodePanel(
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f),
             )
-            TextMMD(
-                text =
-                    when (val d = download) {
-                        DownloadState.None -> stringResource(R.string.episode_keep)
-                        is DownloadState.Downloading ->
-                            d.percent?.let { stringResource(R.string.episode_downloading_percent, it) }
-                                ?: stringResource(R.string.episode_downloading)
-                        DownloadState.WaitingForWifi -> stringResource(R.string.episode_waiting_for_wifi)
-                        DownloadState.Kept ->
-                            if (removeArmed) {
-                                stringResource(R.string.episode_remove_armed)
-                            } else {
-                                stringResource(R.string.episode_kept)
-                            }
-                        DownloadState.Failed -> stringResource(R.string.episode_download_failed)
-                    },
-                style = MaterialTheme.typography.bodyLarge,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier =
-                    Modifier.clickable {
-                        when (download) {
-                            DownloadState.None, DownloadState.Failed -> {
-                                store.download(episode.itemId, episode.url, episode.title, onlyOnWifi)
-                                download = store.downloadState(episode.itemId)
-                            }
-                            is DownloadState.Downloading, DownloadState.WaitingForWifi -> {
-                                store.removeDownload(episode.itemId)
-                                download = DownloadState.None
-                            }
+            // A file already on the phone has nothing to keep: no download line for it.
+            if (!episode.url.startsWith("content://")) {
+                TextMMD(
+                    text =
+                        when (val d = download) {
+                            DownloadState.None -> stringResource(R.string.episode_keep)
+                            is DownloadState.Downloading ->
+                                d.percent?.let { stringResource(R.string.episode_downloading_percent, it) }
+                                    ?: stringResource(R.string.episode_downloading)
+                            DownloadState.WaitingForWifi -> stringResource(R.string.episode_waiting_for_wifi)
                             DownloadState.Kept ->
                                 if (removeArmed) {
-                                    // The one playing keeps playing from its open file; it
-                                    // simply won't be there next time.
+                                    stringResource(R.string.episode_remove_armed)
+                                } else {
+                                    stringResource(R.string.episode_kept)
+                                }
+                            DownloadState.Failed -> stringResource(R.string.episode_download_failed)
+                        },
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier =
+                        Modifier.clickable {
+                            when (download) {
+                                DownloadState.None, DownloadState.Failed -> {
+                                    store.download(episode.itemId, episode.url, episode.title, onlyOnWifi)
+                                    download = store.downloadState(episode.itemId)
+                                }
+                                is DownloadState.Downloading, DownloadState.WaitingForWifi -> {
                                     store.removeDownload(episode.itemId)
                                     download = DownloadState.None
-                                    removeArmed = false
-                                } else {
-                                    removeArmed = true
                                 }
-                        }
-                    },
-            )
+                                DownloadState.Kept ->
+                                    if (removeArmed) {
+                                        // The one playing keeps playing from its open file; it
+                                        // simply won't be there next time.
+                                        store.removeDownload(episode.itemId)
+                                        download = DownloadState.None
+                                        removeArmed = false
+                                    } else {
+                                        removeArmed = true
+                                    }
+                            }
+                        },
+                )
+            }
         }
 
         Row(

@@ -772,6 +772,11 @@ class Repository(
         feedItemStore.deleteFeedItems(ids)
     }
 
+    suspend fun feedItemIdsNotIn(
+        feedId: Long,
+        guids: Set<String>,
+    ): List<Long> = feedItemStore.feedItemIdsNotIn(feedId = feedId, guids = guids)
+
     suspend fun deleteStaleRemoteReadMarks() {
         syncRemoteStore.deleteStaleRemoteReadMarks(Instant.now())
     }

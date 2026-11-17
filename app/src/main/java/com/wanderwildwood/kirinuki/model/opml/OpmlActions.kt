@@ -9,6 +9,7 @@ import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.db.room.FeedDao
 import com.wanderwildwood.kirinuki.model.OPMLParserHandler
+import com.wanderwildwood.kirinuki.podcast.isLocalFolder
 import com.wanderwildwood.kirinuki.util.Either
 import com.wanderwildwood.kirinuki.util.ToastMaker
 import com.wanderwildwood.kirinuki.util.logDebug
@@ -51,7 +52,9 @@ suspend fun exportOpml(
                             blockedPatterns = settingsStore.blockListPreference.first(),
                             tags = feedDao.loadTags(),
                         ) { tag ->
-                            feedDao.getFeedsByTitle(tag = tag)
+                            // A folder on this phone means nothing on another, and its
+                            // permission does not travel with the file.
+                            feedDao.getFeedsByTitle(tag = tag).filterNot { it.isLocalFolder }
                         }
                     }
                 }

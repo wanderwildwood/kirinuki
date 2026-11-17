@@ -73,6 +73,13 @@ an article, with its show notes as the text and the player along the bottom.
   unless **Download episodes only on Wi-Fi** is turned off in Settings — a switch of its own,
   apart from the feeds' — and the episode is removed once you have heard it to the end.
 
+**Audio files on this phone**, in Add feed, makes a folder of sound files into one podcast:
+pick the folder, and its files (and those in folders inside it) are its episodes, named by
+their title tag or else their file name, in name order — "Part 2" before "Part 10", the last
+name counted as the newest. Each keeps its place and plays with the same speed button and sleep
+timer. A refresh picks up files added to the folder and drops those taken away. Nothing is
+fetched for it.
+
 ## The smolnet
 
 `gemini://`, `gopher://` and `spartan://` open in the app and read like anything else.

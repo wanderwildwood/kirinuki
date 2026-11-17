@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui.articles
 
+import com.wanderwildwood.kirinuki.podcast.LocalFolderSync
 import androidx.paging.PagingData
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -18,6 +19,7 @@ class ArticleListViewModel(
     di: DI,
 ) : DIAwareViewModel(di) {
     private val repository: Repository by instance()
+    private val localFolderSync: LocalFolderSync by instance()
 
     val items: Flow<PagingData<FeedListItem>> =
         repository.getCurrentFeedListItems().cachedIn(viewModelScope)
@@ -64,6 +66,8 @@ class ArticleListViewModel(
     fun refresh() {
         viewModelScope.launch {
             val (feedId, tag) = repository.currentFeedAndTag.value
+            // Folders on the phone are read now: the sync job waits for a network they do not need.
+            localFolderSync.syncAll()
             runOnceRssSync(
                 di = di,
                 feedId = feedId,

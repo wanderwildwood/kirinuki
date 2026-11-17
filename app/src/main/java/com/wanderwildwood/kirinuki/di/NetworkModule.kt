@@ -27,6 +27,7 @@ val networkModule =
         bind<FeedParser>() with provider { FeedParser(di) }
         // These don't have state issues
         bind<RssLocalSync>() with singleton { RssLocalSync(di) }
+        bind<com.wanderwildwood.kirinuki.podcast.LocalFolderSync>() with singleton { com.wanderwildwood.kirinuki.podcast.LocalFolderSync(di) }
         bind<com.wanderwildwood.kirinuki.sync.ServerSync>() with singleton { com.wanderwildwood.kirinuki.sync.ServerSync(di) }
         bind<FullTextParser>() with singleton { FullTextParser(di) }
 

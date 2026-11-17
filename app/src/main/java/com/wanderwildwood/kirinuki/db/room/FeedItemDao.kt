@@ -87,6 +87,13 @@ interface FeedItemDao {
         keepCount: Int,
     ): List<Long>
 
+    /** The items of a feed whose guid is not among those given: for a folder, its files that are gone. */
+    @Query("SELECT id FROM feed_items WHERE feed_id IS :feedId AND guid NOT IN (:guids)")
+    suspend fun getItemIdsNotIn(
+        feedId: Long,
+        guids: Set<String>,
+    ): List<Long>
+
     @Query("SELECT * FROM feed_items WHERE guid IS :guid AND feed_id IS :feedId")
     suspend fun loadFeedItem(
         guid: String,
