@@ -1,6 +1,6 @@
 # Feeds — Privacy Policy
 
-Version 0.6.4. Last reviewed 4 November 2026.
+Version 0.6.17. Last reviewed 17 November 2026.
 
 ## The short version
 
@@ -27,15 +27,15 @@ From `app/src/main/AndroidManifest.xml`:
 - `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_MEDIA_PLAYBACK`: so a podcast keeps playing with the screen off.
 - `WAKE_LOCK`: so a sync or a podcast is not cut off while the screen is dark.
 - `CAMERA`: to read a QR code holding a feed's, site's or story's address, and for nothing else. It is asked for only when you press Scan a QR code, and the camera is held only while the scanner is open. The picture is read on the phone (with ZXing) for the code and nothing else: no frame is kept, saved or sent anywhere, and the camera is let go when the scanner closes. Refusing it leaves everything else in the app as it was; the address can still be typed.
-- `READ_EXTERNAL_STORAGE` (Android 9 and below) and `WRITE_EXTERNAL_STORAGE` (Android 10 and below): for OPML import and export. The Kompakt runs Android 12, so on it neither is ever asked for.
+- `READ_EXTERNAL_STORAGE` (Android 9 and below) and `WRITE_EXTERNAL_STORAGE` (Android 10): for OPML import and export on older phones. The app installs on Android 10 and later, so the first is never used; the Kompakt runs Android 12, so on it neither is ever asked for.
 
 The store also lists `com.wanderwildwood.kirinuki.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` because it reads the APK. AndroidX declares it for its own internal receivers; it is signature-level and namespaced to this app, so nothing else can hold it and it grants no access to anything on the phone.
 
-The manifest also lets the app see whether anything on the phone opens web pages, a text-to-speech engine, or other apps' text actions, so it can offer them. It reads nothing from them. Read aloud hands the article's text, a sentence at a time, to the phone's own text-to-speech engine, which speaks it; Feeds sends it nowhere else, and what the engine does with it is that engine's to say. Plain http is permitted; see "Plain http (cleartext traffic)" below.
+The manifest also lets the app see whether anything on the phone opens web pages, a text-to-speech engine, other apps' text actions, or anything that takes shared text, so it can offer them; it reads nothing from them. It can also see two apps by the same developer: Home, whose dark mode switch it reads when Home is installed (that one on/off answer and nothing else), and Files (Cabinet), which, when installed, is asked to show its own screens for picking a file to import or a place to export to. Neither is sent anything else. Read aloud hands the article's text, a sentence at a time, to the phone's own text-to-speech engine, which speaks it; Feeds sends it nowhere else, and what the engine does with it is that engine's to say. Plain http is permitted; see "Plain http (cleartext traffic)" below.
 
 ### Plain http (cleartext traffic)
 
-The manifest sets `usesCleartextTraffic="true"`, and Android scanners flag it. It is on on purpose: some feeds, and many older sites, are only served over plain http, and gopher is a bare, unencrypted socket by design. Feeds served over plain http are fetched as the site serves them, with no encryption, so anyone on the same network can read the feed text on its way, and could alter it. Only the feed or page you asked for is requested, with the app's name and version as the user agent; nothing else about you or your phone is sent. An address that starts with https:// is always fetched encrypted, Gemini capsules are encrypted and pinned to the certificate seen on the first visit. Gopher and Spartan, like plain http, are not encrypted.
+The app's network security config (`res/xml/network_security_config.xml`) permits plain http, and Android scanners flag it. It is on on purpose: some feeds, and many older sites, are only served over plain http, and gopher is a bare, unencrypted socket by design. Feeds served over plain http are fetched as the site serves them, with no encryption, so anyone on the same network can read the feed text on its way, and could alter it. Only the feed or page you asked for is requested, with a user agent that names the app's version (still the one inherited from Feeder, "SpaceCowboys Android RSS Reader"); nothing else about you or your phone is sent. An address that starts with https:// is always fetched encrypted, its certificate checked against the ones Android itself trusts (never a user-added one), Gemini capsules are encrypted and pinned to the certificate seen on the first visit. Gopher and Spartan, like plain http, are not encrypted.
 
 ## Licenses
 
@@ -43,9 +43,9 @@ Settings, About, Licenses shows the license of the app (GNU General Public Licen
 
 ## Who else receives anything
 
-Yes, necessarily. The app fetches each feed, page, episode or capsule directly from the server that publishes it, so those operators see the request: your IP address, the address asked for, and the app's name and version in the user agent. Nothing is routed through the developer, and no analytics, advertising or crash-reporting service is contacted.
+Yes, necessarily. The app fetches each feed, page, episode or capsule directly from the server that publishes it, so those operators see the request: your IP address, the address asked for, and the user agent with the app's version. Nothing is routed through the developer, and no analytics, advertising or crash-reporting service is contacted.
 
-Hosts contacted: the ones you add or follow, and one fixed address, Apple's podcast directory, only when you search it.
+Hosts contacted: the ones you add or follow, the site a new feed names as its home page (fetched once, when the feed is first added, for its icon), and one fixed address, Apple's podcast directory, only when you search it.
 
 - **A feed server, only if you sign in to one** (Settings, Sync with a feed server; off by default): the server at the address you typed (a Google Reader-style server such as FreshRSS or Miniflux, or a Nextcloud with the News app), and no other. The app sends it your login name and API or app password (to sign in), the addresses and folders of your feeds, and which articles you have read or starred; it receives your subscriptions and their articles from it. While sync is on, the feeds that server has are fetched from it instead of from their sites. An `http://` address is accepted only on your own network (private address ranges, `.local`, `.lan`, `.home`, `.home.arpa`, `.internal`, Tailscale); anything else must be `https://`. Stop syncing forgets the address, login and password.
 
@@ -53,7 +53,7 @@ Hosts contacted: the ones you add or follow, and one fixed address, Apple's podc
 - **Podcast episodes**: from the address in the feed, streamed or downloaded.
 - **Gemini, gopher and Spartan capsules**: by direct connection to the capsule's host and port, for an address you open or a gemlog you subscribe to. Gemini connections are checked against the certificate fingerprint the app remembered from the first visit.
 - **A site's page, when you add it by its address**: an address shared into the app or scanned from a QR code is fetched once as soon as it arrives, and a typed one when you press Subscribe, to see whether it is a feed, a page that links a feed, or a single story. A linked feed is then fetched like any other; a story is fetched again only if you choose Read this page, and is then shown and not stored unless you keep it.
-- **Apple's podcast directory** (`itunes.apple.com`), only when you press Search in Add feed, Find a podcast: the words you typed are sent, with your IP address and the app's name and version, and Apple answers with matching shows and the address of each one's feed. Nothing else is sent, no account is used, and nothing is sent while you type or at any other time. Apple handles the request under its own privacy policy. Tapping a show subscribes to its feed, which is then fetched from its publisher like any other.
+- **Apple's podcast directory** (`itunes.apple.com`), only when you press Search in Add feed, Find a podcast: the words you typed are sent, with your IP address and the user agent with the app's version, and Apple answers with matching shows and the address of each one's feed. Nothing else is sent, no account is used, and nothing is sent while you type or at any other time. Apple handles the request under its own privacy policy. Tapping a show subscribes to its feed, which is then fetched from its publisher like any other.
 - **YouTube**: only when the address you add is a YouTube channel page. That page is fetched to find the channel's public feed (`www.youtube.com/feeds/videos.xml`), which is then fetched like any other feed.
 
 In About, "feed the llamas" opens a donation page (square.link) and wanderthe.dev opens the author's website, in your browser and only when you press them. The app does not fetch either page and learns nothing about whether you went.
@@ -71,7 +71,7 @@ The app is suitable for all ages and does not knowingly collect anything from an
 <!-- shared-about privacy section -->
 ## Who we are
 
-Feeds is made by wander wildwood, an independent developer: one person, not a company. wander wildwood is the data controller for anything the app itself handles, and that is very little. What you put in Feeds stays on your phone. The only things that go out are the requests described above: to the sites, podcasts and capsules you add or open, one for each feed, page, episode or capsule, carrying the address asked for and the app's name and version; a podcast search, only when you search, carrying the words you typed to Apple's podcast directory; and, only if you sign in to one, to the feed server whose address you typed, carrying your login name and password, the addresses and folders of your feeds, and which articles you have read or starred. The developer receives nothing, so the developer holds no data about you.
+Feeds is made by wander wildwood, an independent developer: one person, not a company. wander wildwood is the data controller for anything the app itself handles, and that is very little. What you put in Feeds stays on your phone. The only things that go out are the requests described above: to the sites, podcasts and capsules you add or open, one for each feed, page, episode or capsule, carrying the address asked for and the user agent with the app's version; a podcast search, only when you search, carrying the words you typed to Apple's podcast directory; and, only if you sign in to one, to the feed server whose address you typed, carrying your login name and password, the addresses and folders of your feeds, and which articles you have read or starred. The developer receives nothing, so the developer holds no data about you.
 
 ## How to contact us
 
