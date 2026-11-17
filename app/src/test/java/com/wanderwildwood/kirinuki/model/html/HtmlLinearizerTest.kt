@@ -699,7 +699,7 @@ class HtmlLinearizerTest {
                         LinearVideoSource(
                             "https://www.youtube.com/embed/cjxnVO9RpaQ",
                             "https://www.youtube.com/watch?v=cjxnVO9RpaQ",
-                            "http://img.youtube.com/vi/cjxnVO9RpaQ/hqdefault.jpg",
+                            "https://img.youtube.com/vi/cjxnVO9RpaQ/hqdefault.jpg",
                             480,
                             360,
                             null,
@@ -733,7 +733,7 @@ class HtmlLinearizerTest {
                         LinearVideoSource(
                             "https://www.youtube.com/embed/x_m02bUxfvE?feature=oembed",
                             "https://www.youtube.com/watch?v=x_m02bUxfvE",
-                            "http://img.youtube.com/vi/x_m02bUxfvE/hqdefault.jpg",
+                            "https://img.youtube.com/vi/x_m02bUxfvE/hqdefault.jpg",
                             1170,
                             658,
                             null,
