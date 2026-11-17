@@ -29,6 +29,11 @@ class GopherClient(
         val path = uri.path.orEmpty()
         val type = path.getOrNull(1) ?: MENU
         val selector = if (path.length > 2) path.substring(2) else ""
+        // The path arrives percent-decoded, so %0D%0A would become a second line sent to
+        // whatever listens at host:port. A selector is one line; a tab (search) is allowed.
+        if (selector.any { (it < ' ' && it != '\t') || it == '\u007f' }) {
+            throw GopherException("control characters in the selector of $url")
+        }
 
         val body =
             Socket().use { socket ->
