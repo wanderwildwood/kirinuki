@@ -5,7 +5,6 @@ import com.ibm.icu.text.CharsetDetector
 import com.ibm.icu.text.CharsetMatch
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.blob.blobFullFile
-import com.wanderwildwood.kirinuki.blob.blobFullOutputStream
 import com.wanderwildwood.kirinuki.db.room.FeedItemForFetching
 import com.wanderwildwood.kirinuki.db.room.MAX_TITLE_LENGTH
 import com.wanderwildwood.kirinuki.db.room.estimateWordCount
@@ -24,8 +23,11 @@ import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.io.File
+import java.io.IOException
 import java.net.URL
 import java.nio.charset.Charset
+import java.util.zip.GZIPOutputStream
 
 class FullTextParser(
     override val di: DI,
@@ -81,11 +83,19 @@ class FullTextParser(
                 withContext(Dispatchers.IO) {
                     article?.let { articleContent ->
                         filePathProvider.fullArticleDir.mkdirs()
-                        blobFullOutputStream(feedItem.id, filePathProvider.fullArticleDir)
+                        // Written aside and moved into place whole: the file's being there is
+                        // what says the text was fetched, so a half-written one must never be.
+                        val target = blobFullFile(feedItem.id, filePathProvider.fullArticleDir)
+                        val partial = File(target.path + ".part")
+                        GZIPOutputStream(partial.outputStream())
                             .bufferedWriter()
                             .use { writer ->
                                 writer.write(articleContent)
                             }
+                        if (!partial.renameTo(target)) {
+                            partial.delete()
+                            throw IOException("could not move the article text into place")
+                        }
 
                         // Update word count on item
                         val converter = HtmlToPlainTextConverter()

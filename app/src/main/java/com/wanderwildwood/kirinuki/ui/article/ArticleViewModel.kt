@@ -241,6 +241,9 @@ class ArticleViewModel(
                     }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Could not open the stored article", e)
+                // A full text that cannot be read (cut short, say) is let go, so the next open
+                // fetches it again rather than failing on it for good.
+                if (fullText && e is java.io.IOException) blobFullFile(article.id, dir).delete()
                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                 LinearArticle(elements = emptyList())
             }
