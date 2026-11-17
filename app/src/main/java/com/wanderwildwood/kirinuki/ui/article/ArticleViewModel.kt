@@ -27,6 +27,7 @@ import com.wanderwildwood.kirinuki.model.readaloud.ReadAloudPlayer
 import com.wanderwildwood.kirinuki.model.readaloud.ReadAloudScript
 import com.wanderwildwood.kirinuki.model.readaloud.Spoken
 import com.wanderwildwood.kirinuki.util.FilePathProvider
+import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flatMapLatest
@@ -272,22 +273,32 @@ class ArticleViewModel(
                 }
             } else {
                 null
-            } ?: when (val response = geminiClient.fetch(link)) {
-                is GeminiResponse.Body ->
-                    if (response.isGemtext) {
-                        response.text().also { text ->
-                            try {
-                                blobOutputStream(article.id, filePathProvider.articleDir)
-                                    .use { it.write(text.toByteArray(Charsets.UTF_8)) }
-                            } catch (e: Exception) {
-                                // Losing the cache costs a refetch, not the page.
-                                Log.e(LOG_TAG, "Could not store the capsule page", e)
-                            }
-                        }
-                    } else {
-                        textToDisplay.update { TextToDisplay.FAILED_NOT_HTML }
-                        return LinearArticle(elements = emptyList())
+            } ?: when (
+                // No network, the capsule down or its certificate changed: say the text could
+                // not be loaded rather than take the app down with it.
+                val response =
+                    try {
+                        geminiClient.fetch(link).let { if (it is GeminiResponse.Body && it.isGemtext) it.text() else it }
+                    } catch (e: Exception) {
+                        logDebug(LOG_TAG, "Could not fetch the capsule page", e)
+                        null
                     }
+            ) {
+                is String ->
+                    response.also { text ->
+                        try {
+                            blobOutputStream(article.id, filePathProvider.articleDir)
+                                .use { it.write(text.toByteArray(Charsets.UTF_8)) }
+                        } catch (e: Exception) {
+                            // Losing the cache costs a refetch, not the page.
+                            Log.e(LOG_TAG, "Could not store the capsule page", e)
+                        }
+                    }
+
+                is GeminiResponse.Body -> {
+                    textToDisplay.update { TextToDisplay.FAILED_NOT_HTML }
+                    return LinearArticle(elements = emptyList())
+                }
 
                 else -> {
                     textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
