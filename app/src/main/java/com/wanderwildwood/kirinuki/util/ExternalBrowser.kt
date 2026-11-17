@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.util.Log
 import androidx.core.net.toUri
+import com.wanderwildwood.kirinuki.util.logDebug
 
 private const val LOG_TAG = "KIRINUKI_BROWSER"
 
@@ -55,7 +56,7 @@ fun Context.openInBrowser(url: String): Boolean {
         )
         true
     } catch (e: Exception) {
-        Log.e(LOG_TAG, "Could not open $url", e)
+        logDebug(LOG_TAG, "Could not open $url", e)
         false
     }
 }

@@ -13,6 +13,7 @@ import com.wanderwildwood.kirinuki.sync.greader.GReaderException
 import com.wanderwildwood.kirinuki.sync.greader.GReaderSync
 import com.wanderwildwood.kirinuki.sync.greader.RoomGReaderStore
 import com.wanderwildwood.kirinuki.sync.nextcloud.NextcloudNewsApi
+import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -198,14 +199,15 @@ class ServerSync(
                     ServerKind.NEXTCLOUD_NEWS -> NextcloudNewsApi(client, credentials, fullUnread = full)
                 }
             val report = GReaderSync(api, store, keepReadPerFeed = keepReadPerFeed).sync(since)
-            Log.i(LOG_TAG, "Synced with the feed server: $report")
+            logDebug(LOG_TAG, "Synced with the feed server: $report")
             val edit = prefs.edit().putLong(KEY_LAST_SYNC, started)
             if (full) edit.putLong(KEY_LAST_FULL, started)
             edit.apply()
             _state.value = _state.value.copy(lastSync = Instant.ofEpochSecond(started), problem = null, problemCode = 0)
             null
         } catch (e: GReaderException) {
-            Log.w(LOG_TAG, "Feed server sync failed: ${e.message}")
+            Log.w(LOG_TAG, "Feed server sync failed: ${e.javaClass.simpleName}")
+            logDebug(LOG_TAG, "Feed server sync failed: ${e.message}")
             _state.value = _state.value.copy(problem = e.toProblem(), problemCode = e.code())
             SyncFailure(
                 title = host,

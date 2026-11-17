@@ -245,7 +245,7 @@ class RssLocalSync(
                 downloadTime = downloadTime,
             ).onLeft { feedParserError ->
                 failure = syncFailureOf(feedParserError)
-                Log.e(
+                logDebug(
                     LOG_TAG,
                     "Failed to sync ${feed.displayTitle}: ${feed.url} because:\n${feedParserError.description}",
                 )
@@ -265,11 +265,8 @@ class RssLocalSync(
                 repository.setBlockStatusForNewInFeed(feedId = feed.id, blockTime = syncTime)
             }
         } catch (e: Throwable) {
-            Log.e(
-                LOG_TAG,
-                "Failed to sync ${feed.displayTitle}: ${feed.url}",
-                e,
-            )
+            Log.e(LOG_TAG, "Failed to sync feed ${feed.id}: ${e.javaClass.simpleName}")
+            logDebug(LOG_TAG, "Failed to sync ${feed.displayTitle}: ${feed.url}", e)
         } finally {
             repository.setCurrentlySyncingOn(
                 feedId = feed.id,
@@ -332,7 +329,7 @@ class RssLocalSync(
                 (gopherClient.fetch(link) as? GopherResponse.Text)?.text.orEmpty()
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not fetch the entry at $link", e)
+            logDebug(LOG_TAG, "Could not fetch the entry at $link", e)
             ""
         }
 
@@ -446,7 +443,7 @@ class RssLocalSync(
                 }
             }
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "Could not fetch the entry at $link", e)
+            logDebug(LOG_TAG, "Could not fetch the entry at $link", e)
             ""
         }
 
@@ -470,7 +467,7 @@ class RssLocalSync(
 
         // Belts and suspenders
         if (feedSql.retryAfter > Instant.now()) {
-            Log.i(LOG_TAG, "Skipping ${feedSql.displayTitle} due to retry-after. Earliest retry: ${feedSql.retryAfter}")
+            logDebug(LOG_TAG, "Skipping ${feedSql.displayTitle} due to retry-after. Earliest retry: ${feedSql.retryAfter}")
             return Unit.right()
         }
 
@@ -582,7 +579,7 @@ class RssLocalSync(
 
                                     feedItemSql to (item.content_html ?: item.content_text ?: "")
                                 } else {
-                                    Log.i(LOG_TAG, "Duplicate story ignored: [${item.title}] [${feed.title}]")
+                                    logDebug(LOG_TAG, "Duplicate story ignored: [${item.title}] [${feed.title}]")
                                     null
                                 }
                             } ?: emptyList()

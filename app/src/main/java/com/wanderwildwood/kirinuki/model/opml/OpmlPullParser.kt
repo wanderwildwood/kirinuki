@@ -6,6 +6,7 @@ import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.model.OPMLParserHandler
 import com.wanderwildwood.kirinuki.util.Either
 import com.wanderwildwood.kirinuki.util.flatMap
+import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import okio.ByteString.Companion.toByteString
@@ -320,7 +321,7 @@ class OpmlPullParser(
                                     try {
                                         URL(imageUrl)
                                     } catch (e: MalformedURLException) {
-                                        Log.e(
+                                        logDebug(
                                             LOG_TAG,
                                             "Invalid imageUrl [$imageUrl] on feed [$feedTitle] in OPML",
                                             e,
@@ -334,7 +335,7 @@ class OpmlPullParser(
             feeds.add(feed)
         } catch (e: MalformedURLException) {
             // Feed URL is REQUIRED, so don't try to add feeds without valid URLs
-            Log.e(LOG_TAG, "Bad url on feed [$feedTitle] in OPML", e)
+            logDebug(LOG_TAG, "Bad url on feed [$feedTitle] in OPML", e)
         }
 
         skip()

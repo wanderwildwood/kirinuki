@@ -1,7 +1,6 @@
 package com.wanderwildwood.kirinuki.ui.gemini
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
@@ -17,6 +16,7 @@ import com.wanderwildwood.kirinuki.model.gopher.GopherMenuParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import com.wanderwildwood.kirinuki.net.gemini.changedCertificateIn
+import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -136,7 +136,7 @@ class GeminiPageViewModel(
                         changed.message,
                     )
                 } else {
-                    Log.e(LOG_TAG, "Could not reach $url", e)
+                    logDebug(LOG_TAG, "Could not reach $url", e)
                     GeminiPageState.Problem(
                         app.getString(R.string.gemini_unreachable),
                         e.message,

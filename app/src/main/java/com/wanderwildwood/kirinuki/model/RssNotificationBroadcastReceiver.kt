@@ -3,9 +3,9 @@ package com.wanderwildwood.kirinuki.model
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.wanderwildwood.kirinuki.db.room.FeedItemDao
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
+import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -24,7 +24,7 @@ class RssNotificationBroadcastReceiver : BroadcastReceiver() {
         intent: Intent,
     ) {
         val ids = intent.getLongArrayExtra(EXTRA_FEEDITEM_ID_ARRAY)
-        Log.d("RssNotificationReceiver", "onReceive: ${intent.action}; ${ids?.joinToString(", ")}")
+        logDebug("RssNotificationReceiver", "onReceive: ${intent.action}; ${ids?.joinToString(", ")}")
         val di by closestDI(context)
         val dao: FeedItemDao by di.instance()
         when (intent.action) {
