@@ -105,7 +105,10 @@ class NextcloudNewsApi(
 
     override fun subscriptions(): List<RemoteFeed> {
         val folders = folders()
-        return get<NcFeedList>("feeds").feeds.orEmpty().mapNotNull { feed ->
+        // No list in the answer at all is not "no feeds": taken as empty, it would remove every
+        // synced feed from the phone.
+        val feeds = get<NcFeedList>("feeds").feeds ?: throw GReaderException.NotGoogleReader(200)
+        return feeds.mapNotNull { feed ->
             val id = feed.id ?: return@mapNotNull null
             val address = feed.url ?: feed.link ?: return@mapNotNull null
             RemoteFeed(

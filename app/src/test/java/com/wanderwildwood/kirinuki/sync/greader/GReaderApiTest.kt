@@ -113,6 +113,19 @@ class GReaderApiTest {
     }
 
     @Test
+    fun anAnswerWithNoSubscriptionListIsAnErrorNotAnEmptyList() {
+        fake.addSub("Pond Notes", "https://example.org/pond.xml")
+        fake.subscriptionListAnswer = "{}"
+        assertFailsWith<GReaderException.NotGoogleReader> { api().subscriptions() }
+    }
+
+    @Test
+    fun anEmptySubscriptionListIsStillEmpty() {
+        fake.subscriptionListAnswer = """{"subscriptions":[]}"""
+        assertEquals(emptyList(), api().subscriptions())
+    }
+
+    @Test
     fun idsFollowContinuationTokensToTheEnd() {
         val feed = fake.addSub("Pond Notes", "https://example.org/pond.xml")
         (1L..5L).forEach { fake.addItem(feed, it, "Entry $it", 1_700_000_000 + it) }

@@ -64,8 +64,9 @@ class GReaderApi(
     }
 
     override fun subscriptions(): List<RemoteFeed> =
-        get<GrSubscriptionList>("reader/api/0/subscription/list")
-            .subscriptions.orEmpty()
+        // An answer with no list in it at all is not "no subscriptions": taken as empty, it
+        // would remove every synced feed from the phone.
+        (get<GrSubscriptionList>("reader/api/0/subscription/list").subscriptions ?: throw GReaderException.NotGoogleReader(200))
             .mapNotNull { it.toRemoteFeed() }
 
     /** The folder names the server has. */

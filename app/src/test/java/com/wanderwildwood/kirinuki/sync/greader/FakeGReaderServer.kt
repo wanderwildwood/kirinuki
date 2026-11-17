@@ -31,6 +31,9 @@ class FakeGReaderServer(
     val read = mutableSetOf<Long>()
     val starred = mutableSetOf<Long>()
     val requests = mutableListOf<String>()
+
+    /** When set, the subscription list is answered with this instead. */
+    var subscriptionListAnswer: String? = null
     var tokenChecks = 0
     private var nextFeed = 100
 
@@ -74,7 +77,7 @@ class FakeGReaderServer(
         }
         val url = request.requestUrl!!
         return when (path) {
-            "reader/api/0/subscription/list" -> json(subscriptionList())
+            "reader/api/0/subscription/list" -> json(subscriptionListAnswer ?: subscriptionList())
             "reader/api/0/tag/list" ->
                 json(
                     """{"tags":[{"id":"user/-/state/com.google/starred"}""" +
