@@ -123,7 +123,7 @@ Or point [Obtainium](https://github.com/ImranR98/Obtainium) at this repository a
 track releases. Choose `kirinuki.apk` rather than `kirinuki-v*.apk` when it asks: the fixed
 name keeps working after the next release.
 
-Android 12 (API 31) or newer.
+Android 10 (API 29) or newer.
 
 ## On a Mudita Kompakt
 
@@ -156,8 +156,8 @@ MMD comes from Mudita's own Artifactory repository, which is already declared in
 ## What was taken out of Feeder
 
 Feeder is a much larger app, and most of the work here was removal: the OpenAI integration,
-the Bergamot translation engine, the device-to-device sync chain, the home screen widget,
-read-aloud, image loading, and the bundled fonts. Its podcast player and read-aloud went too;
+the Bergamot translation engine, the device-to-device sync chain, the Nostr feeds, the home
+screen widget, image loading, and the bundled fonts. Its podcast player and read-aloud went too;
 smaller ones were written back in later. The reader's own machinery — the feed parsers, the
 full-text extraction, the HTML-to-text pipeline, the database — is Feeder's and is the
 reason this exists at all.

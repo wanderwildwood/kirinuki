@@ -243,11 +243,6 @@ dependencies {
     implementation(libs.bundles.okhttp.android)
     implementation(libs.bundles.kotlin)
 
-    implementation(libs.glance.appwidget)
-    implementation(libs.glance.material3)
-    implementation(libs.glance.preview)
-    implementation(libs.glance.appwidget.preview)
-
     // Markdown
     implementation(libs.jetbrains.markdown)
 
