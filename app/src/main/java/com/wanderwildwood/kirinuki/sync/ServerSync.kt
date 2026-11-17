@@ -7,6 +7,7 @@ import com.wanderwildwood.kirinuki.archmodel.FailKind
 import com.wanderwildwood.kirinuki.archmodel.SyncFailure
 import com.wanderwildwood.kirinuki.db.room.GReaderDao
 import com.wanderwildwood.kirinuki.model.UserAgentInterceptor
+import com.wanderwildwood.kirinuki.model.syncMutex
 import com.wanderwildwood.kirinuki.sync.greader.GReaderApi
 import com.wanderwildwood.kirinuki.sync.greader.GReaderCredentials
 import com.wanderwildwood.kirinuki.sync.greader.GReaderException
@@ -14,15 +15,19 @@ import com.wanderwildwood.kirinuki.sync.greader.GReaderSync
 import com.wanderwildwood.kirinuki.sync.greader.RoomGReaderStore
 import com.wanderwildwood.kirinuki.sync.nextcloud.NextcloudNewsApi
 import com.wanderwildwood.kirinuki.util.logDebug
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.io.IOException
 import java.time.Instant
 import java.util.concurrent.TimeUnit
 
@@ -147,6 +152,10 @@ class ServerSync(
         val check = test(kind, address, login, password)
         if (check is ServerCheck.Works) {
             val sealed = Secrets.seal(password) ?: return ServerCheck.Failed(ServerProblem.PASSWORD_LOST)
+            // A new account starts with no feeds or articles linked: links left from another
+            // server (a sync still running when Stop was pressed) would read as feeds that
+            // server dropped, or as feeds it already has.
+            withContext(Dispatchers.IO) { store.forgetServer() }
             prefs.edit()
                 .putString(KEY_URL, check.apiUrl)
                 .putString(KEY_LOGIN, login.trim())
@@ -168,7 +177,9 @@ class ServerSync(
     suspend fun stop() {
         prefs.edit().clear().apply()
         _state.value = ServerSyncState()
-        withContext(Dispatchers.IO) { store.forgetServer() }
+        // After any sync already running, which would otherwise write its links back; and
+        // finished even if the screen that asked is closed meanwhile.
+        withContext(NonCancellable + Dispatchers.IO) { syncMutex.withLock { store.forgetServer() } }
     }
 
     /** The feeds whose articles now come from the server; empty when sync is off. */
@@ -205,10 +216,17 @@ class ServerSync(
             edit.apply()
             _state.value = _state.value.copy(lastSync = Instant.ofEpochSecond(started), problem = null, problemCode = 0)
             null
-        } catch (e: GReaderException) {
-            Log.w(LOG_TAG, "Feed server sync failed: ${e.javaClass.simpleName}")
-            logDebug(LOG_TAG, "Feed server sync failed: ${e.message}")
-            _state.value = _state.value.copy(problem = e.toProblem(), problemCode = e.code())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (other: Exception) {
+            // Anything else (a connection dropped while an answer was being read, an address
+            // the server lists that cannot be parsed) is this sync's failure, named under the
+            // server, and the feeds fetched from their own sites still go ahead.
+            val e = other as? GReaderException ?: (other as? IOException)?.let { GReaderException.Unreachable(it) }
+            Log.w(LOG_TAG, "Feed server sync failed: ${other.javaClass.simpleName}")
+            logDebug(LOG_TAG, "Feed server sync failed: ${other.message}")
+            _state.value =
+                _state.value.copy(problem = e?.toProblem() ?: ServerProblem.SERVER_ERROR, problemCode = e?.code() ?: 0)
             SyncFailure(
                 title = host,
                 kind =
@@ -218,7 +236,7 @@ class ServerSync(
                         is GReaderException.ServerError -> FailKind.SERVER_ANSWERED
                         else -> FailKind.OTHER
                     },
-                code = e.code(),
+                code = e?.code() ?: 0,
             )
         }
     }
