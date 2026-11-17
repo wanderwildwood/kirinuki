@@ -105,9 +105,12 @@ class KirinukiApplication :
         bind<OkHttpClient>() with
             singleton {
                 val filePathProvider = instance<FilePathProvider>()
+                // Certificates are checked as Android checks them: an https feed or reading server
+                // with a certificate no trusted authority signed is refused, never read unchecked.
                 cachingHttpClient(
                     cacheDirectory = filePathProvider.httpCacheDir,
                     cacheSize = 200L * 1024 * 1024,
+                    trustAllCerts = false,
                 ) {
                     addNetworkInterceptor(UserAgentInterceptor)
                     addNetworkInterceptor(RateLimitedInterceptor)

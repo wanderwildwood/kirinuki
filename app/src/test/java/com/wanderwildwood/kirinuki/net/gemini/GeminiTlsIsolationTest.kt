@@ -1,6 +1,5 @@
 package com.wanderwildwood.kirinuki.net.gemini
 
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -59,8 +58,9 @@ class GeminiTlsIsolationTest {
         server.enqueue(MockResponse().setBody("should never be read"))
         server.start(InetAddress.getByName("localhost"), 0)
 
-        // The app's client: plain OkHttp defaults, exactly as KirinukiApplication builds it.
-        val client = OkHttpClient.Builder().build()
+        // The app's client, made by the same builder and with the same certificate setting that
+        // KirinukiApplication uses (it trusted every certificate until 0.6.16).
+        val client = com.nononsenseapps.jsonfeed.cachingHttpClient(trustAllCerts = false)
 
         assertFailsWith<SSLHandshakeException> {
             client.newCall(Request.Builder().url(server.url("/")).build()).execute()
@@ -146,5 +146,17 @@ class GeminiTlsIsolationTest {
         )
 
         second.shutdown()
+    }
+
+    @Test
+    fun `the client builder checks certificates unless told otherwise`() {
+        val server = serverWith(selfSigned)
+        server.enqueue(MockResponse().setBody("should never be read"))
+        server.start(InetAddress.getByName("localhost"), 0)
+        val client = com.nononsenseapps.jsonfeed.cachingHttpClient()
+        assertFailsWith<SSLHandshakeException> {
+            client.newCall(Request.Builder().url(server.url("/")).build()).execute()
+        }
+        server.shutdown()
     }
 }

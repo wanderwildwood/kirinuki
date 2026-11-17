@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 fun cachingHttpClient(
     cacheDirectory: File? = null,
     cacheSize: Long = 10L * 1024L * 1024L,
-    trustAllCerts: Boolean = true,
+    trustAllCerts: Boolean = false,
     connectTimeoutSecs: Long = 30L,
     readTimeoutSecs: Long = 30L,
     block: (OkHttpClient.Builder.() -> Unit)? = null,
@@ -59,7 +59,7 @@ class JsonFeedParser(
     constructor(
         cacheDirectory: File? = null,
         cacheSize: Long = 10L * 1024L * 1024L,
-        trustAllCerts: Boolean = true,
+        trustAllCerts: Boolean = false,
         connectTimeoutSecs: Long = 5L,
         readTimeoutSecs: Long = 5L,
     ) : this(
