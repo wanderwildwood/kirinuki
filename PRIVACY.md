@@ -4,7 +4,7 @@ Version 0.6.4. Last reviewed 4 November 2026.
 
 ## The short version
 
-The developer collects nothing about you. There is no account with the developer, no sign-up, no analytics, no advertising and no crash reporting, and no server belonging to the developer that the app talks to. What the app stores, it stores on your phone. The app contacts the servers of the feeds, podcasts, pages and capsules you add, directly, and, only if you sign in to one in Settings, the one feed server whose address you typed; nothing else. The hosts are listed below.
+The developer collects nothing about you. There is no account with the developer, no sign-up, no analytics, no advertising and no crash reporting, and no server belonging to the developer that the app talks to. What the app stores, it stores on your phone. The app contacts the servers of the feeds, podcasts, pages and capsules you add, directly, only if you sign in to one in Settings, the one feed server whose address you typed; and, only when you search for a podcast by name, Apple's podcast directory; nothing else. The hosts are listed below.
 
 ## Where it comes from
 
@@ -45,7 +45,7 @@ Settings, About, Licenses shows the license of the app (GNU General Public Licen
 
 Yes, necessarily. The app fetches each feed, page, episode or capsule directly from the server that publishes it, so those operators see the request: your IP address, the address asked for, and the app's name and version in the user agent. Nothing is routed through the developer, and no analytics, advertising or crash-reporting service is contacted.
 
-Hosts contacted: only the ones you add or follow, and nothing at a fixed address.
+Hosts contacted: the ones you add or follow, and one fixed address, Apple's podcast directory, only when you search it.
 
 - **A feed server, only if you sign in to one** (Settings, Sync with a feed server; off by default): the server at the address you typed (a Google Reader-style server such as FreshRSS or Miniflux, or a Nextcloud with the News app), and no other. The app sends it your login name and API or app password (to sign in), the addresses and folders of your feeds, and which articles you have read or starred; it receives your subscriptions and their articles from it. While sync is on, the feeds that server has are fetched from it instead of from their sites. An `http://` address is accepted only on your own network (private address ranges, `.local`, `.lan`, `.home`, `.home.arpa`, `.internal`, Tailscale); anything else must be `https://`. Stop syncing forgets the address, login and password.
 
@@ -53,6 +53,7 @@ Hosts contacted: only the ones you add or follow, and nothing at a fixed address
 - **Podcast episodes**: from the address in the feed, streamed or downloaded.
 - **Gemini, gopher and Spartan capsules**: by direct connection to the capsule's host and port, for an address you open or a gemlog you subscribe to. Gemini connections are checked against the certificate fingerprint the app remembered from the first visit.
 - **A site's page, when you add it by its address**: an address shared into the app or scanned from a QR code is fetched once as soon as it arrives, and a typed one when you press Subscribe, to see whether it is a feed, a page that links a feed, or a single story. A linked feed is then fetched like any other; a story is fetched again only if you choose Read this page, and is then shown and not stored unless you keep it.
+- **Apple's podcast directory** (`itunes.apple.com`), only when you press Search in Add feed, Find a podcast: the words you typed are sent, with your IP address and the app's name and version, and Apple answers with matching shows and the address of each one's feed. Nothing else is sent, no account is used, and nothing is sent while you type or at any other time. Apple handles the request under its own privacy policy. Tapping a show subscribes to its feed, which is then fetched from its publisher like any other.
 - **YouTube**: only when the address you add is a YouTube channel page. That page is fetched to find the channel's public feed (`www.youtube.com/feeds/videos.xml`), which is then fetched like any other feed.
 
 In About, "feed the llamas" opens a donation page (square.link) and wanderthe.dev opens the author's website, in your browser and only when you press them. The app does not fetch either page and learns nothing about whether you went.
@@ -70,7 +71,7 @@ The app is suitable for all ages and does not knowingly collect anything from an
 <!-- shared-about privacy section -->
 ## Who we are
 
-Feeds is made by wander wildwood, an independent developer: one person, not a company. wander wildwood is the data controller for anything the app itself handles, and that is very little. What you put in Feeds stays on your phone. The only things that go out are the requests described above: to the sites, podcasts and capsules you add or open, one for each feed, page, episode or capsule, carrying the address asked for and the app's name and version; and, only if you sign in to one, to the feed server whose address you typed, carrying your login name and password, the addresses and folders of your feeds, and which articles you have read or starred. The developer receives nothing, so the developer holds no data about you.
+Feeds is made by wander wildwood, an independent developer: one person, not a company. wander wildwood is the data controller for anything the app itself handles, and that is very little. What you put in Feeds stays on your phone. The only things that go out are the requests described above: to the sites, podcasts and capsules you add or open, one for each feed, page, episode or capsule, carrying the address asked for and the app's name and version; a podcast search, only when you search, carrying the words you typed to Apple's podcast directory; and, only if you sign in to one, to the feed server whose address you typed, carrying your login name and password, the addresses and folders of your feeds, and which articles you have read or starred. The developer receives nothing, so the developer holds no data about you.
 
 ## How to contact us
 

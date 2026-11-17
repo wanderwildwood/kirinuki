@@ -20,6 +20,7 @@ import com.wanderwildwood.kirinuki.net.isSmolnetUrl
 import com.wanderwildwood.kirinuki.net.isWebUrl
 import com.wanderwildwood.kirinuki.net.parseUrlLeniently
 import com.wanderwildwood.kirinuki.podcast.LocalFolderSync
+import com.wanderwildwood.kirinuki.podcast.PodcastSearch
 import com.wanderwildwood.kirinuki.podcast.keepFolderPermission
 import com.wanderwildwood.kirinuki.podcast.localFolderTree
 import com.wanderwildwood.kirinuki.podcast.localFolderUrl
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import okhttp3.OkHttpClient
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.net.MalformedURLException
@@ -40,6 +42,28 @@ class AddFeedViewModel(
     private val repository: Repository by instance()
     private val feedParser: FeedParser by instance()
     private val localFolderSync: LocalFolderSync by instance()
+    private val okHttpClient: OkHttpClient by instance()
+
+    /** Find a podcast: where the search stands. Nothing is sent until [searchPodcasts]. */
+    private val _podcastSearch = MutableStateFlow<PodcastSearchState>(PodcastSearchState.Idle)
+    val podcastSearch: StateFlow<PodcastSearchState> = _podcastSearch
+
+    fun searchPodcasts(term: String) {
+        val words = term.trim()
+        if (words.isEmpty()) return
+        _podcastSearch.value = PodcastSearchState.Searching(words)
+        viewModelScope.launch {
+            _podcastSearch.value =
+                try {
+                    PodcastSearchState.Found(words, PodcastSearch(okHttpClient).search(words))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.w("KIRINUKI_SEARCH", "Podcast search failed", e)
+                    PodcastSearchState.Failed(words)
+                }
+        }
+    }
 
     /** True while a site's page is being read for the feed it names, before subscribing. */
     private val _looking = MutableStateFlow(false)

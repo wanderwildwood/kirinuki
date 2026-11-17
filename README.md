@@ -57,7 +57,9 @@ Three screens. The feeds, what is in one, and the thing itself.
 ## Podcasts
 
 A podcast is a feed whose posts carry a sound file, so it is subscribed to like any other
-feed — paste its address into Add feed, or bring it in with OPML. Podcasts are kept apart
+feed — paste its address into Add feed, find it by name with **Find a podcast**, or bring it
+in with OPML. Find a podcast asks Apple's podcast directory, and only when you press Search;
+a tap on a show subscribes to its own feed. Podcasts are kept apart
 from the reading: they have their own **Podcasts** row, which lists every episode, and its
 **+** shows each podcast on its own. All feeds is the articles alone, unless **Show podcasts in
 All feeds** is turned on in Settings, and then it is everything together, newest first. An episode opens like

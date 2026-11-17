@@ -96,6 +96,9 @@ fun AddFeedScreen(
     // The scanner takes the whole screen while it is open, and hands back only an address the
     // box could have been given by hand; Subscribe, or Save page, is still the reader's press.
     var scanning by rememberSaveable { mutableStateOf(false) }
+    // Find a podcast takes the whole screen too, and hands back a show's feed to subscribe to.
+    var finding by rememberSaveable { mutableStateOf(false) }
+    val podcastSearch by viewModel.podcastSearch.collectAsStateWithLifecycle()
     val looked by viewModel.looked.collectAsStateWithLifecycle()
     // Only while it is still about the address in the box: an edit leaves it behind.
     val look = looked?.takeIf { it.address == addressKey(url) }?.look
@@ -140,6 +143,21 @@ fun AddFeedScreen(
             viewModel.savedHandled()
             onSaved()
         }
+    }
+
+    if (finding) {
+        PodcastSearchScreen(
+            state = podcastSearch,
+            onSearch = viewModel::searchPodcasts,
+            onPick = { show ->
+                url = show.feedUrl
+                finding = false
+                viewModel.save(url = show.feedUrl, title = "", folder = "")
+            },
+            onClose = { finding = false },
+            modifier = modifier,
+        )
+        return
     }
 
     if (scanning) {
@@ -219,6 +237,12 @@ fun AddFeedScreen(
                 // The Kompakt has no browser to find a feed with, so the address is often found
                 // on a computer, and a QR code made there is the short way across.
                 if (!editing) {
+                    // By name, for someone who knows the show but not where its feed is.
+                    HouseButton(
+                        label = stringResource(R.string.find_podcast),
+                        onClick = { finding = true },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
                     HouseButton(
                         label = stringResource(R.string.qr_scan),
                         onClick = { scanning = true },
