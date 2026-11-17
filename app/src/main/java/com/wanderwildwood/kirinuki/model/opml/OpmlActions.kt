@@ -45,7 +45,7 @@ suspend fun exportOpml(
                     val contentResolver: ContentResolver by di.instance()
                     val feedDao: FeedDao by di.instance()
                     val settingsStore: SettingsStore by di.instance()
-                    contentResolver.openOutputStream(uri)?.let {
+                    contentResolver.openOutputStream(uri, "wt")?.let {
                         writeOutputStream(
                             os = it,
                             settings = settingsStore.getAllSettings(),

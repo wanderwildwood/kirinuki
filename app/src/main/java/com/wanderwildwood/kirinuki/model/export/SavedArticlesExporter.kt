@@ -47,7 +47,7 @@ suspend fun exportSavedArticles(
                 measureTimeMillis {
                     val contentResolver: ContentResolver by di.instance()
                     val feedItemDao: FeedItemDao by di.instance()
-                    contentResolver.openOutputStream(uri)?.bufferedWriter()?.use { bw ->
+                    contentResolver.openOutputStream(uri, "wt")?.bufferedWriter()?.use { bw ->
                         val export =
                             SavedArticlesExport(
                                 format = SAVED_ARTICLES_EXPORT_FORMAT,
