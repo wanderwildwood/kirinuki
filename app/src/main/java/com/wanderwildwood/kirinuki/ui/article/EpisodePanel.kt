@@ -46,7 +46,9 @@ import com.wanderwildwood.kirinuki.podcast.EpisodeService
 import com.wanderwildwood.kirinuki.podcast.EpisodeStore
 import com.wanderwildwood.kirinuki.podcast.episodeMediaItem
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import java.util.Locale
 import com.wanderwildwood.kirinuki.ui.compose.theme.rememberArmedFlag
 
@@ -112,7 +114,8 @@ fun EpisodePanel(
             // The timer ran out: the next press starts again from the shortest.
             if (sleepAt > 0L && nowSleepAt == 0L) sleepChoice = 0
             sleepAt = nowSleepAt
-            download = store.downloadState(episode.itemId)
+            // The download service is another process: asked off the main thread.
+            download = withContext(Dispatchers.IO) { store.downloadState(episode.itemId) }
             delay(TICK_MS)
         }
     }
@@ -182,8 +185,12 @@ fun EpisodePanel(
                         Modifier.clickable {
                             when (download) {
                                 DownloadState.None, DownloadState.Failed -> {
-                                    store.download(episode.itemId, episode.url, episode.title, onlyOnWifi)
-                                    download = store.downloadState(episode.itemId)
+                                    download =
+                                        if (store.download(episode.itemId, episode.url, episode.title, onlyOnWifi)) {
+                                            store.downloadState(episode.itemId)
+                                        } else {
+                                            DownloadState.Failed
+                                        }
                                 }
                                 is DownloadState.Downloading, DownloadState.WaitingForWifi -> {
                                     store.removeDownload(episode.itemId)

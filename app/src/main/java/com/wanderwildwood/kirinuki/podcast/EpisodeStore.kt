@@ -151,21 +151,30 @@ class EpisodeStore(
         url: String,
         title: String,
         onlyOnWifi: Boolean,
-    ) {
-        val manager = appContext.getSystemService(DownloadManager::class.java) ?: return
+    ): Boolean {
+        val manager = appContext.getSystemService(DownloadManager::class.java) ?: return false
         file(itemId)?.delete()
-        val request =
-            DownloadManager
-                .Request(Uri.parse(url))
-                .setTitle(title)
-                .setDestinationInExternalFilesDir(appContext, DIR, itemId.toString())
-                .setAllowedOverMetered(!onlyOnWifi)
-                .setAllowedOverRoaming(false)
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+        // An address the download service will not take (not http or https), or the service
+        // itself switched off: false, and the panel says the download failed.
+        val id =
+            try {
+                val request =
+                    DownloadManager
+                        .Request(Uri.parse(url))
+                        .setTitle(title)
+                        .setDestinationInExternalFilesDir(appContext, DIR, itemId.toString())
+                        .setAllowedOverMetered(!onlyOnWifi)
+                        .setAllowedOverRoaming(false)
+                        .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+                manager.enqueue(request)
+            } catch (e: Exception) {
+                return false
+            }
         prefs.edit {
-            putLong(DOWNLOAD + itemId, manager.enqueue(request))
+            putLong(DOWNLOAD + itemId, id)
             putBoolean(WIFI_ONLY + itemId, onlyOnWifi)
         }
+        return true
     }
 
     private fun onUnmeteredNetwork(): Boolean {
