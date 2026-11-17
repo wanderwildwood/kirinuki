@@ -126,6 +126,24 @@ class GReaderApiTest {
     }
 
     @Test
+    fun aCappedUnreadListDoesNotMakeTheRestRead() {
+        val feed = fake.addSub("Pond Notes", "https://example.org/pond.xml")
+        (1L..5L).forEach { fake.addItem(feed, it, "Entry $it", 1_700_000_000 + it) }
+        fake.starred += 2L..5L
+        val oldest = GReaderIds.toLong("1")!!
+        val known = listOf(GReaderMerge.ItemState(1, oldest, baseRead = false, baseStarred = true, localRead = false, localStarred = true))
+        val capped =
+            GReaderApi(client, GReaderCredentials(server.url("/api/greader.php/").toString(), "ada", "api-pass-1"), maxIds = 2)
+                .serverItems(known, since = 0, newStreams = emptySet())
+        assertTrue(oldest in capped.unread)
+        assertTrue(oldest in capped.starred)
+        // The control: uncapped, the server's own answer stands (the oldest is not starred there).
+        val whole = api().serverItems(known, since = 0, newStreams = emptySet())
+        assertTrue(oldest in whole.unread)
+        assertTrue(oldest !in whole.starred)
+    }
+
+    @Test
     fun idsFollowContinuationTokensToTheEnd() {
         val feed = fake.addSub("Pond Notes", "https://example.org/pond.xml")
         (1L..5L).forEach { fake.addItem(feed, it, "Entry $it", 1_700_000_000 + it) }

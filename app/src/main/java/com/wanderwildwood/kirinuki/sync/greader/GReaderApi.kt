@@ -50,6 +50,7 @@ data class GReaderCredentials(
 class GReaderApi(
     private val client: OkHttpClient,
     private val credentials: GReaderCredentials,
+    private val maxIds: Int = MAX_IDS,
 ) : FeedServerApi {
     private var auth: String? = null
     private var actionToken: String? = null
@@ -83,7 +84,7 @@ class GReaderApi(
         stream: String,
         exclude: String? = null,
         since: Long? = null,
-        max: Int = MAX_IDS,
+        max: Int = maxIds,
     ): List<String> {
         val ids = mutableListOf<String>()
         var continuation: String? = null
@@ -110,12 +111,21 @@ class GReaderApi(
         known: List<GReaderMerge.ItemState>,
         since: Long,
         newStreams: Set<String>,
-    ): ServerItems =
-        ServerItems(
-            unread = itemIds(GReaderIds.READING_LIST, exclude = GReaderIds.READ),
-            starred = itemIds(GReaderIds.STARRED),
+    ): ServerItems {
+        val unread = itemIds(GReaderIds.READING_LIST, exclude = GReaderIds.READ)
+        val starred = itemIds(GReaderIds.STARRED)
+        // A list cut off at [maxIds] does not say the rest are read or unstarred: articles
+        // the phone holds that it left out keep the state both sides last agreed on.
+        return ServerItems(
+            unread =
+                if (unread.size < maxIds) unread
+                else (unread + known.filter { !it.baseRead }.map { it.remoteId }).distinct(),
+            starred =
+                if (starred.size < maxIds) starred
+                else (starred + known.filter { it.baseStarred }.map { it.remoteId }).distinct(),
             recent = itemIds(GReaderIds.READING_LIST, since = since),
         )
+    }
 
     /** The articles for [ids], a hundred to a request. */
     override fun contents(ids: List<String>): List<RemoteItem> =
