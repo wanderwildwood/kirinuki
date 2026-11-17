@@ -1,6 +1,7 @@
 package com.wanderwildwood.kirinuki.net.gemini
 
 import java.io.File
+import java.io.IOException
 import java.time.Instant
 
 /**
@@ -52,10 +53,17 @@ class KnownHosts(
 
     private fun write() {
         file.parentFile?.mkdirs()
-        file.writeText(
+        // Written aside and moved over the old one, so a write cut short never leaves half a
+        // list: a host dropped from it would be pinned afresh to whatever answers next.
+        val partial = File(file.path + ".part")
+        partial.writeText(
             hosts.values
                 .sortedBy { it.host }
                 .joinToString("\n") { "${it.host} ${it.fingerprint} ${it.expiresAt.epochSecond}" },
         )
+        if (!partial.renameTo(file)) {
+            partial.delete()
+            throw IOException("could not save the known capsule certificates")
+        }
     }
 }
