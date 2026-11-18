@@ -24,6 +24,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.asResponseBody
+import okio.Buffer
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.kodein.di.DI
@@ -286,10 +288,8 @@ class FeedParser(
                         RSSParseError(url = url.toString(), throwable = t)
                     },
                 ) {
-                    responseBody.byteStream().use { bs ->
-                        parseFeedBytes(url, bs.readBytes())
-                            ?: throw NullPointerException("Parsed feed is null")
-                    }
+                    parseFeedBytes(url, responseBody.bytesAtMost())
+                        ?: throw NullPointerException("Parsed feed is null")
                 }
 
             else -> return Either.Left(
@@ -442,6 +442,34 @@ internal fun withFeedLogin(
     }
 }
 
+/**
+ * Far beyond any real feed or page (a podcast feed with its whole history runs to a few
+ * megabytes): a body larger than this, or one that never ends, is refused rather than read
+ * into memory until the app is closed for it.
+ */
+internal const val MAX_FEED_BYTES = 50L * 1024 * 1024
+
+/** The whole body, closed after; an IOException past [maxBytes]. */
+internal fun ResponseBody.bytesAtMost(maxBytes: Long = MAX_FEED_BYTES): ByteArray = bufferedAtMost(maxBytes).readByteArray()
+
+/** The whole body as text, read as [ResponseBody.string] reads it (charset and byte order mark). */
+internal fun ResponseBody.stringAtMost(maxBytes: Long = MAX_FEED_BYTES): String {
+    val buffer = bufferedAtMost(maxBytes)
+    return buffer.asResponseBody(contentType(), buffer.size).string()
+}
+
+private fun ResponseBody.bufferedAtMost(maxBytes: Long): Buffer {
+    val buffer = Buffer()
+    use {
+        val source = source()
+        while (buffer.size <= maxBytes) {
+            if (source.read(buffer, 8_192) == -1L) break
+        }
+    }
+    if (buffer.size > maxBytes) throw IOException("Body larger than $maxBytes bytes")
+    return buffer
+}
+
 suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> =
     curlAndOnResponse(url) {
         val contentType = it.body?.contentType()
@@ -458,7 +486,7 @@ suspend fun OkHttpClient.curl(url: URL): Either<FeedParserError, String> =
                                     )
                                 },
                             ) {
-                                body.string()
+                                body.stringAtMost()
                             }
                         } ?: Either.Left(
                             NoBody(
