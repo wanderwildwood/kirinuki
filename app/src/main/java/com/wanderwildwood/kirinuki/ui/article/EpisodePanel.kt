@@ -22,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import com.wanderwildwood.kirinuki.podcast.episodeMediaItem
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 import com.wanderwildwood.kirinuki.ui.compose.theme.rememberArmedFlag
@@ -90,7 +92,11 @@ fun EpisodePanel(
     var speed by remember { mutableStateOf(store.speed) }
     var sleepAt by remember { mutableStateOf(0L) }
     var sleepChoice by remember { mutableIntStateOf(0) }
-    var download by remember { mutableStateOf(store.downloadState(episode.itemId)) }
+    // The download service is another process: nothing is asked of it on the main thread.
+    // Unknown (null) until the first tick below has asked, a moment after the panel opens.
+    var download by remember { mutableStateOf<DownloadState?>(null) }
+    var downloadBusy by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     var removeArmed by rememberArmedFlag()
 
     LaunchedEffect(controller, episode.itemId) {
@@ -165,6 +171,7 @@ fun EpisodePanel(
                 TextMMD(
                     text =
                         when (val d = download) {
+                            null -> ""
                             DownloadState.None -> stringResource(R.string.episode_keep)
                             is DownloadState.Downloading ->
                                 d.percent?.let { stringResource(R.string.episode_downloading_percent, it) }
@@ -183,26 +190,43 @@ fun EpisodePanel(
                     overflow = TextOverflow.Ellipsis,
                     modifier =
                         Modifier.clickable {
+                            // One press at a time: a second press while the service is being
+                            // asked would enqueue the episode twice.
+                            if (downloadBusy) return@clickable
+                            fun ask(work: () -> DownloadState) {
+                                downloadBusy = true
+                                scope.launch {
+                                    try {
+                                        download = withContext(Dispatchers.IO) { work() }
+                                    } finally {
+                                        downloadBusy = false
+                                    }
+                                }
+                            }
                             when (download) {
-                                DownloadState.None, DownloadState.Failed -> {
-                                    download =
+                                null -> Unit
+                                DownloadState.None, DownloadState.Failed ->
+                                    ask {
                                         if (store.download(episode.itemId, episode.url, episode.title, onlyOnWifi)) {
                                             store.downloadState(episode.itemId)
                                         } else {
                                             DownloadState.Failed
                                         }
-                                }
-                                is DownloadState.Downloading, DownloadState.WaitingForWifi -> {
-                                    store.removeDownload(episode.itemId)
-                                    download = DownloadState.None
-                                }
+                                    }
+                                is DownloadState.Downloading, DownloadState.WaitingForWifi ->
+                                    ask {
+                                        store.removeDownload(episode.itemId)
+                                        DownloadState.None
+                                    }
                                 DownloadState.Kept ->
                                     if (removeArmed) {
+                                        removeArmed = false
                                         // The one playing keeps playing from its open file; it
                                         // simply won't be there next time.
-                                        store.removeDownload(episode.itemId)
-                                        download = DownloadState.None
-                                        removeArmed = false
+                                        ask {
+                                            store.removeDownload(episode.itemId)
+                                            DownloadState.None
+                                        }
                                     } else {
                                         removeArmed = true
                                     }
