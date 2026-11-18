@@ -32,7 +32,7 @@ Miniflux: Settings, Integrations, Google Reader: switch on, choose a user name a
 
 **Login.** `POST accounts/ClientLogin` with form `Email=<login>&Passwd=<api password>`.
 Success: 200 and text lines `SID=…`, `LSID=…`, `Auth=<token>` (JSON with the same keys when
-`output=json` is honoured). A wrong password: 401 (FreshRSS adds `Error=BadAuthentication`).
+`output=json` is honored). A wrong password: 401 (FreshRSS adds `Error=BadAuthentication`).
 Every later request carries `Authorization: GoogleLogin auth=<token>`.
 
 **Write token.** `GET reader/api/0/token` returns a short token; every POST sends it as form
@@ -190,7 +190,7 @@ article stays; from the next refresh the feeds are fetched from their sites agai
 - Read You (GPL-3.0, Ashinch and contributors): the item id table and conversion, the request
   shapes (ClientLogin, token, ids, contents, edit-tag, quickadd, subscription/edit) and the
   outline of the sync order (unread and starred id sets first, then contents of what is
-  missing). Rewritten for OkHttp, Moshi and this app's database; credited in Licences.
+  missing). Rewritten for OkHttp, Moshi and this app's database; credited in Licenses.
 - Recipes (same author): `Secrets` (Keystore-sealed password).
 - No code from Feeder's own sync.
 
