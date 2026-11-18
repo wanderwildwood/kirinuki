@@ -13,6 +13,7 @@ import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.db.room.FeedItemDao
 import com.wanderwildwood.kirinuki.model.DownloadedArticles
+import com.wanderwildwood.kirinuki.model.syncMutex
 import com.wanderwildwood.kirinuki.podcast.EpisodeStore
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.logDebug
@@ -21,6 +22,7 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -44,17 +46,23 @@ class CleanupOrphanedFilesJob(
         try {
             Log.i(LOG_TAG, "Starting cleanup of orphaned article files")
 
-            // Get all valid feed item IDs from the database
+            // Held while the ids are read and the files swept: a sync inserts its rows and then
+            // writes their files, and a file written after the ids were read would look orphaned.
+            // Server articles are written only once, so such a file would be lost for good.
             val validFeedItemIds =
-                withContext(Dispatchers.IO) {
-                    feedItemDao.getAllFeedItemIds()
+                syncMutex.withLock {
+                    val ids =
+                        withContext(Dispatchers.IO) {
+                            feedItemDao.getAllFeedItemIds()
+                        }
+
+                    // Clean up article files in articleDir
+                    cleanupDirectory(filePathProvider.articleDir, ids, ::blobFile)
+
+                    // Clean up full article files in fullArticleDir
+                    cleanupDirectory(filePathProvider.fullArticleDir, ids, ::blobFullFile)
+                    ids
                 }
-
-            // Clean up article files in articleDir
-            cleanupDirectory(filePathProvider.articleDir, validFeedItemIds, ::blobFile)
-
-            // Clean up full article files in fullArticleDir
-            cleanupDirectory(filePathProvider.fullArticleDir, validFeedItemIds, ::blobFullFile)
 
             // Podcast episodes: the place and the kept sound of any whose item is gone.
             val episodes =
@@ -112,12 +120,15 @@ class CleanupOrphanedFilesJob(
                     fileProvider(id, directory).canonicalPath
                 }.toSet()
 
+        // Pages saved by hand and full texts are written outside the sync, a new row's file a
+        // moment after its row and through a .part file: anything this young is left alone.
+        val youngSince = System.currentTimeMillis() - TimeUnit.HOURS.toMillis(1)
         var deletedCount = 0
         withContext(Dispatchers.IO) {
             directory.listFiles()?.forEach { file ->
                 try {
                     val filePath = file.canonicalPath
-                    if (!validFilePaths.contains(filePath)) {
+                    if (!validFilePaths.contains(filePath) && file.lastModified() < youngSince) {
                         if (file.delete()) {
                             deletedCount++
                             logDebug(LOG_TAG, "Deleted orphaned file: $filePath")
