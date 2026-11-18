@@ -69,7 +69,13 @@ class FullTextParser(
         } finally {
             repository.markAsFullTextDownloaded(feedItem.id)
         }.onLeft {
-            Log.w(LOG_TAG, "Failed to parse missing full article: $it", it.throwable)
+            // The error and its cause carry the article's address: named only in debug builds.
+            Log.w(
+                LOG_TAG,
+                "Failed to parse missing full article ${feedItem.id}: " +
+                    "${it::class.simpleName} ${it.throwable?.let { t -> t::class.simpleName } ?: ""}",
+            )
+            logDebug(LOG_TAG, "Failed to parse missing full article: $it", it.throwable)
         }
     }
 

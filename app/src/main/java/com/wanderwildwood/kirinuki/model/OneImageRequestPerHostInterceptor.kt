@@ -41,7 +41,8 @@ object OneImageRequestPerHostInterceptor : Interceptor {
             try {
                 Uri.parse(url)
             } catch (e: Exception) {
-                Log.e(LOG_TAG, "Failed to parse url: $url", e)
+                Log.e(LOG_TAG, "Failed to parse an image address: ${e::class.simpleName}")
+                logDebug(LOG_TAG, "Failed to parse url: $url", e)
                 return chain.proceed()
             }
         val host = uri.host ?: return chain.proceed()

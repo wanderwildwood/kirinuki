@@ -1,6 +1,6 @@
 package com.wanderwildwood.kirinuki.model
 
-import android.util.Log
+import com.wanderwildwood.kirinuki.util.logDebug
 import okhttp3.CacheControl
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -22,7 +22,7 @@ object TooManyRequestsInterceptor : Interceptor {
         val now = Instant.now()
 
         if (tooManyResponses[request.url.host]?.isAfter(now) == true) {
-            Log.i(LOG_TAG, "Too many requests for ${request.url.host}, blocked until ${tooManyResponses[request.url.host]}")
+            logDebug(LOG_TAG, "Too many requests for ${request.url.host}, blocked until ${tooManyResponses[request.url.host]}")
             return chain.proceed(
                 request
                     .newBuilder()
@@ -45,7 +45,7 @@ object TooManyRequestsInterceptor : Interceptor {
             tooManyResponses.computeIfAbsent(request.url.host) {
                 val retryAfter = response.header("Retry-After")
                 val retryAfterSeconds = retryAfter?.toIntOrNull() ?: 60
-                Log.i(LOG_TAG, "Too many requests for ${request.url.host}, will intercept for $retryAfterSeconds seconds")
+                logDebug(LOG_TAG, "Too many requests for ${request.url.host}, will intercept for $retryAfterSeconds seconds")
 
                 now.plusSeconds(retryAfterSeconds.toLong() + 1)
             }
