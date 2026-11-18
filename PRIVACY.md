@@ -1,6 +1,6 @@
 # Feeds — Privacy Policy
 
-Version 0.6.17. Last reviewed 17 November 2026.
+Version 0.6.19. Last reviewed 18 November 2026.
 
 ## The short version
 
@@ -43,7 +43,7 @@ Settings, About, Licenses shows the license of the app (GNU General Public Licen
 
 ## Who else receives anything
 
-Yes, necessarily. The app fetches each feed, page, episode or capsule directly from the server that publishes it, so those operators see the request: your IP address, the address asked for, and the user agent with the app's version. Nothing is routed through the developer, and no analytics, advertising or crash-reporting service is contacted.
+Yes, necessarily. The app fetches each feed, page, episode or capsule directly from the server that publishes it, so those operators see the request: your IP address, the address asked for, and the user agent with the app's version. Nothing is routed through the developer, and no analytics, advertising or crash-reporting service is contacted. A feed address that holds a login (name:password@) gives it only to that feed's own host, on its own scheme and port: never to another server it redirects to, never over plain http when the address is https, and never to a proxy.
 
 Hosts contacted: the ones you add or follow, the site a new feed names as its home page (fetched once, when the feed is first added, for its icon), and one fixed address, Apple's podcast directory, only when you search it.
 
