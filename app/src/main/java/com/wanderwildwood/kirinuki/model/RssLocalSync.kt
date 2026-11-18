@@ -12,6 +12,7 @@ import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
+import com.wanderwildwood.kirinuki.blob.blobInputStream
 import com.wanderwildwood.kirinuki.blob.blobOutputStream
 import com.wanderwildwood.kirinuki.db.room.isSavedPages
 import com.wanderwildwood.kirinuki.podcast.LocalFolderSync
@@ -45,6 +46,7 @@ import okhttp3.Response
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import java.io.File
 import java.io.IOException
 import java.net.URL
 import java.time.Clock
@@ -410,6 +412,11 @@ class RssLocalSync(
      * Only entries not already stored are fetched, so this costs a page per new post
      * rather than the whole gemlog every sync. An entry whose page cannot be fetched is
      * still stored: a missing body is worth less than a missing post.
+     *
+     * An entry already stored carries the text saved for it before (at its first sync, or
+     * when it was opened). The index has none, and syncFeed writes each entry's text back
+     * to its file, so passing the index's empty text along would empty the file and blank
+     * the entry's reading time and snippet on every later sync.
      */
     private suspend fun withEntryText(
         feedSql: Feed,
@@ -424,8 +431,11 @@ class RssLocalSync(
                 .map { item ->
                     val guid = item.id ?: return@map item
                     val link = item.url ?: return@map item
-                    if (repository.loadFeedItem(guid = guid, feedId = feedSql.id) != null) {
-                        return@map item
+                    val stored = repository.loadFeedItem(guid = guid, feedId = feedSql.id)
+                    if (stored != null) {
+                        return@map item.copy(
+                            content_text = storedEntryText(stored.id, filePathProvider.articleDir),
+                        )
                     }
                     item.copy(content_text = textAt(link))
                 }
@@ -775,6 +785,23 @@ class RssLocalSync(
  * Remember that text or title literally can mean injection problems if the contain % or similar,
  * so do NOT use them literally
  */
+/**
+ * The text stored for an entry, or "" when there is none (no file yet, or one that cannot be read).
+ */
+internal fun storedEntryText(
+    itemId: Long,
+    articleDir: File,
+): String =
+    try {
+        if (blobFile(itemId = itemId, filesDir = articleDir).isFile) {
+            blobInputStream(itemId = itemId, filesDir = articleDir).bufferedReader().use { it.readText() }
+        } else {
+            ""
+        }
+    } catch (e: IOException) {
+        ""
+    }
+
 private val ParsedArticle.alternateId: String
     get() = "$id|${content_text.hashCode()}|${title.hashCode()}"
 
