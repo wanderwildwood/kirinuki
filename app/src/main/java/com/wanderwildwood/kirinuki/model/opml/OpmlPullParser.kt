@@ -72,8 +72,12 @@ class OpmlPullParser(
                     OpmlUnknownError(it)
                 },
             ) {
+                // Read no further than any real OPML could reach: a huge or endless stream
+                // (handed in by another app, say) is refused instead of filling the memory.
                 inputStream.use {
-                    it.readTheBytes()
+                    it.readTheBytes(limit = MAX_OPML_BYTES + 1)
+                }.also {
+                    if (it.size > MAX_OPML_BYTES) throw IOException("OPML larger than $MAX_OPML_BYTES bytes")
                 }
             }.flatMap { bytes ->
                 val parseResult = parseInputStream(bytes.inputStream())
@@ -370,6 +374,9 @@ class OpmlPullParser(
 
 private const val LOG_TAG = "KIRINUKI_OPMLPULL"
 
+/** Far beyond any real list of feeds (a thousand feeds is a few hundred kilobytes). */
+internal const val MAX_OPML_BYTES = 8 * 1024 * 1024
+
 sealed class OpmlError {
     abstract val throwable: Throwable?
 }
@@ -382,8 +389,9 @@ data class OpmlParsingError(
     override val throwable: Throwable,
 ) : OpmlError()
 
-fun InputStream.readTheBytes(): ByteArray {
-    val len = Int.MAX_VALUE
+/** Reads to the end of the stream, or until [limit] bytes have been read. */
+fun InputStream.readTheBytes(limit: Int = Int.MAX_VALUE): ByteArray {
+    val len = limit
     require(len >= 0) { "len < 0" }
     var bufs: MutableList<ByteArray>? = null
     var result: ByteArray? = null
