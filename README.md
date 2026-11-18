@@ -23,6 +23,11 @@ Three screens. The feeds, what is in one, and the thing itself.
 
 - **No account, and no server of ours.** Feeds are fetched straight from the sites that
   publish them. Nothing is registered and nothing phones home.
+- **Sync with a feed server**, only if you sign in to one (Settings → Sync with a feed server):
+  FreshRSS, Miniflux or another server that speaks the Google Reader API, or Nextcloud News.
+  The app then also talks to that one server, sending your login, your feeds and what you have
+  read or starred. A plain http address is taken only on your own network.
+- **Dark mode**, a switch in Settings; the app also follows the phone's own dark setting.
 - **Read with the radio off.** Everything is fetched on wifi and stored; the reading
   afterwards needs nothing.
 - **Text only.** No images, no embedded web view. A photograph at sixteen grays costs a
