@@ -100,6 +100,8 @@
   <string name="image_loading">Image loading</string>
   <string name="no_activity_for_link">Install something to open this link with first</string>
   <string name="check_for_updates">Look for new articles…</string>
+  <string name="duraspeed_open">Open DuraSpeed</string>
+  <string name="duraspeed_open_summary">This phone stops apps in the background, so feeds are not refreshed until Feeds is allowed. Tap Open, then switch Feeds on. On means allowed.</string>
   <string name="on_startup">Upon app start</string>
   <string name="block_list">Block list</string>
   <string name="block_list_description">Hides articles with titles containing any of these filters. Example filters:</string>

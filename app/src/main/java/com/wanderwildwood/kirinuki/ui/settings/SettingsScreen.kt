@@ -39,6 +39,7 @@ import com.wanderwildwood.kirinuki.ui.compose.components.BarIcon
 import com.wanderwildwood.kirinuki.ui.compose.theme.AboutDialog
 import com.wanderwildwood.kirinuki.ui.compose.theme.DarkMode
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
+import com.wanderwildwood.kirinuki.util.DuraSpeed
 import com.wanderwildwood.kirinuki.util.hasWebBrowser
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -76,6 +77,7 @@ fun SettingsScreen(
 
     val context = LocalContext.current
     val hasBrowser = remember(context) { context.hasWebBrowser() }
+    val hasDuraSpeed = remember(context) { DuraSpeed.isPresent(context) }
     var aboutOpen by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { viewModel.countDownloadedArticles() }
 
@@ -188,6 +190,17 @@ fun SettingsScreen(
                     onLess = { viewModel.setSyncFrequency(syncFrequency.previous()) },
                     onMore = { viewModel.setSyncFrequency(syncFrequency.next()) },
                 )
+            }
+            // Only on a phone that has DuraSpeed (the Kompakt): without Feeds on its list,
+            // nothing is looked for in the background. Its App info page is the one way in.
+            if (hasDuraSpeed) {
+                item {
+                    ValueRow(
+                        title = stringResource(R.string.duraspeed_open),
+                        value = stringResource(R.string.duraspeed_open_summary),
+                        onClick = { DuraSpeed.open(context) },
+                    )
+                }
             }
             item {
                 StepperRow(

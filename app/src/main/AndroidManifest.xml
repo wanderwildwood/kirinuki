@@ -53,6 +53,8 @@
     </intent>
     <!-- Files (Cabinet) answers open and save with its own e-ink screens; unseen, the stock one is used. -->
     <package android:name="com.wanderwildwood.tana" />
+    <!-- DuraSpeed, so its absence can be told from its presence (KompaktOS has none). -->
+    <package android:name="com.mediatek.duraspeed" />
   </queries>
 
   <application
