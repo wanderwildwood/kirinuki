@@ -5,7 +5,13 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.core.net.toUri
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import com.wanderwildwood.kirinuki.base.DIAwareComponentActivity
@@ -38,25 +44,41 @@ class AddFeedFromShareActivity : DIAwareComponentActivity() {
                 val url by sharedUrl
                 // A new address is a new form: everything remembered for the last one goes.
                 key(url) {
-                    AddFeedScreen(
-                        onBack = { onNavigateUpFromIntentActivities() },
-                        onSaved = { finish() },
-                        // This activity has no nav graph of its own, so reading hands the
-                        // address back to the app the same way any other capsule link arrives.
-                        onRead = { address ->
-                            handOverToApp(Intent(Intent.ACTION_VIEW, address.toUri(), this, MainActivity::class.java))
-                        },
-                        // The same hand-over for a web page read on its own, flagged so the app
-                        // knows it was asked to read it and not merely shown an address.
-                        onReadPage = { address ->
-                            handOverToApp(
-                                Intent(Intent.ACTION_VIEW, address.toUri(), this, MainActivity::class.java)
-                                    .putExtra(EXTRA_READ_PAGE, true),
-                            )
-                        },
-                        viewModel = diAwareViewModel(key = url),
-                        initialUrl = url,
-                    )
+                    // The address came from another app: it is shown first, and fetched only
+                    // once Open is pressed. Cancel goes back to where it came from.
+                    var opened by rememberSaveable { mutableStateOf(url.isBlank()) }
+                    if (!opened) {
+                        Surface(color = MaterialTheme.colorScheme.surface, modifier = Modifier.fillMaxSize()) {}
+                        HandedInAddressDialog(
+                            address = url,
+                            onOpen = { opened = true },
+                            onDismiss = { finish() },
+                        )
+                    } else {
+                        AddFeedScreen(
+                            onBack = { onNavigateUpFromIntentActivities() },
+                            onSaved = { finish() },
+                            // This activity has no nav graph of its own, so reading hands the
+                            // address back to the app the same way any other capsule link arrives.
+                            onRead = { address ->
+                                handOverToApp(
+                                    HandOver.mark(Intent(Intent.ACTION_VIEW, address.toUri(), this, MainActivity::class.java)),
+                                )
+                            },
+                            // The same hand-over for a web page read on its own, flagged so the app
+                            // knows it was asked to read it and not merely shown an address.
+                            onReadPage = { address ->
+                                handOverToApp(
+                                    HandOver.mark(
+                                        Intent(Intent.ACTION_VIEW, address.toUri(), this, MainActivity::class.java)
+                                            .putExtra(EXTRA_READ_PAGE, true),
+                                    ),
+                                )
+                            },
+                            viewModel = diAwareViewModel(key = url),
+                            initialUrl = url,
+                        )
+                    }
                 }
             }
         }

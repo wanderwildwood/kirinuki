@@ -71,6 +71,12 @@ class MainActivity : DIAwareComponentActivity() {
     private val pendingPage = mutableStateOf<String?>(null)
 
     /**
+     * An address another app handed in, shown with an Open button before anything is fetched
+     * from it. Kept across a window built again, so the question is still there after a turn.
+     */
+    private val askAddress = mutableStateOf<HandedAddress?>(null)
+
+    /**
      * Whether a reader is the screen in front, which is the only time the volume keys are
      * ours to take. Set by the composition, because the composition is what knows.
      *
@@ -164,8 +170,31 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        capsuleFrom(intent)?.let { pendingCapsule.value = it }
-        pageFrom(intent)?.let { pendingPage.value = it }
+        receive(intent)
+    }
+
+    /**
+     * A capsule or page address from [intent] is asked about first, unless it is Add feed's
+     * own hand-over, which was asked about there already.
+     */
+    private fun receive(intent: Intent?) {
+        val handed =
+            capsuleFrom(intent)?.let { HandedAddress(it, page = false) }
+                ?: pageFrom(intent)?.let { HandedAddress(it, page = true) }
+                ?: return
+        if (HandOver.isOurs(intent)) open(handed) else askAddress.value = handed
+    }
+
+    private fun open(handed: HandedAddress) {
+        if (handed.page) pendingPage.value = handed.address else pendingCapsule.value = handed.address
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        askAddress.value?.let {
+            outState.putString(STATE_ASK_ADDRESS, it.address)
+            outState.putBoolean(STATE_ASK_PAGE, it.page)
+        }
     }
 
     /**
@@ -190,8 +219,16 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        pendingCapsule.value = capsuleFrom(intent)
-        pendingPage.value = pageFrom(intent)
+        // A window built again keeps its screens and its question; only a fresh start reads the
+        // intent, or a turn would ask, or open, the same address a second time.
+        if (savedInstanceState == null) {
+            receive(intent)
+        } else {
+            askAddress.value =
+                savedInstanceState.getString(STATE_ASK_ADDRESS)?.let {
+                    HandedAddress(it, page = savedInstanceState.getBoolean(STATE_ASK_PAGE))
+                }
+        }
 
         // Until the screen in front is known, stay as the window came up, so a window built again
         // after a turn does not turn back and forth.
@@ -251,6 +288,18 @@ class MainActivity : DIAwareComponentActivity() {
                 pendingPage.value = null
                 navController.navigate(Route.webPage(it))
             }
+        }
+
+        val asking by askAddress
+        asking?.let { handed ->
+            HandedInAddressDialog(
+                address = handed.address,
+                onOpen = {
+                    askAddress.value = null
+                    open(handed)
+                },
+                onDismiss = { askAddress.value = null },
+            )
         }
 
         val importLauncher =
@@ -411,6 +460,12 @@ class MainActivity : DIAwareComponentActivity() {
         }
     }
 }
+
+/** An address handed in by another app, and whether it is a web page rather than a capsule. */
+data class HandedAddress(val address: String, val page: Boolean)
+
+private const val STATE_ASK_ADDRESS = "ask_address"
+private const val STATE_ASK_PAGE = "ask_page"
 
 /** Set by Add feed on the intent that asks the app to read one web page on its own. */
 const val EXTRA_READ_PAGE = "com.wanderwildwood.kirinuki.READ_PAGE"

@@ -86,7 +86,7 @@ fetched for it.
 
 `gemini://`, `gopher://` and `spartan://` open in the app and read like anything else.
 Nothing else on the phone opens them, so Feeds offers to — a capsule link tapped or
-shared anywhere arrives here.
+shared anywhere arrives here, shown with an Open button before anything is fetched.
 
 - **Subscribe to a gemlog.** Gemini has no feed format; the convention is that a page *is*
   a feed when its links carry dates. Subscribe to one and its entries arrive like any

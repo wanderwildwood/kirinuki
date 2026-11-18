@@ -375,6 +375,9 @@
   <string name="no_downloaded_models">No translation models downloaded yet. Translation will download the needed model automatically.</string>
   <string name="delete_button_text">Delete</string>
   <string name="cancel">Cancel</string>
+  <string name="handed_in_title">Open this address?</string>
+  <string name="handed_in_body">Another app handed Feeds this address. Nothing is fetched from it until you press Open.</string>
+  <string name="handed_in_open">Open</string>
   <string name="force_single_column">Force single column</string>
   <!-- kirinuki -->
   <string name="show_summary">Summary</string>
