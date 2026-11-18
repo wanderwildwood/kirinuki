@@ -12,7 +12,7 @@ import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.blob.blobFullInputStream
 import com.wanderwildwood.kirinuki.blob.blobInputStream
-import com.wanderwildwood.kirinuki.blob.blobOutputStream
+import com.wanderwildwood.kirinuki.blob.writeBlob
 import com.wanderwildwood.kirinuki.model.gemtext.GemtextParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
@@ -241,9 +241,12 @@ class ArticleViewModel(
                     }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "Could not open the stored article", e)
-                // A full text that cannot be read (cut short, say) is let go, so the next open
-                // fetches it again rather than failing on it for good.
-                if (fullText && e is java.io.IOException) blobFullFile(article.id, dir).delete()
+                // A text that cannot be read (cut short, say) is let go: a full text is fetched
+                // again at the next open, an article's own text comes back with the next sync
+                // while it is in the feed, and until then it shows as missing, not as a failure.
+                if (e is java.io.IOException) {
+                    if (fullText) blobFullFile(article.id, dir).delete() else blobFile(article.id, dir).delete()
+                }
                 textToDisplay.update { TextToDisplay.FAILED_TO_LOAD_FULLTEXT }
                 LinearArticle(elements = emptyList())
             }
@@ -290,8 +293,7 @@ class ArticleViewModel(
                 is String ->
                     response.also { text ->
                         try {
-                            blobOutputStream(article.id, filePathProvider.articleDir)
-                                .use { it.write(text.toByteArray(Charsets.UTF_8)) }
+                            writeBlob(article.id, filePathProvider.articleDir, text)
                         } catch (e: Exception) {
                             // Losing the cache costs a refetch, not the page.
                             Log.e(LOG_TAG, "Could not store the capsule page", e)

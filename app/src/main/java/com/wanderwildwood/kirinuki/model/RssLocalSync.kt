@@ -13,7 +13,7 @@ import com.wanderwildwood.kirinuki.background.runOnceFullTextSync
 import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.blob.blobInputStream
-import com.wanderwildwood.kirinuki.blob.blobOutputStream
+import com.wanderwildwood.kirinuki.blob.writeBlob
 import com.wanderwildwood.kirinuki.db.room.isSavedPages
 import com.wanderwildwood.kirinuki.podcast.LocalFolderSync
 import com.wanderwildwood.kirinuki.podcast.isLocalFolder
@@ -596,11 +596,7 @@ class RssLocalSync(
 
                     repository.upsertFeedItems(feedItemSqls) { feedItem, text ->
                         filePathProvider.articleDir.mkdirs()
-                        blobOutputStream(feedItem.id, filePathProvider.articleDir)
-                            .bufferedWriter()
-                            .use {
-                                it.write(text)
-                            }
+                        writeBlob(feedItem.id, filePathProvider.articleDir, text)
                         // If this item was pre-marked as read from a remote read-mark (alreadyReadGuids),
                         // immediately set it as synced so it won't be echoed back to the server.
                         if (feedItem.guid in alreadyReadGuids) {

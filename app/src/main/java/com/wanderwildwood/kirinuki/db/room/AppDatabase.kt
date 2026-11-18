@@ -13,7 +13,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.wanderwildwood.kirinuki.KirinukiApplication
 import com.wanderwildwood.kirinuki.background.runOnceBlocklistUpdate
-import com.wanderwildwood.kirinuki.blob.blobOutputStream
+import com.wanderwildwood.kirinuki.blob.writeBlob
 import com.wanderwildwood.kirinuki.crypto.SyncKey
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.contentValues
@@ -806,11 +806,7 @@ object MIGRATION_9_10 : Migration(9, 10) {
                     val description = cursor.getString(1)
 
                     @Suppress("DEPRECATION")
-                    blobOutputStream(feedItemId, KirinukiApplication.staticFilesDir)
-                        .bufferedWriter()
-                        .use {
-                            it.write(description)
-                        }
+                    writeBlob(feedItemId, KirinukiApplication.staticFilesDir, description)
                 }
             }
 

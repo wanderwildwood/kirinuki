@@ -1,7 +1,7 @@
 package com.wanderwildwood.kirinuki.model
 
 import com.wanderwildwood.kirinuki.blob.blobFile
-import com.wanderwildwood.kirinuki.blob.blobOutputStream
+import com.wanderwildwood.kirinuki.blob.writeBlob
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -14,7 +14,7 @@ class StoredEntryTextTest {
     @Test
     fun readsTheTextSavedAtTheFirstSync() {
         val dir = tmp.newFolder("articles")
-        blobOutputStream(7L, dir).bufferedWriter().use { it.write("# A walk by the river\nAda Whitlock writes.") }
+        writeBlob(7L, dir, "# A walk by the river\nAda Whitlock writes.")
 
         assertEquals("# A walk by the river\nAda Whitlock writes.", storedEntryText(7L, dir))
     }

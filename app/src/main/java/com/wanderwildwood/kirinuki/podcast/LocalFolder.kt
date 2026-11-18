@@ -11,7 +11,7 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.blob.blobFile
-import com.wanderwildwood.kirinuki.blob.blobOutputStream
+import com.wanderwildwood.kirinuki.blob.writeBlob
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedItem
 import com.wanderwildwood.kirinuki.util.FilePathProvider
@@ -224,7 +224,7 @@ class LocalFolderSync(
             }
         repository.upsertFeedItems(items) { item, text ->
             filePathProvider.articleDir.mkdirs()
-            blobOutputStream(item.id, filePathProvider.articleDir).bufferedWriter().use { it.write(text.htmlEscaped()) }
+            writeBlob(item.id, filePathProvider.articleDir, text.htmlEscaped())
         }
 
         val present = items.map { (item, _) -> item.guid }.toSet()

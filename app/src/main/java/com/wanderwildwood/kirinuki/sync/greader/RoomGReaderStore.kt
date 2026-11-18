@@ -4,7 +4,7 @@ import android.util.Log
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.blob.blobFile
 import com.wanderwildwood.kirinuki.blob.blobFullFile
-import com.wanderwildwood.kirinuki.blob.blobOutputStream
+import com.wanderwildwood.kirinuki.blob.writeBlob
 import com.wanderwildwood.kirinuki.db.room.Feed
 import com.wanderwildwood.kirinuki.db.room.FeedDao
 import com.wanderwildwood.kirinuki.db.room.FeedItem
@@ -155,7 +155,7 @@ class RoomGReaderStore(
         itemDao.upsertFeedItems(rows) { item, text ->
             if (item.id <= ID_UNSET) return@upsertFeedItems
             files.articleDir.mkdirs()
-            blobOutputStream(item.id, files.articleDir).bufferedWriter().use { it.write(text) }
+            writeBlob(item.id, files.articleDir, text)
             bases[item]?.let { (remoteId, base) ->
                 links += GReaderItemRow(item.id, remoteId, syncedRead = base.first, syncedStarred = base.second)
             }

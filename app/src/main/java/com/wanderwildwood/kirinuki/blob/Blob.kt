@@ -18,11 +18,29 @@ fun blobInputStream(
     filesDir: File,
 ): InputStream = GZIPInputStream(blobFile(itemId = itemId, filesDir = filesDir).inputStream())
 
+/**
+ * Stores an article's text. It is written aside and moved into place whole, so a write cut
+ * short (the process killed mid-sync) leaves the old file or none, never a broken one: a
+ * server article is written only once and would otherwise fail to load for good.
+ */
 @Throws(IOException::class)
-fun blobOutputStream(
+fun writeBlob(
     itemId: Long,
     filesDir: File,
-): OutputStream = GZIPOutputStream(blobFile(itemId = itemId, filesDir = filesDir).outputStream())
+    text: String,
+) {
+    val target = blobFile(itemId = itemId, filesDir = filesDir)
+    val partial = File(target.path + ".part")
+    try {
+        GZIPOutputStream(partial.outputStream()).bufferedWriter().use { it.write(text) }
+        if (!partial.renameTo(target)) {
+            throw IOException("could not move the article text into place")
+        }
+    } catch (e: Throwable) {
+        partial.delete()
+        throw e
+    }
+}
 
 fun blobFullFile(
     itemId: Long,
