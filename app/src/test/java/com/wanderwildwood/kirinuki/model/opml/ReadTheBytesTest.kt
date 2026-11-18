@@ -15,5 +15,4 @@ class ReadTheBytesTest {
         val endless = generateSequence { 'a'.code.toByte() }.take(100_000).toList().toByteArray().inputStream()
         assertEquals(30_001, endless.readTheBytes(limit = 30_001).size)
     }
-
 }
