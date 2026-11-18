@@ -19,6 +19,7 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import okhttp3.CacheControl
 import okhttp3.Credentials
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -408,33 +409,12 @@ suspend fun OkHttpClient.getResponse(
             val decodedUser = URLDecoder.decode(user, "UTF-8")
             val decodedPass = URLDecoder.decode(pass, "UTF-8")
             val credentials = Credentials.basic(decodedUser, decodedPass)
+            // The login is the feed's own: answered only to the feed's host, on its scheme and
+            // port, so a redirect elsewhere (or down to http) that asks for a login gets none.
+            // No proxy is given it either.
             newBuilder()
                 .authenticator { _, response ->
-                    when {
-                        response.request.header("Authorization") != null -> {
-                            null
-                        }
-
-                        else -> {
-                            response.request
-                                .newBuilder()
-                                .header("Authorization", credentials)
-                                .build()
-                        }
-                    }
-                }.proxyAuthenticator { _, response ->
-                    when {
-                        response.request.header("Proxy-Authorization") != null -> {
-                            null
-                        }
-
-                        else -> {
-                            response.request
-                                .newBuilder()
-                                .header("Proxy-Authorization", credentials)
-                                .build()
-                        }
-                    }
+                    withFeedLogin(feedUrl = request.url, challenged = response.request, credentials = credentials)
                 }.build()
         } else {
             this
@@ -442,6 +422,23 @@ suspend fun OkHttpClient.getResponse(
 
     return withContext(IO) {
         clientToUse.newCall(request).execute()
+    }
+}
+
+/**
+ * The challenged request again with the feed's login, or null: when it already carried one, or when
+ * it is not for the feed's own scheme, host and port.
+ */
+internal fun withFeedLogin(
+    feedUrl: HttpUrl,
+    challenged: Request,
+    credentials: String,
+): Request? {
+    val target = challenged.url
+    return when {
+        challenged.header("Authorization") != null -> null
+        target.scheme != feedUrl.scheme || target.host != feedUrl.host || target.port != feedUrl.port -> null
+        else -> challenged.newBuilder().header("Authorization", credentials).build()
     }
 }
 
