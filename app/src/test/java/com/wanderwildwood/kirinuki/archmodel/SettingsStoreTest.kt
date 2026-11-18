@@ -312,6 +312,18 @@ class SettingsStoreTest : DIAware {
     }
 
     @Test
+    fun storedMaximumCountPerFeedIsAtLeastOne() {
+        every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns "0"
+        assertEquals(1, SettingsStore(di).maximumCountPerFeed.value)
+
+        every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns "-3"
+        assertEquals(1, SettingsStore(di).maximumCountPerFeed.value)
+
+        every { sp.getString(PREF_MAX_ITEM_COUNT_PER_FEED, "100") } returns "abc"
+        assertEquals(100, SettingsStore(di).maximumCountPerFeed.value)
+    }
+
+    @Test
     fun itemOpener() {
         store.setItemOpener(ItemOpener.CUSTOM_TAB)
 
