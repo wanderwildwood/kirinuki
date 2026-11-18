@@ -201,4 +201,27 @@ class GReaderSyncTest {
         }
         assertTrue(store.feeds.isEmpty())
     }
+
+    @Test
+    fun aServerAddressThePhoneCannotFetchIsLeftOutAndTheRestStillSync() {
+        val (pond, _) = serverWithTwoFeeds()
+        fake.addSub("Odd One", "example.org/no-scheme.xml")
+        fake.addSub("Capsule", "gemini://example.org/gemlog/")
+        val late = fake.addSub("Late Notes", "https://example.org/late.xml")
+        fake.addItem(late, 4, "Owls", 1_700_000_004)
+        sync()
+        assertEquals(setOf("Pond Notes", "Kettle Weekly", "Late Notes"), store.feeds.map { it.title }.toSet())
+        assertEquals(4, store.articles.size)
+        assertEquals("Nature", store.feeds.first { it.title == pond.title }.tag)
+    }
+
+    @Test
+    fun onlyHttpAndHttpsAddressesAreFetchable() {
+        assertTrue(GReaderSync.isFetchable("https://example.org/feed.xml"))
+        assertTrue(GReaderSync.isFetchable("http://192.168.1.20/feed"))
+        assertFalse(GReaderSync.isFetchable(""))
+        assertFalse(GReaderSync.isFetchable("example.org/feed.xml"))
+        assertFalse(GReaderSync.isFetchable("gemini://example.org/"))
+        assertFalse(GReaderSync.isFetchable("https://"))
+    }
 }

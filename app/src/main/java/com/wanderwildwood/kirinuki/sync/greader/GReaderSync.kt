@@ -169,6 +169,9 @@ class GReaderSync(
                 }
             } else {
                 val match = unlinkedByUrl[normalUrl(sub.url)]
+                // An address the phone cannot fetch (blank, no scheme, not http or https) stays
+                // on the server only, so one odd subscription does not stop the whole sync.
+                if (match == null && !isFetchable(sub.url)) continue
                 val feedId =
                     if (match != null) {
                         store.updateFeed(match.id, sub.title.ifBlank { match.title }, sub.label)
@@ -283,6 +286,15 @@ class GReaderSync(
     }
 
     companion object {
+        /** True for an address the phone can make a feed of: an http or https URL with a host. */
+        fun isFetchable(url: String): Boolean =
+            try {
+                val address = java.net.URL(url.trim())
+                address.protocol.lowercase() in setOf("http", "https") && !address.host.isNullOrBlank()
+            } catch (e: java.net.MalformedURLException) {
+                false
+            }
+
         /** Addresses that differ only in scheme or a trailing slash are the same feed. */
         fun normalUrl(url: String): String =
             url.trim()
