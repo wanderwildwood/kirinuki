@@ -157,6 +157,23 @@ class GReaderSyncTest {
     }
 
     @Test
+    fun aFeedDeletedOnThePhoneStaysDeletedWhenTheServerFailsToUnsubscribe() {
+        serverWithTwoFeeds()
+        sync()
+        val kettle = store.feeds.single { it.title == "Kettle Weekly" }
+        runTest { store.deleteFeed(kettle.id) }
+        fake.unsubscribeFailsWith = 503
+        sync()
+        assertEquals(listOf("Pond Notes"), store.feeds.map { it.title })
+        assertEquals(2, fake.subs.size)
+
+        fake.unsubscribeFailsWith = null
+        sync()
+        assertEquals(listOf("Pond Notes"), fake.subs.map { it.title })
+        assertEquals(listOf("Pond Notes"), store.feeds.map { it.title })
+    }
+
+    @Test
     fun aFolderChangedOnThePhoneIsSentToTheServer() {
         val (_, kettle) = serverWithTwoFeeds()
         sync()

@@ -113,8 +113,16 @@ class GReaderSync(
     /** Feeds linked in this sync: the server may hold older articles of theirs the phone never saw. */
     private val newStreams = mutableSetOf<String>()
 
+    /**
+     * Feeds deleted on the phone whose unsubscribe the server failed to carry out (an error of
+     * its own, which may pass): their link stays for the next sync to try again, and in the
+     * meantime they are not brought back from the server's list nor given its articles.
+     */
+    private val stillToUnsubscribe = mutableSetOf<String>()
+
     suspend fun sync(sinceEpochSeconds: Long): GReaderReport {
         newStreams.clear()
+        stillToUnsubscribe.clear()
         api.login()
         var report = syncFeeds()
         report = syncItems(report, sinceEpochSeconds)
@@ -133,10 +141,28 @@ class GReaderSync(
             val stream = link.streamId ?: continue
             val feed = local[link.feedId]
             if (feed == null) {
-                tolerant { api.unsubscribe(stream) }
-                store.removeFeedLink(link.feedId)
+                // A refusal (the feed already gone there) is done with; a server error may
+                // pass, so the link is kept and the next sync tries again.
+                val done =
+                    try {
+                        api.unsubscribe(stream)
+                        true
+                    } catch (e: GReaderException.ServerError) {
+                        e.code < 500
+                    } catch (e: GReaderException.Unreachable) {
+                        throw e
+                    } catch (e: GReaderException.WrongPassword) {
+                        throw e
+                    } catch (e: GReaderException) {
+                        true
+                    }
                 links.remove(link.feedId)
-                sent++
+                if (done) {
+                    store.removeFeedLink(link.feedId)
+                    sent++
+                } else {
+                    stillToUnsubscribe += stream
+                }
             } else if (feed.tag != link.syncedLabel) {
                 api.setLabel(stream, feed.tag, link.syncedLabel)
                 val updated = link.copy(syncedLabel = feed.tag)
@@ -160,6 +186,7 @@ class GReaderSync(
                 .filter { it.id !in links }
                 .associateBy { normalUrl(it.url) }
         for (sub in remote) {
+            if (sub.streamId in stillToUnsubscribe) continue
             val link = linkedByStream[sub.streamId]
             if (link != null) {
                 val feed = local[link.feedId] ?: continue
@@ -254,7 +281,7 @@ class GReaderSync(
                 .filterNot { it in knownIds }
         val feedByStream =
             store.feedLinks()
-                .filter { it.streamId != null }
+                .filter { it.streamId != null && it.streamId !in stillToUnsubscribe }
                 .associate { it.streamId!! to it.feedId }
         var fetched = 0
         if (wanted.isNotEmpty()) {

@@ -35,6 +35,9 @@ class FakeGReaderServer(
     /** When set, the subscription list is answered with this instead. */
     var subscriptionListAnswer: String? = null
     var tokenChecks = 0
+
+    /** When set, an unsubscribe is answered with this status and not carried out. */
+    var unsubscribeFailsWith: Int? = null
     private var nextFeed = 100
 
     fun addSub(
@@ -100,7 +103,7 @@ class FakeGReaderServer(
             "reader/api/0/subscription/edit" -> {
                 val sub = subs.firstOrNull { it.id == form.first("s") } ?: return MockResponse().setResponseCode(400)
                 when (form.first("ac")) {
-                    "unsubscribe" -> subs.remove(sub)
+                    "unsubscribe" -> unsubscribeFailsWith?.let { return MockResponse().setResponseCode(it) } ?: subs.remove(sub)
                     "edit" -> form.first("a")?.let { sub.label = GReaderIds.labelName(it)!! } ?: run {
                         if (form.first("r") != null) sub.label = ""
                     }
