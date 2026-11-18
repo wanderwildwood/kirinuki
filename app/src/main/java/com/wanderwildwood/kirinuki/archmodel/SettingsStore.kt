@@ -394,13 +394,18 @@ class SettingsStore(
         sp.edit().putInt(PREF_REMOVE_DOWNLOADED_AFTER_DAYS, value).apply()
     }
 
+    // At least one: an OPML file can carry any number, and 0 or less would have a server sync
+    // remove every read article and a gemlog sync fail (a negative take()).
     private val _maximumCountPerFeed =
-        MutableStateFlow(sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toInt())
+        MutableStateFlow(
+            sp.getStringNonNull(PREF_MAX_ITEM_COUNT_PER_FEED, "100").toIntOrNull()?.coerceAtLeast(1) ?: 100,
+        )
     val maximumCountPerFeed = _maximumCountPerFeed.asStateFlow()
 
     fun setMaxCountPerFeed(value: Int) {
-        _maximumCountPerFeed.value = value
-        sp.edit().putString(PREF_MAX_ITEM_COUNT_PER_FEED, "$value").apply()
+        val count = value.coerceAtLeast(1)
+        _maximumCountPerFeed.value = count
+        sp.edit().putString(PREF_MAX_ITEM_COUNT_PER_FEED, "$count").apply()
     }
 
     private val _itemOpener =
