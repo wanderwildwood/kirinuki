@@ -55,7 +55,11 @@ fun runOnceFullTextSync(
         JobInfo
             .Builder(BackgroundJobId.FULL_TEXT_SYNC.jobId, componentName)
             .apply {
-                if (!triggeredByUser) {
+                // Always a network constraint: Android 14 and newer refuse a user-initiated
+                // job without one. One asked for by hand takes any network, as before.
+                if (triggeredByUser) {
+                    setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                } else {
                     setRequiresCharging(repository.syncOnlyWhenCharging.value)
                         .setRequiredNetworkType(
                             if (repository.syncOnlyOnWifi.value) {
@@ -71,5 +75,11 @@ fun runOnceFullTextSync(
         builder.setUserInitiated(true)
     }
 
-    jobScheduler.schedule(builder.build())
+    try {
+        jobScheduler.schedule(builder.build())
+    } catch (e: IllegalArgumentException) {
+        Log.e(FullTextSyncJob.LOG_TAG, "Full text job refused", e)
+    } catch (e: SecurityException) {
+        Log.e(FullTextSyncJob.LOG_TAG, "Full text job refused", e)
+    }
 }
