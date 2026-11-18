@@ -330,6 +330,7 @@ private fun problemWords(
         ServerProblem.INSECURE -> stringResource(R.string.server_sync_insecure)
         ServerProblem.SERVER_ERROR -> stringResource(R.string.server_sync_server_error, code)
         ServerProblem.PASSWORD_LOST -> stringResource(R.string.server_sync_password_lost)
+        ServerProblem.NOT_HOME_NETWORK -> stringResource(R.string.server_sync_not_home_network)
     }
 
 /** The server's host, with its port when it is not the usual one for the scheme. */

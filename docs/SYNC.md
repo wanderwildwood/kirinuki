@@ -180,7 +180,11 @@ sync or a test runs. Requests go through their own OkHttp client, not the app's 
 
 **http.** Plain http is accepted only for addresses on the phone or the home network (private
 and link-local ranges, `.local`, `.lan`, `.home`, `.home.arpa`, `.internal`) and Tailscale's 100.64.0.0/10. Any
-other http:// address is refused with a message, before the password is sent.
+other http:// address is refused with a message, before the password is sent. Each plain http
+request then also has to fit the network the phone is on (`HomeNetwork`, an interceptor on that
+client, so redirects are checked too): a Tailscale address only while a VPN is up, any other home
+address only on Wi-Fi, Ethernet or a VPN, never on mobile data. A request that does not fit is
+stopped before it leaves, and the sync says "not on your home network".
 
 **Stop syncing** forgets the address, login, password and both link tables. Every feed and
 article stays; from the next refresh the feeds are fetched from their sites again.

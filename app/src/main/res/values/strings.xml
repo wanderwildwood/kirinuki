@@ -87,6 +87,7 @@
   <string name="pull_one_no_connection">%1$s: could not connect to the server</string>
   <string name="pull_one_server_answered">%1$s: the server answered with error %2$d</string>
   <string name="pull_one_not_a_feed">%1$s: that address does not hold a readable feed</string>
+  <string name="pull_one_not_home_network">%1$s: not on your home network, so it was not synced</string>
   <string name="pull_one_sign_in_refused">%1$s: the login was refused. See Settings, Sync with a feed server.</string>
   <string name="pull_failed_named">Could not fetch: %1$s</string>
   <string name="pull_failed_named_more">Could not fetch: %1$s and %2$d more</string>
@@ -565,8 +566,9 @@
   <string name="server_sync_unreachable">Nothing answered at that address. Check the address, and that the phone is online.</string>
   <string name="server_sync_wrong_password">The server refused the login name or password. Use the API password, not the one for the web page.</string>
   <string name="server_sync_not_greader">Something answered, but not as a Google Reader-style feed server. Check the address: for FreshRSS it can end in /api/greader.php.</string>
-  <string name="server_sync_insecure">That address starts with http:// and is not on your home network, so the password would cross the internet unencrypted. Use https://.</string>
+  <string name="server_sync_insecure">That address starts with http:// and is not a home network address, so the password would cross the internet unencrypted. Use https://.</string>
   <string name="server_sync_server_error">The server answered with error %1$d.</string>
+  <string name="server_sync_not_home_network">Not on your home network, so nothing was sent. An http:// address is used only on Wi-Fi or a VPN, never on mobile data, and a Tailscale address (100.64.x.x) only while Tailscale is on.</string>
   <string name="server_sync_password_lost">The saved password can no longer be read on this phone. Stop syncing and sign in again.</string>
   <string name="server_sync_first_time">On the first sync, the feeds on this phone that the server lacks are added to it.</string>
   <string name="server_sync_signed_in_as">%1$s, as %2$s</string>

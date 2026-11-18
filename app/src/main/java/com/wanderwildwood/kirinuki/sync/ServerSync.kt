@@ -32,7 +32,7 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 /** Why the feed server could not be used, one sentence each in Settings. */
-enum class ServerProblem { UNREACHABLE, WRONG_PASSWORD, NOT_GOOGLE_READER, INSECURE, SERVER_ERROR, PASSWORD_LOST }
+enum class ServerProblem { UNREACHABLE, WRONG_PASSWORD, NOT_GOOGLE_READER, INSECURE, SERVER_ERROR, PASSWORD_LOST, NOT_HOME_NETWORK }
 
 /** The kinds of feed server Feeds syncs with. The name is what is stored. */
 enum class ServerKind {
@@ -66,7 +66,7 @@ sealed class ServerCheck {
 
 fun GReaderException.toProblem(): ServerProblem =
     when (this) {
-        is GReaderException.Unreachable -> ServerProblem.UNREACHABLE
+        is GReaderException.Unreachable -> if (cause is NotOnHomeNetwork) ServerProblem.NOT_HOME_NETWORK else ServerProblem.UNREACHABLE
         is GReaderException.WrongPassword -> ServerProblem.WRONG_PASSWORD
         is GReaderException.NotGoogleReader -> ServerProblem.NOT_GOOGLE_READER
         is GReaderException.Insecure -> ServerProblem.INSECURE
@@ -98,10 +98,14 @@ class ServerSync(
 
     private val client: OkHttpClient by lazy {
         // Its own client: the app's shared one keeps an HTTP cache and, in debug builds, logs
-        // request headers, and this one carries a login token in every request.
+        // request headers, and this one carries a login token in every request. A plain http
+        // home server is sent nothing unless the phone is on a network that fits (HomeNetwork).
+        val gate = HomeNetworkGate { HomeNetwork.now(application) }
         OkHttpClient.Builder()
             .connectTimeout(20, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
+            .addInterceptor(gate)
+            .addNetworkInterceptor(gate)
             .addNetworkInterceptor(UserAgentInterceptor)
             .build()
     }
@@ -231,7 +235,8 @@ class ServerSync(
                 title = host,
                 kind =
                     when (e) {
-                        is GReaderException.Unreachable -> FailKind.NO_CONNECTION
+                        is GReaderException.Unreachable ->
+                            if (e.cause is NotOnHomeNetwork) FailKind.NOT_HOME_NETWORK else FailKind.NO_CONNECTION
                         is GReaderException.WrongPassword -> FailKind.SIGN_IN_REFUSED
                         is GReaderException.ServerError -> FailKind.SERVER_ANSWERED
                         else -> FailKind.OTHER
