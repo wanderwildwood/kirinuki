@@ -34,6 +34,8 @@ import com.mudita.mmd.components.top_app_bar.TopAppBarMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.db.room.ID_ALL_FEEDS
 import com.wanderwildwood.kirinuki.db.room.ID_PODCASTS
+import com.wanderwildwood.kirinuki.db.room.ID_READING
+import com.wanderwildwood.kirinuki.db.room.READING_EXPANDED_KEY
 import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
 import com.wanderwildwood.kirinuki.db.room.PODCASTS_EXPANDED_KEY
@@ -142,12 +144,18 @@ fun FeedsScreen(
                     key = { index -> items.peek(index)?.let { "${it.id}/${it.tag}" } ?: index },
                 ) { index ->
                     val item = items[index] ?: return@items
-                    // The Podcasts row opens like a folder: tapped, every episode; its +, the shows.
-                    val isPodcasts = item.id == ID_PODCASTS
+                    // The Podcasts and Reading rows open like a folder: tapped, every episode or
+                    // article; their +, the shows or the feeds in no folder.
+                    val groupKey =
+                        when (item.id) {
+                            ID_PODCASTS -> PODCASTS_EXPANDED_KEY
+                            ID_READING -> READING_EXPANDED_KEY
+                            else -> null
+                        }
                     FeedRow(
                         item = item,
                         expanded =
-                            if (isPodcasts) PODCASTS_EXPANDED_KEY in expandedTags else item.tag in expandedTags,
+                            (groupKey ?: item.tag) in expandedTags,
                         onClick = {
                             when {
                                 item.id == ID_UNSET && item.tag.isNotEmpty() -> {
@@ -161,7 +169,7 @@ fun FeedsScreen(
                             }
                         },
                         onToggleTag = {
-                            viewModel.toggleTagExpansion(if (isPodcasts) PODCASTS_EXPANDED_KEY else item.tag)
+                            viewModel.toggleTagExpansion(groupKey ?: item.tag)
                         },
                         // A tag, All feeds and Saved articles are not feeds, so there is
                         // nothing to edit on those rows either.
@@ -190,12 +198,13 @@ private fun FeedRow(
     modifier: Modifier = Modifier,
 ) {
     val isTag = item.id == ID_UNSET && item.tag.isNotEmpty()
-    val opens = isTag || item.id == ID_PODCASTS
+    val opens = isTag || item.id == ID_PODCASTS || item.id == ID_READING
     val title =
         when (item.id) {
             ID_ALL_FEEDS -> stringResource(R.string.all_feeds)
             ID_SAVED_ARTICLES -> stringResource(R.string.saved_articles)
             ID_PODCASTS -> stringResource(R.string.podcasts)
+            ID_READING -> stringResource(R.string.reading)
             else -> item.displayTitle
         }
 

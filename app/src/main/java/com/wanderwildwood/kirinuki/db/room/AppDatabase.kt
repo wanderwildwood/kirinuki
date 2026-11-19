@@ -34,6 +34,9 @@ const val ID_SAVED_ARTICLES: Long = -20
 /** Every episode of every podcast, which are kept out of [ID_ALL_FEEDS]. */
 const val ID_PODCASTS: Long = -30
 
+/** The Reading row: the reading feeds that are in no folder, opened like Podcasts. */
+const val ID_READING: Long = -40
+
 /**
  * The feeds that are podcasts: any whose posts carry a sound file. Worked out from the items
  * rather than stored on the feed, so a podcast subscribed to any way at all -- Add feed, OPML,
@@ -43,6 +46,9 @@ const val PODCAST_FEED_IDS = "SELECT DISTINCT feed_id FROM feed_items WHERE encl
 
 /** Stands in [expandedTags] for the Podcasts row's own +, beside the real tags. */
 const val PODCASTS_EXPANDED_KEY = ":podcasts:"
+
+/** Stands in [expandedTags] for the Reading row's own +. */
+const val READING_EXPANDED_KEY = ":reading:"
 
 private const val LOG_TAG = "KIRINUKI_APPDB"
 

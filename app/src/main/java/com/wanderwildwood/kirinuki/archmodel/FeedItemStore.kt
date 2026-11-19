@@ -18,6 +18,7 @@ import com.wanderwildwood.kirinuki.db.room.FeedItemDao.Companion.FEED_ITEM_LIST_
 import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
 import com.wanderwildwood.kirinuki.db.room.FeedItemWithFeed
 import com.wanderwildwood.kirinuki.db.room.ID_PODCASTS
+import com.wanderwildwood.kirinuki.db.room.ID_READING
 import com.wanderwildwood.kirinuki.db.room.ID_SAVED_ARTICLES
 import com.wanderwildwood.kirinuki.db.room.PODCAST_FEED_IDS
 import com.wanderwildwood.kirinuki.db.room.ID_UNSET
@@ -176,6 +177,7 @@ class FeedItemStore(
             // Podcasts have their own row; All feeds is the reading, unless the reader has
             // asked for the episodes to be shown in it too.
             feedId == ID_PODCASTS -> append("AND feed_id IN ($PODCAST_FEED_IDS)\n")
+            feedId == ID_READING -> append("AND tag IS '' AND feed_id NOT IN ($PODCAST_FEED_IDS)\n")
             !includePodcasts -> append("AND feed_id NOT IN ($PODCAST_FEED_IDS)\n")
         }
 
@@ -329,6 +331,10 @@ class FeedItemStore(
 
     suspend fun markAllPodcastsAsRead() {
         dao.markAllPodcastsAsRead()
+    }
+
+    suspend fun markAllReadingAsRead() {
+        dao.markAllReadingAsRead()
     }
 
     fun getFeedsItemsWithDefaultFullTextNeedingDownload(): Flow<List<FeedItemIdWithLink>> = dao.getFeedsItemsWithDefaultFullTextNeedingDownload()

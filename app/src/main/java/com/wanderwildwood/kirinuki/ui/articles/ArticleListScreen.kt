@@ -67,6 +67,7 @@ fun ArticleListScreen(
             screenTitle?.title != null -> screenTitle?.title.orEmpty()
             screenTitle?.type == FeedType.SAVED_ARTICLES -> stringResource(R.string.saved_articles)
             screenTitle?.type == FeedType.PODCASTS -> stringResource(R.string.podcasts)
+            screenTitle?.type == FeedType.READING -> stringResource(R.string.reading)
             else -> stringResource(R.string.all_feeds)
         }
 

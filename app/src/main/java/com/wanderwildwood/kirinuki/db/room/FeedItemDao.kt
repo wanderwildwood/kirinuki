@@ -360,6 +360,19 @@ interface FeedItemDao {
     @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE feed_id IN ($PODCAST_FEED_IDS)")
     suspend fun markAllPodcastsAsRead(readTime: Instant = Instant.now())
 
+    @Query(
+        """
+        UPDATE feed_items
+        SET read_time = coalesce(read_time, :readTime), notified = 1
+        WHERE id IN (
+          SELECT feed_items.id
+          FROM feed_items
+          JOIN feeds ON feed_items.feed_id = feeds.id
+          WHERE feeds.tag IS '' AND feed_items.feed_id NOT IN ($PODCAST_FEED_IDS)
+        )""",
+    )
+    suspend fun markAllReadingAsRead(readTime: Instant = Instant.now())
+
     @Query("UPDATE feed_items SET read_time = coalesce(read_time, :readTime), notified = 1 WHERE feed_id IS :feedId")
     suspend fun markAllAsRead(
         feedId: Long?,

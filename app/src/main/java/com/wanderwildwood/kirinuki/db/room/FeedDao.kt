@@ -167,6 +167,16 @@ interface FeedDao {
                 from feeds_with_items_for_nav_drawer
                 where feed_id in ($PODCAST_FEED_IDS) and '$PODCASTS_EXPANDED_KEY' in (:expandedTags)
                 group by feed_id
+                -- reading: the feeds in no folder, under one row of their own, opened like Podcasts
+                union
+                select $ID_READING as id, '' as display_title, '' as tag, '' as image_url, sum(unread) as unread_count, '$READING_EXPANDED_KEY' in (:expandedTags) as expanded, 1 as sort_section, 3 as sort_tag_or_feed
+                from feeds_with_items_for_nav_drawer
+                where tag is '' and feed_id not in ($PODCAST_FEED_IDS)
+                union
+                select feed_id as id, display_title, '' as tag, image_url, sum(unread) as unread_count, 0 as expanded, 1 as sort_section, 4 as sort_tag_or_feed
+                from feeds_with_items_for_nav_drawer
+                where tag is '' and feed_id not in ($PODCAST_FEED_IDS) and '$READING_EXPANDED_KEY' in (:expandedTags)
+                group by feed_id
                 -- tags
                 union
                 select $ID_UNSET as id, tag as display_title, tag, '' as image_url, sum(unread) as unread_count, tag in (:expandedTags) as expanded, 2 as sort_section, 0 as sort_tag_or_feed
@@ -175,13 +185,13 @@ interface FeedDao {
                 group by tag
                 -- feeds
                 union
-                select feed_id as id, display_title, tag, image_url, sum(unread) as unread_count, 0 as expanded, case when tag is '' then 3 else 2 end as sort_section, 1 as sort_tag_or_feed
+                select feed_id as id, display_title, tag, image_url, sum(unread) as unread_count, 0 as expanded, 2 as sort_section, 1 as sort_tag_or_feed
                 from feeds_with_items_for_nav_drawer
-                where (tag is '' or tag in (:expandedTags)) and feed_id not in ($PODCAST_FEED_IDS)
+                where tag is not '' and tag in (:expandedTags) and feed_id not in ($PODCAST_FEED_IDS)
                 group by feed_id
             )
             -- no podcasts, no Podcasts row: its sum over nothing is null
-            where id is not $ID_PODCASTS or unread_count is not null
+            where (id is not $ID_PODCASTS and id is not $ID_READING) or unread_count is not null
             -- sort them
             order by sort_section, tag, sort_tag_or_feed, display_title collate nocase
         """,
