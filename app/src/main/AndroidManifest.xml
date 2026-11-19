@@ -29,7 +29,8 @@
   <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
 
   <queries>
-      <!-- Home, whose dark mode switch this app follows when Home is installed. -->
+      <!-- Home, whose dark mode switch this app follows when Home is installed, and whose
+           Nextcloud account it can use for Nextcloud News (sync/HomeAccount.kt). -->
       <package android:name="com.wanderwildwood.iori" />
     <!-- Package visibility: without this the reader cannot tell whether anything on the
          phone opens a web page, and the "open the title in a browser" setting could only

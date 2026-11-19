@@ -90,6 +90,10 @@ class MainActivity : DIAwareComponentActivity() {
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
     private val settingsStore: SettingsStore by instance()
+    private val serverSync: com.wanderwildwood.kirinuki.sync.ServerSync by instance()
+
+    /** Stops listening for Home's account changes; set while the app is in front. */
+    private var stopHomeWatch: (() -> Unit)? = null
 
     /** Turns the screen with the phone, but only while an article or a capsule page is the screen in front. */
     private val turner = TurnWithPhone(this)
@@ -97,9 +101,13 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onStart() {
         super.onStart()
         notificationsWorker.runForever()
+        // Home's Nextcloud account, when Feeds uses it: asked again on each change notice.
+        stopHomeWatch = serverSync.watchHome()
     }
 
     override fun onStop() {
+        stopHomeWatch?.invoke()
+        stopHomeWatch = null
         notificationsWorker.stopForever()
         super.onStop()
     }
@@ -107,6 +115,7 @@ class MainActivity : DIAwareComponentActivity() {
     override fun onResume() {
         super.onResume()
         mainActivityViewModel.setResumeTime()
+        serverSync.refreshFromHome()
         maybeRequestSync()
         turner.resume()
     }

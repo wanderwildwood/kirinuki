@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug builds only: a debug Home, whose Nextcloud account a debug Feeds can use. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <queries>
+    <package android:name="com.wanderwildwood.iori.debug" />
+  </queries>
+</manifest>

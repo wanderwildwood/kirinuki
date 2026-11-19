@@ -28,6 +28,10 @@ Three screens. The feeds, what is in one, and the thing itself.
   The app then also talks to that one server, sending your login, your feeds and what you have
   read or starred. A plain http address is taken only for a home server, and used only on
   Wi-Fi or a VPN, never on mobile data.
+  With [Home](https://github.com/wanderwildwood/iori) on the phone and signed in to Nextcloud,
+  **Use the phone's Nextcloud account** there syncs with that Nextcloud's News app, with no
+  password typed here. Home keeps the password; Feeds asks Home for it before each sync, and
+  stops syncing when Home signs out.
 - **Dark mode**, a switch in Settings; the app also follows the phone's own dark setting.
 - **Read with the radio off.** Everything is fetched on wifi and stored; the reading
   afterwards needs nothing.

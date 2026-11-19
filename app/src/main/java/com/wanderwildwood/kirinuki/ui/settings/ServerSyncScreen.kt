@@ -55,6 +55,10 @@ import androidx.compose.ui.semantics.selected
  * typed: no browser, nothing to register.
  * Signed in, it says where and as whom, when it last synced, what went wrong if something did,
  * and offers Sync now and Stop syncing.
+ *
+ * When Home holds the phone's Nextcloud account for this app, a row offers it for Nextcloud
+ * News. While it is in use the screen says whose it is, from Home, and Stop using it goes back
+ * to this app's own sign-in, empty. When Home signs out, so does this, without an error.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +70,7 @@ fun ServerSyncScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val check by viewModel.check.collectAsStateWithLifecycle()
+    val homeAvailable by viewModel.homeAvailable.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     // Chosen above the form, and read by the result line too, so it lives here.
     var kind by rememberSaveable { mutableStateOf(ServerKind.GOOGLE_READER) }
@@ -73,7 +78,7 @@ fun ServerSyncScreen(
     // buttons are at the foot of a form taller than the panel, and a line under them was
     // off the screen when it appeared.
     LaunchedEffect(busy, check) {
-        if (state.account == null && (busy || check != null)) listState.scrollToItem(1)
+        if (state.account == null && state.home == null && (busy || check != null)) listState.scrollToItem(if (homeAvailable) 2 else 1)
     }
 
     Scaffold(
@@ -101,10 +106,34 @@ fun ServerSyncScreen(
             showCutRow = true,
         ) {
             val account = state.account
-            if (account == null) {
+            val home = state.home
+            if (account == null && home != null) {
+                // Home's account was chosen and Home is signed out of it: nothing syncs, and it
+                // comes back on its own when Home signs in to the same account again.
+                item(key = "home_signed_out") {
+                    TextMMD(
+                        text = stringResource(R.string.home_account_signed_out, stringResource(R.string.home_account_kept)),
+                    )
+                }
+                item(key = "home_stop") {
+                    StopButton(label = R.string.home_account_stop, onStop = viewModel::stop)
+                }
+            } else if (account == null) {
                 // Keyed: the result line comes and goes above the form, and without keys the
                 // form would take the result's slot and lose what was typed into it.
                 item(key = "intro") { TextMMD(text = stringResource(R.string.server_sync_intro)) }
+                if (homeAvailable) {
+                    item(key = "home_use") {
+                        HomeUseButton(
+                            enabled = !busy,
+                            onUse = {
+                                // Home's account is a Nextcloud: the result line speaks of News.
+                                kind = ServerKind.NEXTCLOUD_NEWS
+                                viewModel.useHome()
+                            },
+                        )
+                    }
+                }
                 item(key = "kind") {
                     KindChoice(
                         kind = kind,
@@ -141,11 +170,15 @@ fun ServerSyncScreen(
                         TextMMD(text = stringResource(kindName(account.kind)))
                         TextMMD(
                             text =
-                                stringResource(
-                                    R.string.server_sync_signed_in_as,
-                                    displayHost(account.apiUrl),
-                                    account.login,
-                                ),
+                                if (home != null) {
+                                    stringResource(R.string.home_account_in_use, home.user, shownServer(home.server))
+                                } else {
+                                    stringResource(
+                                        R.string.server_sync_signed_in_as,
+                                        displayHost(account.apiUrl),
+                                        account.login,
+                                    )
+                                },
                         )
                         TextMMD(
                             text =
@@ -159,6 +192,20 @@ fun ServerSyncScreen(
                 state.problem?.let { problem ->
                     item { TextMMD(text = problemWords(problem, state.problemCode, account.kind)) }
                 }
+                // Switching from this app's own sign-in to Home's: what the switch came to.
+                val result = check
+                if (home == null && (busy || result is ServerCheck.Failed)) {
+                    item {
+                        TextMMD(
+                            text =
+                                if (result is ServerCheck.Failed && !busy) {
+                                    problemWords(result.problem, result.code, ServerKind.NEXTCLOUD_NEWS)
+                                } else {
+                                    stringResource(R.string.server_sync_checking)
+                                },
+                        )
+                    }
+                }
                 item {
                     HouseButton(
                         label = stringResource(R.string.server_sync_now),
@@ -166,7 +213,14 @@ fun ServerSyncScreen(
                         modifier = Modifier.fillMaxWidth(),
                     )
                 }
-                item { StopButton(onStop = viewModel::stop) }
+                if (home == null && homeAvailable) {
+                    item { HomeUseButton(enabled = !busy, onUse = viewModel::useHome) }
+                }
+                if (home != null) {
+                    item { StopButton(label = R.string.home_account_stop, onStop = viewModel::stop) }
+                } else {
+                    item { StopButton(label = R.string.server_sync_stop, onStop = viewModel::stop) }
+                }
             }
         }
     }
@@ -289,15 +343,33 @@ private fun SignInForm(
     }
 }
 
+/** "Use the phone's Nextcloud account": shown only while Home has one for this app. */
+@Composable
+private fun HomeUseButton(
+    enabled: Boolean,
+    onUse: () -> Unit,
+) {
+    HouseButton(
+        label = stringResource(R.string.home_account_use),
+        onClick = onUse,
+        enabled = enabled,
+        maxLines = 2,
+        modifier = Modifier.fillMaxWidth(),
+    )
+}
+
 /**
  * The armed-row pattern: the first press only says what the second will do; it stays armed
  * until the next other touch, Back or leaving the screen.
  */
 @Composable
-private fun StopButton(onStop: () -> Unit) {
+private fun StopButton(
+    label: Int,
+    onStop: () -> Unit,
+) {
     var armed by rememberArmedFlag()
     HouseButton(
-        label = stringResource(if (armed) R.string.server_sync_stop_armed else R.string.server_sync_stop),
+        label = stringResource(if (armed) R.string.server_sync_stop_armed else label),
         onClick = {
             if (armed) {
                 armed = false
@@ -331,6 +403,8 @@ private fun problemWords(
         ServerProblem.SERVER_ERROR -> stringResource(R.string.server_sync_server_error, code)
         ServerProblem.PASSWORD_LOST -> stringResource(R.string.server_sync_password_lost)
         ServerProblem.NOT_HOME_NETWORK -> stringResource(R.string.server_sync_not_home_network)
+        ServerProblem.HOME_SIGNED_OUT ->
+            stringResource(R.string.home_account_signed_out, stringResource(R.string.home_account_kept))
     }
 
 /** The server's host, with its port when it is not the usual one for the scheme. */
@@ -339,6 +413,9 @@ internal fun displayHost(url: String): String {
     val usual = okhttp3.HttpUrl.defaultPort(parsed.scheme)
     return if (parsed.port == usual) parsed.host else "${parsed.host}:${parsed.port}"
 }
+
+/** Home's server as a person reads it: without https://, and without a slash at the end. */
+internal fun shownServer(server: String): String = server.trimEnd('/').substringAfter("://")
 
 private val lastSyncFormat: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
 

@@ -13,6 +13,7 @@ import com.wanderwildwood.kirinuki.ui.compose.utils.withAllProviders
 import com.wanderwildwood.kirinuki.ui.settings.ServerSyncScreen
 import com.wanderwildwood.kirinuki.ui.settings.ServerSyncViewModel
 import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
+import org.kodein.di.instance
 
 /**
  * Should only be opened from the MANAGE SETTINGS INTENT.
@@ -21,6 +22,27 @@ import com.wanderwildwood.kirinuki.ui.settings.SettingsScreen
  * document picker wants an activity that is going to stay on screen afterwards.
  */
 class ManageSettingsActivity : DIAwareComponentActivity() {
+    private val serverSync: com.wanderwildwood.kirinuki.sync.ServerSync by instance()
+
+    /** Stops listening for Home's account changes; set while the screen is in front. */
+    private var stopHomeWatch: (() -> Unit)? = null
+
+    override fun onStart() {
+        super.onStart()
+        stopHomeWatch = serverSync.watchHome()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        serverSync.refreshFromHome()
+    }
+
+    override fun onStop() {
+        stopHomeWatch?.invoke()
+        stopHomeWatch = null
+        super.onStop()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

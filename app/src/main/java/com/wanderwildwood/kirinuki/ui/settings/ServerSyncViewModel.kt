@@ -1,15 +1,19 @@
 package com.wanderwildwood.kirinuki.ui.settings
 
+import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.background.runOnceRssSync
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
+import com.wanderwildwood.kirinuki.sync.HomeAccount
 import com.wanderwildwood.kirinuki.sync.ServerCheck
 import com.wanderwildwood.kirinuki.sync.ServerKind
 import com.wanderwildwood.kirinuki.sync.ServerSync
 import com.wanderwildwood.kirinuki.sync.ServerSyncState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.instance
 
@@ -29,6 +33,38 @@ class ServerSyncViewModel(
 
     /** What the last Test or Sign in came to, until something is typed again. */
     val check: StateFlow<ServerCheck?> = _check
+
+    private val _homeAvailable = MutableStateFlow(false)
+
+    /** Home has a Nextcloud account for this app: the row "Use the phone's Nextcloud account" shows. */
+    val homeAvailable: StateFlow<Boolean> = _homeAvailable
+
+    /** Asked when the screen opens and again on each change notice from Home. */
+    private val stopWatching: () -> Unit
+
+    init {
+        checkHome()
+        stopWatching = HomeAccount.observe(getApplication<Application>()) { checkHome() }
+    }
+
+    override fun onCleared() {
+        stopWatching()
+        super.onCleared()
+    }
+
+    private fun checkHome() {
+        viewModelScope.launch {
+            _homeAvailable.value = withContext(Dispatchers.IO) { HomeAccount.available(getApplication<Application>()) }
+        }
+    }
+
+    /** Switches to Home's account, dropping this app's own sign-in; the first sync starts at once. */
+    fun useHome() =
+        run {
+            serverSync.useHome().also {
+                if (it is ServerCheck.Works) runOnceRssSync(di = di, forceNetwork = true, triggeredByUser = true)
+            }
+        }
 
     fun clearCheck() {
         _check.value = null

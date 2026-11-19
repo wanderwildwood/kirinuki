@@ -14,4 +14,10 @@ class DisplayHostTest {
     fun anotherPortIsShown() {
         assertEquals("192.168.1.20:8080", displayHost("http://192.168.1.20:8080/"))
     }
+
+    @Test
+    fun homesServerIsShownWithoutTheScheme() {
+        assertEquals("cloud.example.org", shownServer("https://cloud.example.org"))
+        assertEquals("example.org/nextcloud", shownServer("https://example.org/nextcloud/"))
+    }
 }

@@ -238,3 +238,24 @@ server); fixed the same day (articles in no feed leave the sync) and seen fixed.
   a word feeds share; moving each feed is sent).
 - A feed renamed on the phone keeps its name on the phone only (Feeds' own custom title).
 - No per-feed "fetch from site instead" switch while sync is on.
+
+## The phone's Nextcloud account, from Home
+
+When Home (iori, the launcher) is signed in to a Nextcloud and has Feeds on its list, the
+screen shows **Use the phone's Nextcloud account**. Pressed, Feeds asks Home for the account
+(`sync/HomeAccount.kt`, the shared copy from shared-homeaccount), finds News' API on that
+server with it, and drops its own sign-in. It keeps only whose account it is (server and user)
+and the stamp Home gave it; the password stays with Home. Feeds asks Home again before each
+sync, on each start and resume, and on each change notice, and holds the password in memory
+only.
+
+- Home gets a new password: the next answer has a new stamp, and Feeds takes it.
+- Home signs out, or is uninstalled: Feeds shows itself signed out and stops syncing, with no
+  error. Feeds and articles stay, and so do their links to the account, so the same account
+  carries on when Home signs in to it again.
+- Home signs in to another account: Feeds forgets the one it had, as Stop using it does. The
+  new one is used only after the row is pressed again.
+- **Stop using it** forgets the choice and the links, like Stop syncing, and shows the app's
+  own sign-in, empty.
+
+Without Home, nothing changes: the typed sign-in works as before.

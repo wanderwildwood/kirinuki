@@ -16,8 +16,12 @@ import com.wanderwildwood.kirinuki.sync.greader.RoomGReaderStore
 import com.wanderwildwood.kirinuki.sync.nextcloud.NextcloudNewsApi
 import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.withLock
@@ -32,7 +36,7 @@ import java.time.Instant
 import java.util.concurrent.TimeUnit
 
 /** Why the feed server could not be used, one sentence each in Settings. */
-enum class ServerProblem { UNREACHABLE, WRONG_PASSWORD, NOT_GOOGLE_READER, INSECURE, SERVER_ERROR, PASSWORD_LOST, NOT_HOME_NETWORK }
+enum class ServerProblem { UNREACHABLE, WRONG_PASSWORD, NOT_GOOGLE_READER, INSECURE, SERVER_ERROR, PASSWORD_LOST, NOT_HOME_NETWORK, HOME_SIGNED_OUT }
 
 /** The kinds of feed server Feeds syncs with. The name is what is stored. */
 enum class ServerKind {
@@ -50,8 +54,21 @@ data class ServerAccount(
     val kind: ServerKind = ServerKind.GOOGLE_READER,
 )
 
+/**
+ * The phone's Nextcloud account, taken from Home (HomeAccount) for Nextcloud News: whose it is,
+ * and whether Home is signed out of it just now (then nothing syncs until it is back).
+ */
+data class HomeUse(
+    val server: String,
+    val user: String,
+    val signedOut: Boolean,
+)
+
 data class ServerSyncState(
+    /** The account syncing now; null while signed out, Home's account included. */
     val account: ServerAccount? = null,
+    /** Set while the account is Home's, or was and Home is signed out of it. */
+    val home: HomeUse? = null,
     val lastSync: Instant? = null,
     val problem: ServerProblem? = null,
     val problemCode: Int = 0,
@@ -87,6 +104,11 @@ fun GReaderException.code(): Int =
  * Stopping forgets the server and keeps every feed and article where it is.
  *
  * The server is the only place this talks to, and only what was typed is used.
+ *
+ * Or, for Nextcloud News, the phone's Nextcloud account that Home holds (HomeAccount): then
+ * only the choice is kept here (whose account, and the stamp last taken). The password is
+ * asked of Home before each sync and on each start, resume and change notice, held in memory
+ * only, and let go when Home signs out, is gone or holds another account.
  */
 class ServerSync(
     override val di: DI,
@@ -115,15 +137,148 @@ class ServerSync(
 
     val isOn: Boolean get() = _state.value.account != null
 
+    /** Home's password while its account is in use: in memory only, never stored or logged. */
+    @Volatile
+    private var homePassword: String? = null
+
+    /** Each answer from Home is followed one at a time. Taken after syncMutex, never before it. */
+    private val homeMutex = Mutex()
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private fun load(): ServerSyncState {
         val url = prefs.getString(KEY_URL, null) ?: return ServerSyncState()
         val login = prefs.getString(KEY_LOGIN, null) ?: return ServerSyncState()
         // Accounts made before there was a choice are Google Reader ones.
         val kind = ServerKind.entries.firstOrNull { it.name == prefs.getString(KEY_KIND, null) } ?: ServerKind.GOOGLE_READER
-        return ServerSyncState(
-            account = ServerAccount(url, login, kind),
-            lastSync = prefs.getLong(KEY_LAST_SYNC, 0L).takeIf { it > 0 }?.let { Instant.ofEpochSecond(it) },
-        )
+        val lastSync = prefs.getLong(KEY_LAST_SYNC, 0L).takeIf { it > 0 }?.let { Instant.ofEpochSecond(it) }
+        val who = homeWho()
+        if (who != null) {
+            // Home's account: on while a stamp is held, signed out while it is empty.
+            val holding = homeStamp().isNotEmpty()
+            return ServerSyncState(
+                account = if (holding) ServerAccount(url, login, ServerKind.NEXTCLOUD_NEWS) else null,
+                home = homeUse(who, signedOut = !holding),
+                lastSync = lastSync,
+            )
+        }
+        return ServerSyncState(account = ServerAccount(url, login, kind), lastSync = lastSync)
+    }
+
+    private fun homeWho(): String? = prefs.getString(KEY_HOME_WHO, null)?.takeIf { it.isNotEmpty() }
+
+    private fun homeStamp(): String = prefs.getString(KEY_HOME_STAMP, null).orEmpty()
+
+    private fun homeUse(
+        who: String,
+        signedOut: Boolean,
+    ) = HomeUse(server = who.substringBefore('\n'), user = who.substringAfter('\n'), signedOut = signedOut)
+
+    /**
+     * Switches to Home's Nextcloud account for Nextcloud News: asks Home for it, finds the News
+     * API on that server with it, and if that works, drops this app's own sign-in and keeps
+     * only whose account it is and its stamp.
+     */
+    suspend fun useHome(): ServerCheck {
+        val held =
+            withContext(Dispatchers.IO) { HomeAccount.read(application) }
+                ?: return ServerCheck.Failed(ServerProblem.HOME_SIGNED_OUT)
+        val apiUrl =
+            try {
+                withContext(Dispatchers.IO) { NextcloudNewsApi.resolve(client, held.server, held.user, held.password) }
+            } catch (e: GReaderException) {
+                return ServerCheck.Failed(e.toProblem(), e.code())
+            }
+        withContext(NonCancellable + Dispatchers.IO) {
+            syncMutex.withLock {
+                homeMutex.withLock {
+                    val before = _state.value.account
+                    // The same News account as before keeps its links and its last sync; any
+                    // other starts with nothing linked, as a new sign-in does.
+                    val same = before != null && before.kind == ServerKind.NEXTCLOUD_NEWS && before.apiUrl == apiUrl && before.login == held.user
+                    if (!same) store.forgetServer()
+                    val edit =
+                        prefs.edit()
+                            .putString(KEY_URL, apiUrl)
+                            .putString(KEY_LOGIN, held.user)
+                            .putString(KEY_KIND, ServerKind.NEXTCLOUD_NEWS.name)
+                            .remove(KEY_PASSWORD)
+                            .putString(KEY_HOME_WHO, held.who)
+                            .putString(KEY_HOME_STAMP, held.stamp)
+                    if (!same) edit.remove(KEY_LAST_SYNC).remove(KEY_LAST_FULL)
+                    edit.apply()
+                    homePassword = held.password
+                    _state.value =
+                        ServerSyncState(
+                            account = ServerAccount(apiUrl, held.user, ServerKind.NEXTCLOUD_NEWS),
+                            home = homeUse(held.who, signedOut = false),
+                            lastSync = if (same) _state.value.lastSync else null,
+                        )
+                }
+            }
+        }
+        return ServerCheck.Works(apiUrl, ServerKind.NEXTCLOUD_NEWS)
+    }
+
+    /**
+     * Asks Home again, when its account is the one chosen, and does what HomeAccount.follow
+     * says. Called on each start and resume of the app and on each change notice from Home.
+     */
+    fun refreshFromHome() {
+        if (homeWho() == null) return
+        scope.launch {
+            if (followHome(holdingSync = false)) {
+                // Home now holds another account: its links go, after any sync still running.
+                withContext(NonCancellable) { syncMutex.withLock { store.forgetServer() } }
+            }
+        }
+    }
+
+    /**
+     * Listens for Home's change notices while the app is in front; returns what stops it.
+     * Call in onStart, and the returned stop in onStop.
+     */
+    fun watchHome(): () -> Unit = HomeAccount.observe(application) { refreshFromHome() }
+
+    /**
+     * Asks Home and follows its answer. True when the account was let go for another one and
+     * its links are still to be forgotten (by the caller, which may already hold syncMutex).
+     */
+    private suspend fun followHome(holdingSync: Boolean): Boolean {
+        val answer = withContext(Dispatchers.IO) { HomeAccount.ask(application) }
+        return homeMutex.withLock {
+            val who = homeWho() ?: return@withLock false
+            when (val step = HomeAccount.follow(who, homeStamp(), answer)) {
+                is HomeAccount.Step.Keep -> {
+                    // The same account and stamp: the password may not be in memory yet (a new process).
+                    (answer as? HomeAccount.Answer.Has)?.held?.takeIf { it.who == who }?.let { homePassword = it.password }
+                    false
+                }
+                is HomeAccount.Step.Take -> {
+                    homePassword = step.held.password
+                    prefs.edit().putString(KEY_HOME_STAMP, step.held.stamp).apply()
+                    _state.value = load().copy(problem = null, problemCode = 0)
+                    false
+                }
+                is HomeAccount.Step.Drop -> {
+                    homePassword = null
+                    if (step.following) {
+                        // Signed out, or Home is gone: nothing syncs, the choice stays, so the
+                        // same account is taken again when Home has it back. What is on the
+                        // phone stays, and so do its links to that account.
+                        prefs.edit().putString(KEY_HOME_STAMP, "").apply()
+                        _state.value = load()
+                        false
+                    } else {
+                        // Home holds another account: forget this one, as Stop using it does.
+                        prefs.edit().clear().apply()
+                        _state.value = ServerSyncState()
+                        if (holdingSync) store.forgetServer()
+                        !holdingSync
+                    }
+                }
+            }
+        }
     }
 
     /** Tries the address, login name and password, and says what happened; stores nothing. */
@@ -165,21 +320,25 @@ class ServerSync(
                 .putString(KEY_LOGIN, login.trim())
                 .putString(KEY_PASSWORD, sealed)
                 .putString(KEY_KIND, kind.name)
+                .remove(KEY_HOME_WHO)
+                .remove(KEY_HOME_STAMP)
                 .remove(KEY_LAST_SYNC)
                 .remove(KEY_LAST_FULL)
                 .apply()
+            homePassword = null
             _state.value = ServerSyncState(account = ServerAccount(check.apiUrl, login.trim(), kind))
         }
         return check
     }
 
     /**
-     * Stops syncing: forgets the address, login and password, and which feeds and articles
-     * came from the server. Every feed and article stays; the feeds are fetched from their
+     * Stops syncing: forgets the address, login and password (or the choice of Home's account),
+     * and which feeds and articles came from the server. Every feed and article stays; the feeds are fetched from their
      * sites again from the next refresh.
      */
     suspend fun stop() {
         prefs.edit().clear().apply()
+        homePassword = null
         _state.value = ServerSyncState()
         // After any sync already running, which would otherwise write its links back; and
         // finished even if the screen that asked is closed meanwhile.
@@ -194,9 +353,19 @@ class ServerSync(
      * the failure, worded for the pull line under the server's own name.
      */
     suspend fun syncNow(keepReadPerFeed: Int): SyncFailure? {
+        // Home's account is asked for before each sync. Signed out or gone, nothing syncs and
+        // nothing is said: the screen shows it signed out. This runs inside syncMutex.
+        val fromHome = homeWho() != null
+        if (fromHome) followHome(holdingSync = true)
         val account = _state.value.account ?: return null
         val host = account.apiUrl.toHttpUrlOrNull()?.host ?: account.apiUrl
-        val password = Secrets.open(prefs.getString(KEY_PASSWORD, null))
+        val password =
+            if (fromHome) {
+                // Null only when Home could not be asked just now and nothing was in memory: try next time.
+                homePassword ?: return null
+            } else {
+                Secrets.open(prefs.getString(KEY_PASSWORD, null))
+            }
         if (password == null) {
             _state.value = _state.value.copy(problem = ServerProblem.PASSWORD_LOST, problemCode = 0)
             return SyncFailure(title = host, kind = FailKind.SIGN_IN_REFUSED)
@@ -255,6 +424,12 @@ class ServerSync(
         private const val KEY_LAST_SYNC = "last_sync"
         private const val KEY_KIND = "kind"
         private const val KEY_LAST_FULL = "last_full_list"
+
+        /** Home's account chosen: whose it is (HomeAccount.Held.who: server and user, no password). */
+        private const val KEY_HOME_WHO = "home_who"
+
+        /** The stamp of Home's account last taken; empty while Home is signed out of it. */
+        private const val KEY_HOME_STAMP = "home_stamp"
 
         /** How often a Nextcloud News sync reads the whole unread list rather than the changes. */
         private const val FULL_LIST_SECONDS = 24L * 3600

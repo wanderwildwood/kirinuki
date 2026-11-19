@@ -578,6 +578,12 @@
   <string name="server_sync_now">Sync now</string>
   <string name="server_sync_stop">Stop syncing</string>
   <string name="server_sync_stop_armed">Tap again to stop. Feeds and articles stay on the phone.</string>
+  <!-- The phone's Nextcloud account, held by Home (shared-homeaccount) -->
+  <string name="home_account_use">Use the phone\'s Nextcloud account</string>
+  <string name="home_account_in_use">%1$s on %2$s, from Home.</string>
+  <string name="home_account_stop">Stop using it</string>
+  <string name="home_account_signed_out">Home is signed out of Nextcloud, so this app is too. Your %1$s stay on the phone.</string>
+  <string name="home_account_kept">feeds and articles</string>
   <!-- QR codes: a feed's address scanned in, and a story's address shown for another device. -->
   <string name="qr_scan">Scan a QR code</string>
   <string name="qr_scan_title">Scan a QR code</string>
