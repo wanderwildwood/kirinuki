@@ -77,6 +77,8 @@ an article, with its show notes as the text and the player along the bottom.
   60 minutes.
 - **Skip buttons on headphones** skip 30 seconds ahead and 15 back; held, they go to the next
   episode in the show or start this one again. Settings swaps the two.
+- **Play from headphones, a car or a navigation app** with Feeds closed: the episode heard
+  last carries on where it stopped. One heard to the end is not started again.
 - **Download** keeps an episode on the phone to hear with the radio off. It waits for wifi
   unless **Download episodes only on Wi-Fi** is turned off in Settings — a switch of its own,
   apart from the feeds' — and the episode is removed once you have heard it to the end.
