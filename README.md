@@ -12,6 +12,11 @@ Fork of [Feeder](https://github.com/spacecowboy/Feeder) by
 [Jonas Kalderstam](https://github.com/spacecowboy), pared to a reader and rebuilt on
 Mudita's MMD design system.
 
+| | |
+|---|---|
+| ![The feeds: podcasts kept apart, a gemlog among them](screenshots/1-feeds.png) | ![Everything, whichever protocol it came over](screenshots/2-articles.png) |
+| ![An article, with Read aloud](screenshots/3-article.png) | ![A capsule, over Gemini](screenshots/4-capsule.png) |
+
 ## What it is
 
 Three screens. The feeds, what is in one, and the thing itself.
