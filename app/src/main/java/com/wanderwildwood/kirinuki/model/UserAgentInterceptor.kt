@@ -23,3 +23,21 @@ object UserAgentInterceptor : Interceptor {
 // const val USER_AGENT_STRING = "Mjukisbyxor / ${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
 const val USER_AGENT_STRING =
     "SpaceCowboys Android RSS Reader / ${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"
+
+/**
+ * The feed server (FreshRSS, Nextcloud News) is the person's own: it is told this app's name,
+ * so its log shows Feeds. Feeds and the sites they link to keep the name above, which upstream
+ * chose after sites blocked the others.
+ */
+object ServerUserAgentInterceptor : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response =
+        chain.proceed(
+            chain
+                .request()
+                .newBuilder()
+                .header("User-Agent", SERVER_USER_AGENT_STRING)
+                .build(),
+        )
+}
+
+const val SERVER_USER_AGENT_STRING = "Feeds (Android) / ${BuildConfig.VERSION_NAME}(${BuildConfig.VERSION_CODE})"

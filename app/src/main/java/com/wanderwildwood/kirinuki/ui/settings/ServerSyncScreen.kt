@@ -414,8 +414,12 @@ internal fun displayHost(url: String): String {
     return if (parsed.port == usual) parsed.host else "${parsed.host}:${parsed.port}"
 }
 
-/** Home's server as a person reads it: without https://, and without a slash at the end. */
-internal fun shownServer(server: String): String = server.trimEnd('/').substringAfter("://")
+/**
+ * Home's server as a person reads it, the same way as this app's own server ([displayHost]):
+ * without http:// or https://, with its port only when it is not the usual one.
+ */
+internal fun shownServer(server: String): String =
+    server.trim().trimEnd('/').let { if (it.toHttpUrlOrNull() != null) displayHost(it) else it.substringAfter("://") }
 
 private val lastSyncFormat: DateTimeFormatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)
 

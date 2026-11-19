@@ -18,6 +18,9 @@ class DisplayHostTest {
     @Test
     fun homesServerIsShownWithoutTheScheme() {
         assertEquals("cloud.example.org", shownServer("https://cloud.example.org"))
-        assertEquals("example.org/nextcloud", shownServer("https://example.org/nextcloud/"))
+        assertEquals("example.org", shownServer("https://example.org/nextcloud/"))
+        assertEquals("10.0.2.2:8080", shownServer("http://10.0.2.2:8080"))
+        assertEquals("cloud.example.org", shownServer("https://cloud.example.org:443/"))
+        assertEquals(displayHost("http://192.168.1.20:8080/index.php/apps/news/api/v1-3"), shownServer("http://192.168.1.20:8080"))
     }
 }

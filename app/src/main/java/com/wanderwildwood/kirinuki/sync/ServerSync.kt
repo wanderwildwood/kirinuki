@@ -6,7 +6,7 @@ import android.util.Log
 import com.wanderwildwood.kirinuki.archmodel.FailKind
 import com.wanderwildwood.kirinuki.archmodel.SyncFailure
 import com.wanderwildwood.kirinuki.db.room.GReaderDao
-import com.wanderwildwood.kirinuki.model.UserAgentInterceptor
+import com.wanderwildwood.kirinuki.model.ServerUserAgentInterceptor
 import com.wanderwildwood.kirinuki.model.syncMutex
 import com.wanderwildwood.kirinuki.sync.greader.GReaderApi
 import com.wanderwildwood.kirinuki.sync.greader.GReaderCredentials
@@ -128,7 +128,7 @@ class ServerSync(
             .readTimeout(60, TimeUnit.SECONDS)
             .addInterceptor(gate)
             .addNetworkInterceptor(gate)
-            .addNetworkInterceptor(UserAgentInterceptor)
+            .addNetworkInterceptor(ServerUserAgentInterceptor)
             .build()
     }
 
@@ -166,6 +166,9 @@ class ServerSync(
     }
 
     private fun homeWho(): String? = prefs.getString(KEY_HOME_WHO, null)?.takeIf { it.isNotEmpty() }
+
+    /** [who] as HomeAccount writes it now (server in lower case, no default port, no slash at the end). */
+    private fun sameWho(who: String): String = HomeAccount.who(who.substringBefore('\n'), who.substringAfter('\n'))
 
     private fun homeStamp(): String = prefs.getString(KEY_HOME_STAMP, null).orEmpty()
 
@@ -251,12 +254,16 @@ class ServerSync(
             when (val step = HomeAccount.follow(who, homeStamp(), answer)) {
                 is HomeAccount.Step.Keep -> {
                     // The same account and stamp: the password may not be in memory yet (a new process).
-                    (answer as? HomeAccount.Answer.Has)?.held?.takeIf { it.who == who }?.let { homePassword = it.password }
+                    // A who kept by an older copy of HomeAccount is written as it writes it now.
+                    (answer as? HomeAccount.Answer.Has)?.held?.takeIf { it.who == sameWho(who) }?.let {
+                        homePassword = it.password
+                        if (it.who != who) prefs.edit().putString(KEY_HOME_WHO, it.who).apply()
+                    }
                     false
                 }
                 is HomeAccount.Step.Take -> {
                     homePassword = step.held.password
-                    prefs.edit().putString(KEY_HOME_STAMP, step.held.stamp).apply()
+                    prefs.edit().putString(KEY_HOME_WHO, step.held.who).putString(KEY_HOME_STAMP, step.held.stamp).apply()
                     _state.value = load().copy(problem = null, problemCode = 0)
                     false
                 }
