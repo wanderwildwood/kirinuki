@@ -20,6 +20,7 @@ import androidx.media3.session.SessionCommand
 import androidx.media3.session.SessionResult
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.google.common.util.concurrent.SettableFuture
 import com.wanderwildwood.kirinuki.ApplicationCoroutineScope
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.Repository
@@ -186,6 +187,37 @@ class EpisodeService :
         }
 
         /**
+         * A play button pressed while nothing is loaded, usually with the app closed: on
+         * headphones, in a car, or in a navigation app. Picks up the episode heard last where
+         * it stopped. An episode heard to the end, or gone from its feed, is not started again.
+         */
+        override fun onPlaybackResumption(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+            val result = SettableFuture.create<MediaSession.MediaItemsWithStartPosition>()
+            val id = store.lastItemId
+            appScope.launch {
+                val episode = if (id > 0L && !store.finished(id)) repository.episode(id) else null
+                val link = episode?.enclosureLink
+                if (episode == null || link == null) {
+                    result.setException(UnsupportedOperationException("nothing to resume"))
+                    return@launch
+                }
+                val kept = store.file(id)?.takeIf { store.downloadState(id) == DownloadState.Kept }
+                val item =
+                    episodeMediaItem(
+                        itemId = id,
+                        uri = kept?.toURI()?.toString() ?: link,
+                        title = episode.plainTitle,
+                        show = episode.feedDisplayTitle,
+                    )
+                result.set(MediaSession.MediaItemsWithStartPosition(listOf(item), 0, store.position(id)))
+            }
+            return result
+        }
+
+        /**
          * Headphones, a car or a Bluetooth remote: told apart here so a long press can do
          * something other than a press. The notification's own buttons send only a press and
          * are left to the session, which hands them to [EpisodePlayer] all the same.
@@ -295,6 +327,7 @@ class EpisodeService :
         val id = currentItemId() ?: return
         if (current.playbackState == Player.STATE_ENDED) return
         store.savePosition(id, current.currentPosition, current.duration.takeIf { it != C.TIME_UNSET } ?: 0L)
+        store.lastItemId = id
         store.speed = current.playbackParameters.speed
     }
 

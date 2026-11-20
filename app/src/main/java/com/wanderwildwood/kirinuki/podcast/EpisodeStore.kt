@@ -59,6 +59,14 @@ class EpisodeStore(
         prefs.edit { remove(FINISHED + itemId) }
     }
 
+    /**
+     * The episode heard last, for a play button pressed while the app is closed: on
+     * headphones, in a car or in a navigation app. 0 for none yet.
+     */
+    var lastItemId: Long
+        get() = prefs.getLong(LAST, 0L)
+        set(value) = prefs.edit { putLong(LAST, value) }
+
     /** One speed for every episode: a listener who likes 1.5x likes it for all of them. */
     var speed: Float
         get() = prefs.getFloat(SPEED, 1f)
@@ -224,6 +232,7 @@ class EpisodeStore(
         private const val DOWNLOAD = "download_"
         private const val WIFI_ONLY = "wifionly_"
         private const val SPEED = "speed"
+        private const val LAST = "last"
         private val KEYED = listOf(POSITION, DURATION, FINISHED, DOWNLOAD, WIFI_ONLY)
     }
 }

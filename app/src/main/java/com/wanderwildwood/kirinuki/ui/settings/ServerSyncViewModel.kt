@@ -89,7 +89,14 @@ class ServerSyncViewModel(
         }
     }
 
+    private val repository: com.wanderwildwood.kirinuki.archmodel.Repository by instance()
+
+    /**
+     * A second press while a sync runs does nothing: scheduling the same job again would stop
+     * the running sync and start it over.
+     */
     fun syncNow() {
+        if (repository.syncWorkerRunning.value) return
         viewModelScope.launch { runOnceRssSync(di = di, forceNetwork = true, triggeredByUser = true) }
     }
 

@@ -258,6 +258,8 @@ class Repository(
      * The episode after or before [itemId] in its show, in the order the show's list has them
      * and leaving out played ones when the list does. Null at either end.
      */
+    suspend fun episode(itemId: Long): FeedItemWithFeed? = feedItemStore.loadFeedItemWithFeed(itemId)
+
     suspend fun neighborEpisode(
         itemId: Long,
         next: Boolean,
