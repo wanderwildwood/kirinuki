@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.Flow
 import java.net.URL
 import java.time.Instant
 
+data class StoredEpisodeRow(val id: Long, val enclosureLink: String?, val link: String?)
+
 @Dao
 interface FeedItemDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
@@ -419,6 +421,30 @@ interface FeedItemDao {
     /** A podcast is a feed with any audio episode, as [PODCAST_FEED_IDS] has it. */
     @Query("SELECT EXISTS(SELECT 1 FROM feed_items WHERE feed_id IS :feedId AND enclosure_type LIKE 'audio/%')")
     fun isPodcastFeed(feedId: Long): Flow<Boolean>
+
+    /** The feeds with any audio episode, as [PODCAST_FEED_IDS] has it. */
+    @Query("SELECT DISTINCT feed_id FROM feed_items WHERE feed_id IS NOT NULL AND enclosure_type LIKE 'audio/%'")
+    suspend fun podcastFeedIds(): List<Long>
+
+    /** What a feed's stored episodes can be matched by (podcast tags read for feed-server feeds). */
+    @Query("SELECT id, enclosure_link AS enclosureLink, link FROM feed_items WHERE feed_id IS :feedId")
+    suspend fun storedEpisodes(feedId: Long): List<StoredEpisodeRow>
+
+    /** Sets only the addresses given; one that is null leaves what is stored, so nothing is ever wiped. */
+    @Query(
+        """
+        UPDATE feed_items SET chapters_url = coalesce(:chaptersUrl, chapters_url),
+            transcript_url = coalesce(:transcriptUrl, transcript_url),
+            transcript_type = CASE WHEN :transcriptUrl IS NULL THEN transcript_type ELSE :transcriptType END
+        WHERE id IS :id
+        """,
+    )
+    suspend fun setPodcastTags(
+        id: Long,
+        chaptersUrl: String?,
+        transcriptUrl: String?,
+        transcriptType: String?,
+    )
 
     @Query("UPDATE feed_items SET read_time = null WHERE id IS :id")
     suspend fun markAsUnread(id: Long)

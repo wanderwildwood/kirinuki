@@ -75,6 +75,7 @@ class RssLocalSync(
     private val application: Application by instance()
     private val serverSync: com.wanderwildwood.kirinuki.sync.ServerSync by instance()
     private val localFolderSync: LocalFolderSync by instance()
+    private val serverPodcastTags: com.wanderwildwood.kirinuki.sync.ServerPodcastTags by instance()
 
     suspend fun syncFeeds(
         feedId: Long = ID_UNSET,
@@ -149,6 +150,8 @@ class RssLocalSync(
                             failures.add(serverFailure)
                         }
                         val serverFeeds = serverSync.serverFeedIds()
+                        // Their podcast chapters and transcripts come from the feeds' own XML, in the background.
+                        if (serverFeeds.isNotEmpty()) serverPodcastTags.launchAfterSync(serverFeeds)
                         val allCandidates = feedsToSync(feedId, feedTag, staleTime = staleTime)
                         val candidates = allCandidates.filterNot { it.id in serverFeeds }
                         // The saved pages have no feed to fetch -- but they do want the
