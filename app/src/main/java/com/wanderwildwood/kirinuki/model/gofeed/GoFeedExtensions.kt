@@ -98,6 +98,9 @@ class KirinukiGoItem(
     val extensions: GoExtensions?
         get() = goItem.extensions
 
+    /** Chapters and transcript addresses, if the feed gives them (Podcasting 2.0). */
+    val podcastLinks: PodcastLinks by lazy { podcastLinksFrom(goItem.extensions) }
+
     val feedThumbnail: ThumbnailImage? by lazy {
         val thumbnailCandidates =
             sequence {

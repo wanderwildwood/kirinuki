@@ -6,6 +6,7 @@ import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.archmodel.Article
 import com.wanderwildwood.kirinuki.archmodel.Repository
 import com.wanderwildwood.kirinuki.archmodel.TextToDisplay
+import com.wanderwildwood.kirinuki.archmodel.isAudio
 import androidx.lifecycle.viewModelScope
 import com.wanderwildwood.kirinuki.base.DIAwareViewModel
 import com.wanderwildwood.kirinuki.blob.blobFile
@@ -17,7 +18,15 @@ import com.wanderwildwood.kirinuki.model.gemtext.GemtextParser
 import com.wanderwildwood.kirinuki.net.gemini.GeminiClient
 import com.wanderwildwood.kirinuki.net.gemini.GeminiResponse
 import com.wanderwildwood.kirinuki.net.isGeminiUrl
+import com.wanderwildwood.kirinuki.podcast.EpisodeExtras
+import com.wanderwildwood.kirinuki.podcast.EpisodeExtrasStore
 import com.wanderwildwood.kirinuki.podcast.EpisodeStore
+import com.wanderwildwood.kirinuki.db.room.FeedItemDao
+import okhttp3.OkHttpClient
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.coroutineScope
 import com.wanderwildwood.kirinuki.db.room.FeedItemIdWithLink
 import com.wanderwildwood.kirinuki.model.FullTextParser
 import com.wanderwildwood.kirinuki.model.html.LinearArticle
@@ -50,6 +59,63 @@ class ArticleViewModel(
     private val filePathProvider: FilePathProvider by instance()
     private val fullTextParser: FullTextParser by instance()
     private val geminiClient: GeminiClient by instance()
+    private val feedItemDao: FeedItemDao by instance()
+    private val httpClient: OkHttpClient by instance()
+
+    private val _episodeExtras = MutableStateFlow(EpisodeExtras())
+
+    /**
+     * The episode's chapters and transcript, when its feed gives them. The addresses are known
+     * at once; the files are fetched the moment the episode opens (or read from the phone, if
+     * kept), and whichever arrives first is shown first.
+     */
+    val episodeExtras: StateFlow<EpisodeExtras> = _episodeExtras
+
+    private fun extrasStore() = EpisodeExtrasStore(getApplication<Application>(), httpClient)
+
+    /** Fetch both now, to be kept beside a downloaded episode. Safe to call again: kept files are not fetched twice. */
+    fun keepExtras() {
+        val id = article.value?.takeIf { it.enclosure.isAudio }?.id ?: return
+        viewModelScope.launch {
+            val item = withContext(Dispatchers.IO) { feedItemDao.loadFeedItem(id) } ?: return@launch
+            val store = extrasStore()
+            item.chaptersUrl?.let { store.chapters(id, it) }
+            item.transcriptUrl?.let { store.transcript(id, it, item.transcriptType) }
+        }
+    }
+
+    private suspend fun loadExtras(itemId: Long?) {
+        _episodeExtras.value = EpisodeExtras()
+        if (itemId == null || itemId <= 0L) return
+        val item = withContext(Dispatchers.IO) { feedItemDao.loadFeedItem(itemId) } ?: return
+        val chaptersUrl = item.chaptersUrl
+        val transcriptUrl = item.transcriptUrl
+        if (chaptersUrl == null && transcriptUrl == null) return
+        _episodeExtras.value =
+            EpisodeExtras(
+                hasChapters = chaptersUrl != null,
+                chaptersLoading = chaptersUrl != null,
+                hasTranscript = transcriptUrl != null,
+                transcriptLoading = transcriptUrl != null,
+            )
+        val store = extrasStore()
+        coroutineScope {
+            if (chaptersUrl != null) {
+                launch {
+                    // Null is a fetch that failed: the button stays, and the window says so. A file
+                    // that was reached but has no chapters in it is not worth a button.
+                    val got = store.chapters(itemId, chaptersUrl)
+                    _episodeExtras.update { it.copy(chapters = got.orEmpty(), chaptersLoading = false, hasChapters = got == null || got.isNotEmpty()) }
+                }
+            }
+            if (transcriptUrl != null) {
+                launch {
+                    val got = store.transcript(itemId, transcriptUrl, item.transcriptType)
+                    _episodeExtras.update { it.copy(transcript = got.orEmpty(), transcriptLoading = false, hasTranscript = got == null || got.isNotEmpty()) }
+                }
+            }
+        }
+    }
 
     private val displayFullTextOverride = MutableStateFlow<Boolean?>(null)
     private val textToDisplay = MutableStateFlow(TextToDisplay.CONTENT)
@@ -88,6 +154,12 @@ class ArticleViewModel(
             .stateIn(viewModelScope, SharingStarted.Eagerly, ReadAloudPlayer.State())
 
     init {
+        viewModelScope.launch {
+            article
+                .map { a -> a?.takeIf { it.enclosure.isAudio }?.id }
+                .distinctUntilChanged()
+                .collectLatest { loadExtras(it) }
+        }
         viewModelScope.launch {
             combine(article, showingFullText) { article, fullText -> article to fullText }
                 .collect { (article, fullText) ->

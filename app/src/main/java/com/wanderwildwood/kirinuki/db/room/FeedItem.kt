@@ -8,6 +8,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.wanderwildwood.kirinuki.db.COL_AUTHOR
 import com.wanderwildwood.kirinuki.db.COL_BLOCK_TIME
+import com.wanderwildwood.kirinuki.db.COL_CHAPTERS_URL
 import com.wanderwildwood.kirinuki.db.COL_BOOKMARKED
 import com.wanderwildwood.kirinuki.db.COL_ENCLOSURELINK
 import com.wanderwildwood.kirinuki.db.COL_ENCLOSURE_TYPE
@@ -26,6 +27,8 @@ import com.wanderwildwood.kirinuki.db.COL_PRIMARYSORTTIME
 import com.wanderwildwood.kirinuki.db.COL_PUBDATE
 import com.wanderwildwood.kirinuki.db.COL_READ_TIME
 import com.wanderwildwood.kirinuki.db.COL_TITLE
+import com.wanderwildwood.kirinuki.db.COL_TRANSCRIPT_TYPE
+import com.wanderwildwood.kirinuki.db.COL_TRANSCRIPT_URL
 import com.wanderwildwood.kirinuki.db.COL_WORD_COUNT
 import com.wanderwildwood.kirinuki.db.COL_WORD_COUNT_FULL
 import com.wanderwildwood.kirinuki.db.FEED_ITEMS_TABLE_NAME
@@ -122,6 +125,9 @@ data class FeedItem
         @ColumnInfo(name = COL_WORD_COUNT) var wordCount: Int = 0,
         @ColumnInfo(name = COL_WORD_COUNT_FULL) var wordCountFull: Int = 0,
         @ColumnInfo(name = COL_BLOCK_TIME) var blockTime: Instant? = null,
+        @ColumnInfo(name = COL_CHAPTERS_URL) var chaptersUrl: String? = null,
+        @ColumnInfo(name = COL_TRANSCRIPT_URL) var transcriptUrl: String? = null,
+        @ColumnInfo(name = COL_TRANSCRIPT_TYPE) var transcriptType: String? = null,
     ) : FeedItemForFetching,
         FeedItemCursor {
         constructor() : this(id = ID_UNSET)
@@ -169,6 +175,12 @@ data class FeedItem
                     ?: entry.attachments?.firstOrNull()
             this.enclosureLink = firstEnclosure?.url
             this.enclosureType = firstEnclosure?.mime_type?.lowercase()
+
+            // Kept when the new copy leaves them out: a feed that drops the tag for a week, or a
+            // sync server that never carried it, does not take the addresses away.
+            this.chaptersUrl = entry.chaptersUrl ?: this.chaptersUrl
+            this.transcriptUrl = entry.transcriptUrl ?: this.transcriptUrl
+            this.transcriptType = if (entry.transcriptUrl != null) entry.transcriptType else this.transcriptType
 
             this.author = entry.author?.name ?: feed.author?.name
             this.link = entry.url

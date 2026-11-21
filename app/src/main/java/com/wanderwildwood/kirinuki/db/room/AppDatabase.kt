@@ -75,7 +75,7 @@ private const val LOG_TAG = "KIRINUKI_APPDB"
     views = [
         FeedsWithItemsForNavDrawer::class,
     ],
-    version = 41,
+    version = 42,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -163,6 +163,7 @@ fun getAllMigrations(di: DI) =
         MIGRATION_38_39,
         MIGRATION_39_40,
         MIGRATION_40_41,
+        MIGRATION_41_42,
     )
 
 /*
@@ -245,6 +246,19 @@ object MIGRATION_38_39 : Migration(38, 39) {
  * Sync with a feed server: which feeds and articles belong to a subscription there.
  * Nothing existing changes; both tables start empty and stay empty until sync is switched on.
  */
+/**
+ * Podcast chapters and transcripts: the addresses a feed gives for an episode, kept with it.
+ * Three nullable columns added to feed_items and nothing else touched: every existing row keeps
+ * all it had, with NULL for the new ones until its feed is next synced.
+ */
+object MIGRATION_41_42 : Migration(41, 42) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE feed_items ADD COLUMN chapters_url TEXT")
+        database.execSQL("ALTER TABLE feed_items ADD COLUMN transcript_url TEXT")
+        database.execSQL("ALTER TABLE feed_items ADD COLUMN transcript_type TEXT")
+    }
+}
+
 object MIGRATION_40_41 : Migration(40, 41) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(

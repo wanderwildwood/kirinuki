@@ -529,6 +529,13 @@
   <string name="episode_kept">On this phone</string>
   <string name="episode_remove_armed">Remove — tap again</string>
   <string name="episode_download_failed">Download failed</string>
+  <string name="episode_chapters">Chapters</string>
+  <string name="episode_transcript">Transcript</string>
+  <string name="episode_transcript_now">Go to now</string>
+  <string name="episode_extras_close">Close</string>
+  <string name="episode_extras_loading">Loading…</string>
+  <string name="episode_chapters_failed">The chapters could not be loaded.</string>
+  <string name="episode_transcript_failed">The transcript could not be loaded.</string>
   <string name="episode_failed">Could not reach it</string>
   <string name="read_aloud">Read aloud</string>
   <string name="read_aloud_close">Stop</string>

@@ -358,6 +358,9 @@ private fun KirinukiGoItem.asParsedArticle() =
         tags = categories,
         attachments = enclosures?.map { it.asParsedEnclosure() },
         hasFeedImage = thumbnail?.fromBody == false,
+        chaptersUrl = podcastLinks.chaptersUrl,
+        transcriptUrl = podcastLinks.transcriptUrl,
+        transcriptType = podcastLinks.transcriptType,
     )
 
 private fun GoEnclosure.asParsedEnclosure() =

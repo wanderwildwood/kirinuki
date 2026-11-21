@@ -43,7 +43,12 @@ import com.mudita.mmd.components.divider.HorizontalDividerMMD
 import com.mudita.mmd.components.text.TextMMD
 import com.wanderwildwood.kirinuki.R
 import com.wanderwildwood.kirinuki.podcast.DownloadState
+import com.wanderwildwood.kirinuki.podcast.EpisodeExtras
 import com.wanderwildwood.kirinuki.podcast.EpisodeService
+import com.wanderwildwood.kirinuki.podcast.chapterIndexAt
+import com.wanderwildwood.kirinuki.podcast.lineIndexAt
+import androidx.compose.runtime.derivedStateOf
+import com.wanderwildwood.kirinuki.ui.compose.theme.HouseButton
 import com.wanderwildwood.kirinuki.podcast.EpisodeStore
 import com.wanderwildwood.kirinuki.podcast.episodeMediaItem
 import com.wanderwildwood.kirinuki.ui.compose.theme.Icons
@@ -75,6 +80,8 @@ fun EpisodePanel(
     episode: Episode,
     onlyOnWifi: Boolean,
     modifier: Modifier = Modifier,
+    extras: EpisodeExtras = EpisodeExtras(),
+    onKeepExtras: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val store = remember(context) { EpisodeStore(context) }
@@ -98,6 +105,24 @@ fun EpisodePanel(
     var downloadBusy by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     var removeArmed by rememberArmedFlag()
+    var chaptersOpen by remember { mutableStateOf(false) }
+    var transcriptOpen by remember { mutableStateOf(false) }
+    // Which chapter and which line the sound is at. Derived, so what reads them is drawn again
+    // when the answer changes, not every second as the position does.
+    val chapterNow = remember(extras.chapters) { derivedStateOf { chapterIndexAt(extras.chapters, positionMs) } }
+    val lineNow = remember(extras.transcript) { derivedStateOf { lineIndexAt(extras.transcript, positionMs) } }
+
+    // A tap on a chapter or a line: on the playing episode it seeks; on one not loaded it sets
+    // the place Play will start from.
+    fun seekToMs(ms: Long) {
+        val c = controller
+        if (c != null && isThis) {
+            c.seekTo(ms)
+        } else {
+            store.savePosition(episode.itemId, ms, durationMs)
+        }
+        positionMs = ms
+    }
 
     LaunchedEffect(controller, episode.itemId) {
         while (true) {
@@ -147,6 +172,25 @@ fun EpisodePanel(
         c.setPlaybackSpeed(store.speed)
         c.prepare()
         c.play()
+    }
+
+    if (chaptersOpen) {
+        ChaptersWindow(
+            chapters = extras.chapters,
+            loading = extras.chaptersLoading,
+            nowIndex = { chapterNow.value },
+            onSeek = ::seekToMs,
+            onClose = { chaptersOpen = false },
+        )
+    }
+    if (transcriptOpen) {
+        TranscriptWindow(
+            lines = extras.transcript,
+            loading = extras.transcriptLoading,
+            nowIndex = { lineNow.value },
+            onSeek = ::seekToMs,
+            onClose = { transcriptOpen = false },
+        )
     }
 
     Column(modifier = modifier.fillMaxWidth()) {
@@ -208,6 +252,8 @@ fun EpisodePanel(
                                 DownloadState.None, DownloadState.Failed ->
                                     ask {
                                         if (store.download(episode.itemId, episode.url, episode.title, onlyOnWifi)) {
+                                            // Chapters and transcript go with the sound, so they open offline too.
+                                            onKeepExtras()
                                             store.downloadState(episode.itemId)
                                         } else {
                                             DownloadState.Failed
@@ -233,6 +279,30 @@ fun EpisodePanel(
                             }
                         },
                 )
+            }
+        }
+
+        if (extras.hasChapters || extras.hasTranscript) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                if (extras.hasChapters) {
+                    // The name of the chapter playing is the note under the label.
+                    HouseButton(
+                        label = stringResource(R.string.episode_chapters),
+                        note = extras.chapters.getOrNull(chapterNow.value)?.title,
+                        onClick = { chaptersOpen = true },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                if (extras.hasTranscript) {
+                    HouseButton(
+                        label = stringResource(R.string.episode_transcript),
+                        onClick = { transcriptOpen = true },
+                        modifier = Modifier.weight(1f),
+                    )
+                }
             }
         }
 

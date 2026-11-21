@@ -14,6 +14,7 @@ import com.wanderwildwood.kirinuki.blob.blobFullFile
 import com.wanderwildwood.kirinuki.db.room.FeedItemDao
 import com.wanderwildwood.kirinuki.model.DownloadedArticles
 import com.wanderwildwood.kirinuki.model.syncMutex
+import com.wanderwildwood.kirinuki.podcast.EpisodeExtrasStore
 import com.wanderwildwood.kirinuki.podcast.EpisodeStore
 import com.wanderwildwood.kirinuki.util.FilePathProvider
 import com.wanderwildwood.kirinuki.util.logDebug
@@ -67,7 +68,10 @@ class CleanupOrphanedFilesJob(
             // Podcast episodes: the place and the kept sound of any whose item is gone.
             val episodes =
                 withContext(Dispatchers.IO) {
-                    EpisodeStore(context).forgetAllBut(validFeedItemIds.toSet())
+                    val valid = validFeedItemIds.toSet()
+                    // Kept chapters and transcripts go with their episode.
+                    EpisodeExtrasStore.forgetAllBut(context, valid)
+                    EpisodeStore(context).forgetAllBut(valid)
                 }
             Log.i(LOG_TAG, "Removed $episodes downloaded episodes no longer in any feed")
 

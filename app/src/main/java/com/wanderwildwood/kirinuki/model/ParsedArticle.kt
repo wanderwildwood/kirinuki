@@ -15,4 +15,7 @@ data class ParsedArticle(
     val tags: List<String>? = null,
     val attachments: List<ParsedEnclosure>? = null,
     val hasFeedImage: Boolean = false,
+    val chaptersUrl: String? = null,
+    val transcriptUrl: String? = null,
+    val transcriptType: String? = null,
 )

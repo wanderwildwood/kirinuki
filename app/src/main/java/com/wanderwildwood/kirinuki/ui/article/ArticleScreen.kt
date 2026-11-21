@@ -86,6 +86,7 @@ fun ArticleScreen(
     val textScale by viewModel.textScale.collectAsStateWithLifecycle()
     val openTitleInBrowser by viewModel.openTitleInBrowser.collectAsStateWithLifecycle()
     val onlyOnWifi by viewModel.onlyOnWifi.collectAsStateWithLifecycle()
+    val episodeExtras by viewModel.episodeExtras.collectAsStateWithLifecycle()
     var scaleOpen by remember { mutableStateOf(false) }
     var qrOpen by remember { mutableStateOf(false) }
     val lineFence = rememberLineFence(listState)
@@ -362,6 +363,8 @@ fun ArticleScreen(
                             show = current.feedDisplayTitle,
                         ),
                     onlyOnWifi = onlyOnWifi,
+                    extras = episodeExtras,
+                    onKeepExtras = viewModel::keepExtras,
                 )
             }
         }
