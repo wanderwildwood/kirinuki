@@ -292,6 +292,7 @@ fun EpisodePanel(
                     HouseButton(
                         label = stringResource(R.string.episode_chapters),
                         note = extras.chapters.getOrNull(chapterNow.value)?.title,
+                        noteMaxLines = 1,
                         onClick = { chaptersOpen = true },
                         modifier = Modifier.weight(1f),
                     )

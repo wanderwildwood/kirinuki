@@ -256,6 +256,14 @@ object MIGRATION_41_42 : Migration(41, 42) {
         database.execSQL("ALTER TABLE feed_items ADD COLUMN chapters_url TEXT")
         database.execSQL("ALTER TABLE feed_items ADD COLUMN transcript_url TEXT")
         database.execSQL("ALTER TABLE feed_items ADD COLUMN transcript_type TEXT")
+        // Make the first sync after the update read every feed in full, so the items already
+        // stored pick up their chapters and transcript addresses (an update rewrites the whole
+        // stored item, so the read state, the dates and the texts already there are kept).
+        // What actually holds a feed back is last_sync: a feed synced less than the minimum
+        // age ago is not fetched (RssLocalSync, FeedDao.syncLoadFeeds*IfStale). response_hash
+        // and when_modified are not read by anything now, and are zeroed too, as 8-to-9 did.
+        // retry_after is left alone: a server that said wait is still waited for.
+        database.execSQL("UPDATE feeds SET last_sync = 0, response_hash = 0, when_modified = 0")
     }
 }
 

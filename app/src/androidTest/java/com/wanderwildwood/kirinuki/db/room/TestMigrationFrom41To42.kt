@@ -35,7 +35,7 @@ class TestMigrationFrom41To42 {
             oldDB.execSQL(
                 """
                 INSERT INTO feeds(id, title, url, custom_title, tag, notify, image_url, last_sync, response_hash, fulltext_by_default, open_articles_with, alternate_id, currently_syncing, when_modified, site_fetched, skip_duplicates, retry_after, summarize_on_open, fetch_og_images, block_rules, allow_rules)
-                VALUES(1, 'feed', 'https://example.com/feed.xml', 'Custom', 'News', 0, null, 0, 666, 0, '', 0, 0, 0, 0, 0, 0, 0, 0, 'blocked', '')
+                VALUES(1, 'feed', 'https://example.com/feed.xml', 'Custom', 'News', 0, null, 123456, 666, 0, '', 0, 0, 777, 0, 0, 0, 0, 0, 'blocked', '')
                 """.trimIndent(),
             )
             oldDB.execSQL(
@@ -48,6 +48,14 @@ class TestMigrationFrom41To42 {
 
         val db = testHelper.runMigrationsAndValidate(dbName, TO_VERSION, true, MIGRATION_41_42)
 
+        // The first sync after the update reads every feed again.
+        db.query("SELECT last_sync, response_hash, when_modified, custom_title FROM feeds WHERE id = 1").use {
+            it.moveToFirst()
+            assertEquals(0L, it.getLong(0))
+            assertEquals(0L, it.getLong(1))
+            assertEquals(0L, it.getLong(2))
+            assertEquals("Custom", it.getString(3))
+        }
         db.query("SELECT title, feed_id, bookmarked, read_time, chapters_url, transcript_url, transcript_type FROM feed_items WHERE id = 7").use {
             assertEquals(1, it.count)
             it.moveToFirst()

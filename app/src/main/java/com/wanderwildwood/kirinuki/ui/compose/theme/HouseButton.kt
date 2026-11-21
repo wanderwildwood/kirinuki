@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.mudita.mmd.components.buttons.ButtonMMD
@@ -55,7 +56,7 @@ internal fun validChoice(selected: Int, count: Int): Int = if (selected in 0 unt
 /**
  * One press. [on] is filled black with white words (a chosen choice, a switch that is on, the
  * primary press); off is white with a black rim. At least 48 dp tall and wide whatever the words.
- * [note] is a second, smaller line under the label. [maxLines] lets a long label (a message to
+ * [note] is a second, smaller line under the label. [noteMaxLines] cuts the note with an ellipsis after that many lines. [maxLines] lets a long label (a message to
  * dismiss, a word you typed yourself) wrap instead of being cut; the usual label is one line.
  */
 @Composable
@@ -68,6 +69,7 @@ fun HouseButton(
     compact: Boolean = false,
     note: String? = null,
     maxLines: Int = 1,
+    noteMaxLines: Int = 2,
 ) {
     val m = modifier.heightIn(min = HOUSE_MIN).widthIn(min = HOUSE_MIN)
     val pad = PaddingValues(horizontal = houseSide(compact), vertical = 8.dp)
@@ -77,7 +79,7 @@ fun HouseButton(
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 TextMMD(text = label, style = MaterialTheme.typography.bodySmall, maxLines = maxLines, textAlign = TextAlign.Center)
-                TextMMD(text = note, style = MaterialTheme.typography.labelSmall, maxLines = 2, textAlign = TextAlign.Center)
+                TextMMD(text = note, style = MaterialTheme.typography.labelSmall, maxLines = noteMaxLines, overflow = TextOverflow.Ellipsis, textAlign = TextAlign.Center)
             }
         }
     }
