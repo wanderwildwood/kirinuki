@@ -1,5 +1,6 @@
 package com.wanderwildwood.kirinuki.ui
 
+import com.wanderwildwood.kirinuki.archmodel.isAudio
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
@@ -87,6 +88,14 @@ class MainActivity : DIAwareComponentActivity() {
      */
     private val readerOpen = mutableStateOf(false)
 
+    /**
+     * Whether the article in front is a podcast episode (it has a sound, so the player is under
+     * the text). The volume keys are the listener's there, as the system's: they turn the sound
+     * up and down, and only a text article takes them to turn its pages. Set by the article
+     * screen's composition, like [readerOpen].
+     */
+    private val episodeOpen = mutableStateOf(false)
+
     private val notificationsWorker: NotificationsWorker by instance()
     private val mainActivityViewModel: MainActivityViewModel by instance(arg = this)
     private val settingsStore: SettingsStore by instance()
@@ -133,7 +142,7 @@ class MainActivity : DIAwareComponentActivity() {
         keyCode: Int,
         event: KeyEvent?,
     ): Boolean {
-        if (readerOpen.value) {
+        if (readerOpen.value && !episodeOpen.value) {
             when (keyCode) {
                 KeyEvent.KEYCODE_VOLUME_UP -> {
                     mainActivityViewModel.emitScrollCommand(ScrollDirection.UP)
@@ -159,7 +168,7 @@ class MainActivity : DIAwareComponentActivity() {
         keyCode: Int,
         event: KeyEvent?,
     ): Boolean {
-        if (readerOpen.value &&
+        if (readerOpen.value && !episodeOpen.value &&
             (keyCode == KeyEvent.KEYCODE_VOLUME_UP || keyCode == KeyEvent.KEYCODE_VOLUME_DOWN)
         ) {
             return true
@@ -365,6 +374,13 @@ class MainActivity : DIAwareComponentActivity() {
             }
             composable(Route.ARTICLE) { entry ->
                 val viewModel: ArticleViewModel = entry.diAwareViewModel()
+                // An episode's volume keys are the system's, so the sound can be turned up.
+                val openArticle by viewModel.article.collectAsStateWithLifecycle()
+                val isEpisode = openArticle?.enclosure?.isAudio == true
+                DisposableEffect(isEpisode) {
+                    episodeOpen.value = isEpisode
+                    onDispose { episodeOpen.value = false }
+                }
                 // This screen's list is the one the volume keys page while it is up. The
                 // identity check on the way out is for going from one capsule to the next:
                 // the screen arriving may take the keys before the screen leaving gives
