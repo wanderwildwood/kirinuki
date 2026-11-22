@@ -30,8 +30,8 @@ android {
 
     defaultConfig {
         applicationId = "com.wanderwildwood.kirinuki"
-        versionCode = 72
-        versionName = "0.6.21"
+        versionCode = 73
+        versionName = "0.6.22"
         // TLS1.3 is enabled in Android 10 (29) and above
         minSdk = 29
         targetSdk =
