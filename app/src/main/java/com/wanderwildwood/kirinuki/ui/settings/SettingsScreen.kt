@@ -284,20 +284,13 @@ fun SettingsScreen(
             }
             // Last, because forgetting is the one thing on this screen that cannot be taken
             // back, and it is only ever wanted after a capsule has been refused.
-            item {
+            // The heading is over a list, so it waits for the first pinned certificate.
+            if (capsuleCertificates.isNotEmpty()) item {
                 TextMMD(
                     text = stringResource(R.string.capsule_certificates),
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
                 )
-            }
-            if (capsuleCertificates.isEmpty()) {
-                item {
-                    TextMMD(
-                        text = stringResource(R.string.capsule_certificates_none),
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                    )
-                }
             }
             capsuleCertificates.forEach { known ->
                 item(key = known.host) {

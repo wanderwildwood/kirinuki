@@ -413,7 +413,6 @@
   <string name="gemini_refused">The capsule refused, with code %1$d.</string>
   <!-- Settings: the certificates remembered for Gemini capsules, one row per capsule -->
   <string name="capsule_certificates">Capsule certificates</string>
-  <string name="capsule_certificates_none">None remembered yet</string>
   <!-- Under a capsule's name; %1$s is the date its remembered certificate expires -->
   <string name="capsule_certificate_until">Remembered until %1$s</string>
   <string name="capsule_certificate_forget_armed">Forget it — tap again. The next visit trusts what it is shown.</string>
