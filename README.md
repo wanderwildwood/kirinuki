@@ -28,6 +28,8 @@ Three screens. The feeds, what is in one, and the thing itself.
   The app then also talks to that one server, sending your login, your feeds and what you have
   read or starred. A plain http address is taken only for a home server, and used only on
   Wi-Fi or a VPN, never on mobile data.
+  For podcasts that come through the server, the app also reads each podcast's own feed from
+  its site once a day, for the chapters and transcripts a feed server does not pass on.
   With [Home](https://github.com/wanderwildwood/iori) on the phone and signed in to Nextcloud,
   **Use the phone's Nextcloud account** there syncs with that Nextcloud's News app, with no
   password typed here. Home keeps the password; Feeds asks Home for it before each sync, and
