@@ -11,7 +11,6 @@ import com.wanderwildwood.kirinuki.model.FeedParser
 import com.wanderwildwood.kirinuki.model.ParsedArticle
 import com.wanderwildwood.kirinuki.model.getResponse
 import com.wanderwildwood.kirinuki.util.currentlyUnmetered
-import com.wanderwildwood.kirinuki.util.logDebug
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -120,6 +119,9 @@ class ServerPodcastTags(
         val now = System.currentTimeMillis()
         val podcasts = itemDao.podcastFeedIds().toSet()
         val due = serverFeedIds.filter { it in podcasts && isDue(prefs.getLong(key(it), 0L), now) }
+        // Counts only, and in release builds too: this pass has nothing to show on screen when it
+        // finds nothing, so the log is the one place that says whether it ran.
+        Log.i(LOG_TAG, "Pass: ${serverFeedIds.size} server feeds, ${serverFeedIds.count { it in podcasts }} with audio, ${due.size} due")
         for (feedId in due) {
             try {
                 val feed = feedDao.getFeed(feedId) ?: continue
@@ -136,7 +138,7 @@ class ServerPodcastTags(
                 withContext(Dispatchers.IO) {
                     for (u in updates) itemDao.setPodcastTags(u.itemId, u.chaptersUrl, u.transcriptUrl, u.transcriptType)
                 }
-                logDebug(LOG_TAG, "Feed $feedId: ${updates.size} episodes got chapter or transcript addresses")
+                Log.i(LOG_TAG, "Feed $feedId: ${parsed.items.orEmpty().size} in the feed, ${updates.size} stored episodes got chapter or transcript addresses")
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Throwable) {
